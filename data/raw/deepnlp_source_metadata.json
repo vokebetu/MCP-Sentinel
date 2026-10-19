@@ -1,0 +1,14 @@
+{
+  "dataset": "DeepNLP/mcp-servers",
+  "source_url": "https://huggingface.co/datasets/DeepNLP/mcp-servers",
+  "revision": "f1bb6287a9e200f8cdcc0079718573515a74754e",
+  "last_modified": "2025-04-21T02:27:43.000Z",
+  "downloaded_at": "2026-10-18T06:25:46Z",
+  "files": [
+    {
+      "file_name": "data_agent_mcp-server_202503.json",
+      "bytes": 102820,
+      "sha256": "7afdae8d397d9141bd1169acd593cefa1eacdd2a9ba3a2f95241bede3dad4adb"
+    }
+  ]
+}

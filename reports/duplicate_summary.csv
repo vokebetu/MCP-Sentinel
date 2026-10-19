@@ -1,0 +1,23 @@
+dataset,check,count,description
+deepnlp,exact_duplicate_records,0,Raw records identical to an earlier record in every source field
+deepnlp,duplicate_publisher_id,0,Records repeating an earlier publisher_id
+deepnlp,duplicate_server_name,0,Records repeating an earlier content_name exactly
+deepnlp,duplicate_server_name_case_insensitive,0,Records repeating an earlier content_name after trimming and lowercasing
+deepnlp,duplicate_website_raw,0,Records repeating an earlier website string exactly
+deepnlp,duplicate_website_normalized,0,Records repeating an earlier website after URL normalization
+deepnlp,duplicate_server_id,0,Staged records repeating a server_id (must be 0)
+deepnlp,duplicate_repository_location,0,Servers pointing to the same repository and the same subdirectory
+deepnlp,servers_sharing_a_repository,19,"Servers whose GitHub repository is shared with at least one other server (monorepo pattern, not duplicates)"
+deepnlp,repositories_shared_by_multiple_servers,1,Distinct repositories referenced by more than one server
+deepnlp,possible_semantic_duplicate_records,4,Records flagged because their normalized name or normalized website matches another record
+deepnlp,possible_semantic_duplicate_groups,2,Distinct groups of possible semantic duplicates
+official_mcp_registry,duplicate_registry_name,0,"Staged registry entries repeating a server name (latest versions only, must be 0)"
+official_mcp_registry,entries_sharing_repository_location,5517,Registry entries that point to the same repository and subfolder as another entry
+mcpcorpus,exact_duplicate_records,2,Raw corpus records identical to an earlier record
+mcpcorpus,duplicate_id,2,Raw corpus records repeating an earlier id
+mcpcorpus,records_sharing_repository_location,1007,Corpus records that point to the same repository and subdirectory as another record (listed more than once)
+mcpcorpus,repository_locations_listed_more_than_once,471,Distinct repository locations that appear in more than one corpus record
+cross_source,deepnlp_servers_in_mcp_registry,18,DeepNLP servers matched to exactly one MCP Registry entry by repository and subfolder
+cross_source,deepnlp_servers_with_multiple_registry_matches,3,"DeepNLP servers matched to several MCP Registry entries (ambiguous, not used for package identity)"
+cross_source,deepnlp_servers_in_mcpcorpus,166,DeepNLP servers matched to exactly one MCPCorpus record
+cross_source,deepnlp_servers_with_multiple_corpus_matches,27,DeepNLP servers matched to several MCPCorpus records (the corpus lists the same repository more than once)

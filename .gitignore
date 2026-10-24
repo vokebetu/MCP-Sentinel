@@ -1,7 +1,13 @@
 .env
+.env.*
+!.env.example
+
 .venv/
 __pycache__/
-.ipynb_checkpoints/
 .pytest_cache/
-data/cache/
-data/limit_runs/
+
+artifacts/
+data/bundle/
+research/
+*.dump
+*.log

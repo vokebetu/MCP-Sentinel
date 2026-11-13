@@ -80,7 +80,7 @@ def test_profile_shows_findings_and_coverage(page):
 
 def test_unassessed_server_is_not_shown_as_safe(page):
     page.goto(f"{FRONTEND_URL}/profile")
-    choose_server(page, "Find a server", "ac.inference.sh/mcp")
+    choose_server(page, "Find a server", "ai.agentplaybooks/agentplaybooks")
     wait_text(page, "No vulnerability lookup has been recorded")
     page.get_by_role("tab", name="Observed concerns").click()
     wait_text(page, "unknown, not zero")
@@ -89,7 +89,31 @@ def test_unassessed_server_is_not_shown_as_safe(page):
 def test_compare_two_servers(page):
     page.goto(f"{FRONTEND_URL}/compare")
     choose_server(page, "First server", "praisonai")
-    choose_server(page, "Second server", "ac.inference.sh/mcp")
+    choose_server(page, "Second server", "ai.agentplaybooks/agentplaybooks")
     wait_text(page, "different assessment coverage")
     wait_text(page, "unknown rather than zero")
     shot(page, "07_compare")
+
+
+@pytest.mark.skipif(os.environ.get("RUN_LIVE_AI_TESTS") != "1", reason="set RUN_LIVE_AI_TESTS=1 to allow live model requests")
+def test_ai_assistant_answers_with_sources_and_clears_history(page):
+    page.goto(f"{FRONTEND_URL}/ai")
+    wait_text(page, "searchable evidence chunks")
+    question = page.get_by_placeholder("Ask about a server, vulnerability, or missing assessment")
+    question.fill("How many direct advisories are recorded for praisonai?")
+    question.press("Enter")
+    wait_text(page, "Evidence sources", timeout=110000)
+    assert "80" in page.get_by_test_id("stChatMessage").last.inner_text()
+    if SCREENSHOTS:
+        page.screenshot(path=str(Path(SCREENSHOTS) / "08_ai_answer.png"), full_page=False)
+    page.get_by_text("Evidence sources", exact=False).click()
+    wait_text(page, "Original data source")
+    shot(page, "08_ai_answer_sources")
+    question.fill("Do those findings prove which dependencies are installed?")
+    question.press("Enter")
+    page.get_by_test_id("stChatMessage").nth(3).wait_for(timeout=110000)
+    wait_text(page, "input /", timeout=110000)
+    shot(page, "09_ai_followup")
+    page.get_by_role("button", name="Clear conversation").click()
+    page.get_by_test_id("stChatMessage").first.wait_for(state="detached")
+    assert page.get_by_test_id("stChatMessage").count() == 0

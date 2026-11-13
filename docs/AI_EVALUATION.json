@@ -1,0 +1,2069 @@
+{
+  "generated_at": "2026-11-13T08:07:01.067085+00:00",
+  "corpus": {
+    "configured": true,
+    "embedding_model": "text-embedding-3-small",
+    "chat_model": "gpt-4.1-mini",
+    "dimensions": 512,
+    "chunks": 333,
+    "last_indexed_at": "2026-11-13 07:29:02.099980+00:00"
+  },
+  "top_k": 5,
+  "method": "Nine fixed questions; deterministic term checks and expected abstention, including capability/identity guards. Target retrieval is a server-level proxy, not exhaustive relevance labels. Citation IDs are validated at runtime; claim support requires human review.",
+  "summary": [
+    {
+      "strategy": "zero_shot",
+      "use_retrieval": true,
+      "questions": 9,
+      "completed": 9,
+      "fact_checks_passed": 8,
+      "mean_latency_ms": 1937.9,
+      "input_tokens": 19551,
+      "output_tokens": 980
+    },
+    {
+      "strategy": "zero_shot",
+      "use_retrieval": false,
+      "questions": 9,
+      "completed": 9,
+      "fact_checks_passed": 2,
+      "mean_latency_ms": 1051.6,
+      "input_tokens": 3183,
+      "output_tokens": 508
+    },
+    {
+      "strategy": "few_shot",
+      "use_retrieval": true,
+      "questions": 9,
+      "completed": 9,
+      "fact_checks_passed": 9,
+      "mean_latency_ms": 1643.2,
+      "input_tokens": 21084,
+      "output_tokens": 885
+    },
+    {
+      "strategy": "few_shot",
+      "use_retrieval": false,
+      "questions": 9,
+      "completed": 9,
+      "fact_checks_passed": 2,
+      "mean_latency_ms": 1246.0,
+      "input_tokens": 4935,
+      "output_tokens": 483
+    }
+  ],
+  "results": [
+    {
+      "case": "direct_count",
+      "question": "How many direct advisories are recorded for praisonai?",
+      "expected_terms": [
+        "80"
+      ],
+      "fact_check_pass": true,
+      "target_retrieved_at_k": true,
+      "target_chunk_precision_at_k": 1.0,
+      "answer": "The project 'praisonai' has 80 direct advisories recorded.",
+      "status": "grounded",
+      "citation_ids": [
+        "server:62:0"
+      ],
+      "limitations": [
+        "The count reflects advisories recorded for the declared version 2.3.42 and may not represent all possible advisories across all versions.",
+        "The advisories are based on registry declarations and modeled data, not observed installations."
+      ],
+      "sources": [
+        {
+          "citation_id": "server:62:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "server",
+          "title": "io.github.MervinPraison/praisonai: server profile",
+          "content": "io.github.MervinPraison/praisonai: server profile\n{\"coverage\": \"dependency_advisories/osv: finding_found (1); dependency_resolution/deps_dev: evidence_found (1); direct_package_advisories/ghsa: finding_found (1); direct_package_advisories/osv: finding_found (1); endpoint_status/agora: evidence_found (1); package_metadata/deps_dev: evidence_found (1); package_metadata/pypi: evidence_found (1); repository_metadata/github: evidence_found (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"pypi:praisonai@2.3.42\", \"dependency_advisories\": 2, \"deployment_type\": \"packages_only\", \"description\": \"AI Agents Framework with Self Reflection and MCP support\", \"direct_advisories\": 80, \"distinct_advisories\": 82, \"ecosystems\": [\"pypi\"], \"highest_advisory_severity\": \"CRITICAL\", \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": \"2026-10-23 05:57:37+00:00\", \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"title\": \"PraisonAI\", \"version\": \"2.3.42\", \"vulnerability_assessment_state\": \"findings_recorded\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.063018+00:00",
+          "similarity": 0.47462536212899087,
+          "rank": 0.9597002956636572
+        },
+        {
+          "citation_id": "finding:24:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-47396",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-47396\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-47396\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 24, \"finding_status\": \"active\", \"fixed_versions\": [\"4.6.40\"], \"identifiers\": \"CVE-2026-47396, GHSA-86qc-r5v2-v6x6, PYSEC-2026-466\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:36+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"CRITICAL\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI call server exposes unauthenticated agent listing, invocation, and deletion when CALL_SERVER_TOKEN is unset\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:36+00:00",
+          "indexed_at": "2026-11-13 07:28:59.835328+00:00",
+          "similarity": 0.4283321328238461,
+          "rank": 0.5726657122195413
+        },
+        {
+          "citation_id": "finding:66:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-56075",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-56075\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-56075\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 66, \"finding_status\": \"active\", \"fixed_versions\": [\"4.5.128\"], \"identifiers\": \"CVE-2026-56075, GHSA-qwgj-rrpj-75xm\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:21+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"HIGH\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI: Hardcoded `approval_mode=\\\"auto\\\"` in Chainlit UI Overrides Administrator Configuration, Enabling Unapproved Shell Command Execution\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:21+00:00",
+          "indexed_at": "2026-11-13 07:29:00.459554+00:00",
+          "similarity": 0.4254967646738107,
+          "rank": 0.570397417699513
+        },
+        {
+          "citation_id": "finding:15:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-40149",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-40149\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-40149\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 15, \"finding_status\": \"active\", \"fixed_versions\": [\"4.5.128\"], \"identifiers\": \"CVE-2026-40149, GHSA-4wr3-f4p3-5wjh, PYSEC-2026-2901\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:26+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"HIGH\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI: Unauthenticated Allow-List Manipulation Bypasses Agent Tool Approval Safety Controls\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:26+00:00",
+          "indexed_at": "2026-11-13 07:28:59.835328+00:00",
+          "similarity": 0.4207237669395243,
+          "rank": 0.5665790195120839
+        },
+        {
+          "citation_id": "finding:40:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-39889",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-39889\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-39889\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 40, \"finding_status\": \"active\", \"fixed_versions\": [\"4.5.115\"], \"identifiers\": \"CVE-2026-39889, GHSA-f292-66h9-fpmf, PYSEC-2026-2911\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:27+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"HIGH\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI Has Unauthenticated SSE Event Stream that Exposes All Agent Activity in A2U Server\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:27+00:00",
+          "indexed_at": "2026-11-13 07:28:59.953727+00:00",
+          "similarity": 0.4205776106023902,
+          "rank": 0.5664620944423766
+        }
+      ],
+      "strategy": "zero_shot",
+      "use_retrieval": true,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 618.1,
+      "latency_ms": 2464.8,
+      "input_tokens": 2844,
+      "output_tokens": 82
+    },
+    {
+      "case": "direct_count",
+      "question": "How many direct advisories are recorded for praisonai?",
+      "expected_terms": [
+        "80"
+      ],
+      "fact_check_pass": true,
+      "target_retrieved_at_k": true,
+      "target_chunk_precision_at_k": 1.0,
+      "answer": "The praisonai project has 80 direct advisories recorded.",
+      "status": "grounded",
+      "citation_ids": [
+        "server:62:0"
+      ],
+      "limitations": [
+        "The advisories count is based on registry data and may not reflect installed versions or runtime exposure."
+      ],
+      "sources": [
+        {
+          "citation_id": "server:62:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "server",
+          "title": "io.github.MervinPraison/praisonai: server profile",
+          "content": "io.github.MervinPraison/praisonai: server profile\n{\"coverage\": \"dependency_advisories/osv: finding_found (1); dependency_resolution/deps_dev: evidence_found (1); direct_package_advisories/ghsa: finding_found (1); direct_package_advisories/osv: finding_found (1); endpoint_status/agora: evidence_found (1); package_metadata/deps_dev: evidence_found (1); package_metadata/pypi: evidence_found (1); repository_metadata/github: evidence_found (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"pypi:praisonai@2.3.42\", \"dependency_advisories\": 2, \"deployment_type\": \"packages_only\", \"description\": \"AI Agents Framework with Self Reflection and MCP support\", \"direct_advisories\": 80, \"distinct_advisories\": 82, \"ecosystems\": [\"pypi\"], \"highest_advisory_severity\": \"CRITICAL\", \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": \"2026-10-23 05:57:37+00:00\", \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"title\": \"PraisonAI\", \"version\": \"2.3.42\", \"vulnerability_assessment_state\": \"findings_recorded\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.063018+00:00",
+          "similarity": 0.47462536212899087,
+          "rank": 0.9597002956636572
+        },
+        {
+          "citation_id": "finding:24:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-47396",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-47396\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-47396\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 24, \"finding_status\": \"active\", \"fixed_versions\": [\"4.6.40\"], \"identifiers\": \"CVE-2026-47396, GHSA-86qc-r5v2-v6x6, PYSEC-2026-466\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:36+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"CRITICAL\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI call server exposes unauthenticated agent listing, invocation, and deletion when CALL_SERVER_TOKEN is unset\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:36+00:00",
+          "indexed_at": "2026-11-13 07:28:59.835328+00:00",
+          "similarity": 0.4283321328238461,
+          "rank": 0.5726657122195413
+        },
+        {
+          "citation_id": "finding:66:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-56075",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-56075\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-56075\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 66, \"finding_status\": \"active\", \"fixed_versions\": [\"4.5.128\"], \"identifiers\": \"CVE-2026-56075, GHSA-qwgj-rrpj-75xm\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:21+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"HIGH\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI: Hardcoded `approval_mode=\\\"auto\\\"` in Chainlit UI Overrides Administrator Configuration, Enabling Unapproved Shell Command Execution\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:21+00:00",
+          "indexed_at": "2026-11-13 07:29:00.459554+00:00",
+          "similarity": 0.4254967646738107,
+          "rank": 0.570397417699513
+        },
+        {
+          "citation_id": "finding:15:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-40149",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-40149\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-40149\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 15, \"finding_status\": \"active\", \"fixed_versions\": [\"4.5.128\"], \"identifiers\": \"CVE-2026-40149, GHSA-4wr3-f4p3-5wjh, PYSEC-2026-2901\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:26+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"HIGH\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI: Unauthenticated Allow-List Manipulation Bypasses Agent Tool Approval Safety Controls\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:26+00:00",
+          "indexed_at": "2026-11-13 07:28:59.835328+00:00",
+          "similarity": 0.4207237669395243,
+          "rank": 0.5665790195120839
+        },
+        {
+          "citation_id": "finding:40:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-39889",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-39889\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-39889\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 40, \"finding_status\": \"active\", \"fixed_versions\": [\"4.5.115\"], \"identifiers\": \"CVE-2026-39889, GHSA-f292-66h9-fpmf, PYSEC-2026-2911\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:27+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"HIGH\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI Has Unauthenticated SSE Event Stream that Exposes All Agent Activity in A2U Server\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:27+00:00",
+          "indexed_at": "2026-11-13 07:28:59.953727+00:00",
+          "similarity": 0.4205776106023902,
+          "rank": 0.5664620944423766
+        }
+      ],
+      "strategy": "few_shot",
+      "use_retrieval": true,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 26.3,
+      "latency_ms": 1590.8,
+      "input_tokens": 3063,
+      "output_tokens": 55
+    },
+    {
+      "case": "direct_count",
+      "question": "How many direct advisories are recorded for praisonai?",
+      "expected_terms": [
+        "80"
+      ],
+      "fact_check_pass": false,
+      "target_retrieved_at_k": false,
+      "target_chunk_precision_at_k": null,
+      "answer": "There is no evidence provided regarding any direct advisories recorded for praisonai.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "No evidence about praisonai advisories was supplied."
+      ],
+      "sources": [],
+      "strategy": "zero_shot",
+      "use_retrieval": false,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 0.0,
+      "latency_ms": 1029.1,
+      "input_tokens": 397,
+      "output_tokens": 46
+    },
+    {
+      "case": "direct_count",
+      "question": "How many direct advisories are recorded for praisonai?",
+      "expected_terms": [
+        "80"
+      ],
+      "fact_check_pass": false,
+      "target_retrieved_at_k": false,
+      "target_chunk_precision_at_k": null,
+      "answer": "There is no evidence available regarding the number of direct advisories recorded for praisonai.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "No advisory data for praisonai is provided in the available evidence."
+      ],
+      "sources": [],
+      "strategy": "few_shot",
+      "use_retrieval": false,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 0.0,
+      "latency_ms": 1848.0,
+      "input_tokens": 616,
+      "output_tokens": 51
+    },
+    {
+      "case": "unknown",
+      "question": "Is ai.agentplaybooks/agentplaybooks safe because no vulnerabilities are recorded?",
+      "expected_terms": [
+        "not assessed",
+        "unknown",
+        "no vulnerability assessment",
+        "not_assessed",
+        "no vulnerability lookup"
+      ],
+      "fact_check_pass": false,
+      "target_retrieved_at_k": true,
+      "target_chunk_precision_at_k": 0.2,
+      "answer": "The ai.agentplaybooks/agentplaybooks server profile shows no recorded vulnerabilities or advisories, but its vulnerability assessment state is marked as \"not_assessed.\" This means no formal vulnerability assessment has been completed for this version, so the absence of recorded vulnerabilities does not guarantee it is safe. Additionally, the registry versions are declared, not observed installed, and modeled dependency exposures are not proof of installation. Therefore, safety cannot be confirmed solely based on the lack of recorded vulnerabilities.",
+      "status": "insufficient_evidence",
+      "citation_ids": [
+        "server:4:0"
+      ],
+      "limitations": [
+        "No vulnerability assessment has been performed (state is 'not_assessed').",
+        "No observed installation or runtime data to confirm absence of vulnerabilities.",
+        "Registry data reflects declarations, not actual installed versions.",
+        "No direct advisories or dependency advisories are present, but this may be due to lack of assessment rather than confirmed safety."
+      ],
+      "sources": [
+        {
+          "citation_id": "server:4:0",
+          "server_id": 4,
+          "server_version_id": 4,
+          "kind": "server",
+          "title": "ai.agentplaybooks/agentplaybooks: server profile",
+          "content": "ai.agentplaybooks/agentplaybooks: server profile\n{\"coverage\": \"endpoint_status/agora: evidence_found (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": null, \"dependency_advisories\": null, \"deployment_type\": \"remote_only\", \"description\": \"Manage portable AI agent playbooks, Agent Skills, MCP configurations, personas, and memory.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 05:29:22+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"ai.agentplaybooks/agentplaybooks\", \"server_id\": 4, \"server_version_id\": 4, \"title\": \"AgentPlaybooks\", \"version\": \"1.0.0\", \"vulnerability_assessment_state\": \"not_assessed\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:57.987659+00:00",
+          "similarity": 0.6512629042426917,
+          "rank": 1.1010103293546178
+        },
+        {
+          "citation_id": "server:21:0",
+          "server_id": 21,
+          "server_version_id": 21,
+          "kind": "server",
+          "title": "app.nanocorp.agentarena/agent-coliseum-mcp: server profile",
+          "content": "app.nanocorp.agentarena/agent-coliseum-mcp: server profile\n{\"coverage\": \"dependency_advisories/osv: not_applicable (1); dependency_resolution/deps_dev: not_applicable (1); direct_package_advisories/ghsa: not_applicable (1); direct_package_advisories/osv: not_applicable (1); endpoint_status/agora: evidence_found (1); repository_metadata/github: not_found (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": null, \"dependency_advisories\": null, \"deployment_type\": \"remote_only\", \"description\": \"Free Streamable HTTP MCP arena for 1v1 AI agent skill battles and Gladiator Badges.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"app.nanocorp.agentarena/agent-coliseum-mcp\", \"server_id\": 21, \"server_version_id\": 21, \"title\": \"Agent Coliseum MCP\", \"version\": \"0.1.0\", \"vulnerability_assessment_state\": \"no_package_vulnerability_path\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:57.987659+00:00",
+          "similarity": 0.5656657874794193,
+          "rank": 0.632532635944
+        },
+        {
+          "citation_id": "server:51:0",
+          "server_id": 51,
+          "server_version_id": 51,
+          "kind": "server",
+          "title": "io.github.Evozim/agentphone-ai-mcp: server profile",
+          "content": "io.github.Evozim/agentphone-ai-mcp: server profile\n{\"coverage\": \"dependency_advisories/osv: not_applicable (1); dependency_resolution/deps_dev: not_applicable (1); direct_package_advisories/ghsa: not_applicable (1); direct_package_advisories/osv: not_applicable (1); endpoint_status/agora: evidence_found (1); repository_metadata/github: missing_identifier (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: missing_identifier (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": null, \"dependency_advisories\": null, \"deployment_type\": \"remote_only\", \"description\": \"Premium agentic endpoint for agentphone-ai-mcp.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.Evozim/agentphone-ai-mcp\", \"server_id\": 51, \"server_version_id\": 51, \"title\": \"Execute agentphone-ai-mcp\", \"version\": \"2.0.0\", \"vulnerability_assessment_state\": \"no_package_vulnerability_path\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.063018+00:00",
+          "similarity": 0.5254760583122904,
+          "rank": 0.6003808526102968
+        },
+        {
+          "citation_id": "server:86:0",
+          "server_id": 86,
+          "server_version_id": 86,
+          "kind": "server",
+          "title": "io.github.faisal-maverick/aayat-ai: server profile",
+          "content": "io.github.faisal-maverick/aayat-ai: server profile\n{\"coverage\": \"dependency_advisories/osv: not_applicable (1); dependency_resolution/deps_dev: not_applicable (1); direct_package_advisories/ghsa: not_applicable (1); direct_package_advisories/osv: not_applicable (1); endpoint_status/agora: evidence_found (1); repository_metadata/github: not_found (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": null, \"dependency_advisories\": null, \"deployment_type\": \"remote_only\", \"description\": \"AI agent tools: crypto token safety, web search with cited answers, live library docs. Free trial.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.faisal-maverick/aayat-ai\", \"server_id\": 86, \"server_version_id\": 86, \"title\": \"Aayat AI\", \"version\": \"1.1.0\", \"vulnerability_assessment_state\": \"no_package_vulnerability_path\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.582809+00:00",
+          "similarity": 0.5204290025794465,
+          "rank": 0.5963432080240216
+        },
+        {
+          "citation_id": "server:33:0",
+          "server_id": 33,
+          "server_version_id": 33,
+          "kind": "server",
+          "title": "com.peerlookup/board: server profile",
+          "content": "com.peerlookup/board: server profile\n{\"coverage\": \"dependency_advisories/osv: not_applicable (1); dependency_resolution/deps_dev: not_applicable (1); direct_package_advisories/ghsa: not_applicable (1); direct_package_advisories/osv: not_applicable (1); endpoint_status/agora: evidence_found (1); repository_metadata/github: missing_identifier (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: missing_identifier (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": null, \"dependency_advisories\": null, \"deployment_type\": \"remote_only\", \"description\": \"Public questions, findings, replies, author-selected answers and scoped updates for agents.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"com.peerlookup/board\", \"server_id\": 33, \"server_version_id\": 33, \"title\": \"Peer Lookup Board\", \"version\": \"1.0.0\", \"vulnerability_assessment_state\": \"no_package_vulnerability_path\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:57.987659+00:00",
+          "similarity": 0.5118795214622675,
+          "rank": 0.5895036231302785
+        }
+      ],
+      "strategy": "zero_shot",
+      "use_retrieval": true,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 229.9,
+      "latency_ms": 3072.0,
+      "input_tokens": 2827,
+      "output_tokens": 182
+    },
+    {
+      "case": "unknown",
+      "question": "Is ai.agentplaybooks/agentplaybooks safe because no vulnerabilities are recorded?",
+      "expected_terms": [
+        "not assessed",
+        "unknown",
+        "no vulnerability assessment",
+        "not_assessed",
+        "no vulnerability lookup"
+      ],
+      "fact_check_pass": true,
+      "target_retrieved_at_k": true,
+      "target_chunk_precision_at_k": 0.2,
+      "answer": "The ai.agentplaybooks/agentplaybooks project has no recorded vulnerabilities, but its vulnerability assessment state is \"not_assessed.\" This means no formal vulnerability assessment has been completed for it. Therefore, the absence of recorded vulnerabilities does not guarantee that it is safe. The data only shows that no vulnerabilities have been identified so far, but the safety status remains unknown due to lack of assessment.",
+      "status": "grounded",
+      "citation_ids": [
+        "server:4:0"
+      ],
+      "limitations": [
+        "No completed vulnerability assessment for ai.agentplaybooks/agentplaybooks.",
+        "No observed installed dependencies or deployment details to confirm exposure.",
+        "Absence of vulnerabilities does not imply confirmed safety."
+      ],
+      "sources": [
+        {
+          "citation_id": "server:4:0",
+          "server_id": 4,
+          "server_version_id": 4,
+          "kind": "server",
+          "title": "ai.agentplaybooks/agentplaybooks: server profile",
+          "content": "ai.agentplaybooks/agentplaybooks: server profile\n{\"coverage\": \"endpoint_status/agora: evidence_found (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": null, \"dependency_advisories\": null, \"deployment_type\": \"remote_only\", \"description\": \"Manage portable AI agent playbooks, Agent Skills, MCP configurations, personas, and memory.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 05:29:22+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"ai.agentplaybooks/agentplaybooks\", \"server_id\": 4, \"server_version_id\": 4, \"title\": \"AgentPlaybooks\", \"version\": \"1.0.0\", \"vulnerability_assessment_state\": \"not_assessed\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:57.987659+00:00",
+          "similarity": 0.6512629042426917,
+          "rank": 1.1010103293546178
+        },
+        {
+          "citation_id": "server:21:0",
+          "server_id": 21,
+          "server_version_id": 21,
+          "kind": "server",
+          "title": "app.nanocorp.agentarena/agent-coliseum-mcp: server profile",
+          "content": "app.nanocorp.agentarena/agent-coliseum-mcp: server profile\n{\"coverage\": \"dependency_advisories/osv: not_applicable (1); dependency_resolution/deps_dev: not_applicable (1); direct_package_advisories/ghsa: not_applicable (1); direct_package_advisories/osv: not_applicable (1); endpoint_status/agora: evidence_found (1); repository_metadata/github: not_found (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": null, \"dependency_advisories\": null, \"deployment_type\": \"remote_only\", \"description\": \"Free Streamable HTTP MCP arena for 1v1 AI agent skill battles and Gladiator Badges.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"app.nanocorp.agentarena/agent-coliseum-mcp\", \"server_id\": 21, \"server_version_id\": 21, \"title\": \"Agent Coliseum MCP\", \"version\": \"0.1.0\", \"vulnerability_assessment_state\": \"no_package_vulnerability_path\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:57.987659+00:00",
+          "similarity": 0.5656657874794193,
+          "rank": 0.632532635944
+        },
+        {
+          "citation_id": "server:51:0",
+          "server_id": 51,
+          "server_version_id": 51,
+          "kind": "server",
+          "title": "io.github.Evozim/agentphone-ai-mcp: server profile",
+          "content": "io.github.Evozim/agentphone-ai-mcp: server profile\n{\"coverage\": \"dependency_advisories/osv: not_applicable (1); dependency_resolution/deps_dev: not_applicable (1); direct_package_advisories/ghsa: not_applicable (1); direct_package_advisories/osv: not_applicable (1); endpoint_status/agora: evidence_found (1); repository_metadata/github: missing_identifier (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: missing_identifier (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": null, \"dependency_advisories\": null, \"deployment_type\": \"remote_only\", \"description\": \"Premium agentic endpoint for agentphone-ai-mcp.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.Evozim/agentphone-ai-mcp\", \"server_id\": 51, \"server_version_id\": 51, \"title\": \"Execute agentphone-ai-mcp\", \"version\": \"2.0.0\", \"vulnerability_assessment_state\": \"no_package_vulnerability_path\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.063018+00:00",
+          "similarity": 0.5254760583122904,
+          "rank": 0.6003808526102968
+        },
+        {
+          "citation_id": "server:86:0",
+          "server_id": 86,
+          "server_version_id": 86,
+          "kind": "server",
+          "title": "io.github.faisal-maverick/aayat-ai: server profile",
+          "content": "io.github.faisal-maverick/aayat-ai: server profile\n{\"coverage\": \"dependency_advisories/osv: not_applicable (1); dependency_resolution/deps_dev: not_applicable (1); direct_package_advisories/ghsa: not_applicable (1); direct_package_advisories/osv: not_applicable (1); endpoint_status/agora: evidence_found (1); repository_metadata/github: not_found (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": null, \"dependency_advisories\": null, \"deployment_type\": \"remote_only\", \"description\": \"AI agent tools: crypto token safety, web search with cited answers, live library docs. Free trial.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.faisal-maverick/aayat-ai\", \"server_id\": 86, \"server_version_id\": 86, \"title\": \"Aayat AI\", \"version\": \"1.1.0\", \"vulnerability_assessment_state\": \"no_package_vulnerability_path\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.582809+00:00",
+          "similarity": 0.5204290025794465,
+          "rank": 0.5963432080240216
+        },
+        {
+          "citation_id": "server:33:0",
+          "server_id": 33,
+          "server_version_id": 33,
+          "kind": "server",
+          "title": "com.peerlookup/board: server profile",
+          "content": "com.peerlookup/board: server profile\n{\"coverage\": \"dependency_advisories/osv: not_applicable (1); dependency_resolution/deps_dev: not_applicable (1); direct_package_advisories/ghsa: not_applicable (1); direct_package_advisories/osv: not_applicable (1); endpoint_status/agora: evidence_found (1); repository_metadata/github: missing_identifier (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: missing_identifier (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": null, \"dependency_advisories\": null, \"deployment_type\": \"remote_only\", \"description\": \"Public questions, findings, replies, author-selected answers and scoped updates for agents.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"com.peerlookup/board\", \"server_id\": 33, \"server_version_id\": 33, \"title\": \"Peer Lookup Board\", \"version\": \"1.0.0\", \"vulnerability_assessment_state\": \"no_package_vulnerability_path\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:57.987659+00:00",
+          "similarity": 0.5118795214622675,
+          "rank": 0.5895036231302785
+        }
+      ],
+      "strategy": "few_shot",
+      "use_retrieval": true,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 26.1,
+      "latency_ms": 1842.9,
+      "input_tokens": 3046,
+      "output_tokens": 136
+    },
+    {
+      "case": "unknown",
+      "question": "Is ai.agentplaybooks/agentplaybooks safe because no vulnerabilities are recorded?",
+      "expected_terms": [
+        "not assessed",
+        "unknown",
+        "no vulnerability assessment",
+        "not_assessed",
+        "no vulnerability lookup"
+      ],
+      "fact_check_pass": false,
+      "target_retrieved_at_k": false,
+      "target_chunk_precision_at_k": null,
+      "answer": "There is no evidence available regarding vulnerabilities or security assessments for ai.agentplaybooks/agentplaybooks. Therefore, it is not possible to determine its safety based on the absence of recorded vulnerabilities alone.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "No evidence about vulnerabilities or security assessments for ai.agentplaybooks/agentplaybooks was provided."
+      ],
+      "sources": [],
+      "strategy": "zero_shot",
+      "use_retrieval": false,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 0.0,
+      "latency_ms": 1257.5,
+      "input_tokens": 401,
+      "output_tokens": 77
+    },
+    {
+      "case": "unknown",
+      "question": "Is ai.agentplaybooks/agentplaybooks safe because no vulnerabilities are recorded?",
+      "expected_terms": [
+        "not assessed",
+        "unknown",
+        "no vulnerability assessment",
+        "not_assessed",
+        "no vulnerability lookup"
+      ],
+      "fact_check_pass": false,
+      "target_retrieved_at_k": false,
+      "target_chunk_precision_at_k": null,
+      "answer": "There is no evidence available regarding the vulnerability status of ai.agentplaybooks/agentplaybooks. The absence of recorded vulnerabilities in the provided data does not confirm its safety.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "No vulnerability assessment data is available for ai.agentplaybooks/agentplaybooks.",
+        "No information on installed dependencies or live security telemetry is provided."
+      ],
+      "sources": [],
+      "strategy": "few_shot",
+      "use_retrieval": false,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 0.0,
+      "latency_ms": 2019.1,
+      "input_tokens": 620,
+      "output_tokens": 81
+    },
+    {
+      "case": "dependency",
+      "question": "Do praisonai dependency findings prove vulnerable packages are installed?",
+      "expected_terms": [
+        "not prove",
+        "not proof",
+        "does not",
+        "do not"
+      ],
+      "fact_check_pass": true,
+      "target_retrieved_at_k": true,
+      "target_chunk_precision_at_k": 1.0,
+      "answer": "PraisonAI dependency findings indicate declared versions and modeled dependency exposures but do not prove that vulnerable packages are actually installed. The evidence clarifies that registry versions are declared, not observed as installed, and modeled dependency exposures are not proof of installation. Additionally, missing assessment counts remain unknown, so the presence of vulnerable packages on a system cannot be confirmed solely from these findings.",
+      "status": "grounded",
+      "citation_ids": [
+        "server:62:0",
+        "finding:75:0",
+        "finding:42:0",
+        "finding:8:0",
+        "finding:19:0"
+      ],
+      "limitations": [
+        "Evidence is based on declared registry versions, not observed installations.",
+        "Modeled dependency exposures do not confirm actual package installation.",
+        "Assessment counts for missing data are unknown, limiting certainty."
+      ],
+      "sources": [
+        {
+          "citation_id": "server:62:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "server",
+          "title": "io.github.MervinPraison/praisonai: server profile",
+          "content": "io.github.MervinPraison/praisonai: server profile\n{\"coverage\": \"dependency_advisories/osv: finding_found (1); dependency_resolution/deps_dev: evidence_found (1); direct_package_advisories/ghsa: finding_found (1); direct_package_advisories/osv: finding_found (1); endpoint_status/agora: evidence_found (1); package_metadata/deps_dev: evidence_found (1); package_metadata/pypi: evidence_found (1); repository_metadata/github: evidence_found (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"pypi:praisonai@2.3.42\", \"dependency_advisories\": 2, \"deployment_type\": \"packages_only\", \"description\": \"AI Agents Framework with Self Reflection and MCP support\", \"direct_advisories\": 80, \"distinct_advisories\": 82, \"ecosystems\": [\"pypi\"], \"highest_advisory_severity\": \"CRITICAL\", \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": \"2026-10-23 05:57:37+00:00\", \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"title\": \"PraisonAI\", \"version\": \"2.3.42\", \"vulnerability_assessment_state\": \"findings_recorded\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.063018+00:00",
+          "similarity": 0.6086589831586968,
+          "rank": 1.0669271924874222
+        },
+        {
+          "citation_id": "finding:75:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-55529",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-55529\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-55529\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 75, \"finding_status\": \"active\", \"fixed_versions\": [\"4.6.58\"], \"identifiers\": \"CVE-2026-55529, GHSA-wj6g-v78p-6fx3, PYSEC-2026-3896\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:33+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"MODERATE\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI has an origin validation bypass in MCP HTTP Stream transport that allows browser-mediated unauthenticated tool execution on local MCP server\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:33+00:00",
+          "indexed_at": "2026-11-13 07:29:00.459554+00:00",
+          "similarity": 0.5849824707561053,
+          "rank": 0.6979859825653487
+        },
+        {
+          "citation_id": "finding:42:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-61439",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-61439\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-61439\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 42, \"finding_status\": \"active\", \"fixed_versions\": [\"4.6.78\"], \"identifiers\": \"CVE-2026-61439, GHSA-fj8f-m44g-c479, PYSEC-2026-4255\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:34+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"HIGH\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI: Prompt Injection Defense Bypassed for HIGH-Level Threats\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:34+00:00",
+          "indexed_at": "2026-11-13 07:28:59.953727+00:00",
+          "similarity": 0.5805363978560906,
+          "rank": 0.694429124245337
+        },
+        {
+          "citation_id": "finding:8:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-40158",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-40158\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-40158\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 8, \"finding_status\": \"active\", \"fixed_versions\": [\"4.5.128\"], \"identifiers\": \"CVE-2026-40158, GHSA-3c4r-6p77-xwr7, PYSEC-2026-2898\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:25+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"HIGH\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI Vulnerable to Code Injection and Protection Mechanism Failure\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:25+00:00",
+          "indexed_at": "2026-11-13 07:28:59.835328+00:00",
+          "similarity": 0.5762655760815901,
+          "rank": 0.6910124668257366
+        },
+        {
+          "citation_id": "finding:19:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-55536",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-55536\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-55536\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 19, \"finding_status\": \"active\", \"fixed_versions\": [\"4.6.58\"], \"identifiers\": \"CVE-2026-55536, GHSA-6g6r-q6gw-w8fg, PYSEC-2026-3886\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:32+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"CRITICAL\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI has a Browser Server WebSocket origin validation bypass via unanchored regex (patch bypass of CVE-2026-40289 / GHSA-8x8f-54wf-vv92)\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:32+00:00",
+          "indexed_at": "2026-11-13 07:28:59.835328+00:00",
+          "similarity": 0.5740498185693683,
+          "rank": 0.6892398608159591
+        }
+      ],
+      "strategy": "zero_shot",
+      "use_retrieval": true,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 239.5,
+      "latency_ms": 2046.5,
+      "input_tokens": 2864,
+      "output_tokens": 154
+    },
+    {
+      "case": "dependency",
+      "question": "Do praisonai dependency findings prove vulnerable packages are installed?",
+      "expected_terms": [
+        "not prove",
+        "not proof",
+        "does not",
+        "do not"
+      ],
+      "fact_check_pass": true,
+      "target_retrieved_at_k": true,
+      "target_chunk_precision_at_k": 1.0,
+      "answer": "PraisonAI dependency findings indicate vulnerabilities in declared package versions but do not prove that vulnerable packages are actually installed. The evidence clarifies that registry versions are declared, not observed as installed, and modeled dependency exposures are not definitive proof of installation. Therefore, while vulnerabilities are recorded for PraisonAI versions, this does not confirm the presence of vulnerable packages in any deployed environment.",
+      "status": "grounded",
+      "citation_ids": [
+        "server:62:0",
+        "finding:75:0",
+        "finding:42:0",
+        "finding:8:0",
+        "finding:19:0"
+      ],
+      "limitations": [
+        "No deployed software inventory was collected to confirm actual installations.",
+        "Dependency findings are based on declared versions, not observed installations."
+      ],
+      "sources": [
+        {
+          "citation_id": "server:62:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "server",
+          "title": "io.github.MervinPraison/praisonai: server profile",
+          "content": "io.github.MervinPraison/praisonai: server profile\n{\"coverage\": \"dependency_advisories/osv: finding_found (1); dependency_resolution/deps_dev: evidence_found (1); direct_package_advisories/ghsa: finding_found (1); direct_package_advisories/osv: finding_found (1); endpoint_status/agora: evidence_found (1); package_metadata/deps_dev: evidence_found (1); package_metadata/pypi: evidence_found (1); repository_metadata/github: evidence_found (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"pypi:praisonai@2.3.42\", \"dependency_advisories\": 2, \"deployment_type\": \"packages_only\", \"description\": \"AI Agents Framework with Self Reflection and MCP support\", \"direct_advisories\": 80, \"distinct_advisories\": 82, \"ecosystems\": [\"pypi\"], \"highest_advisory_severity\": \"CRITICAL\", \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": \"2026-10-23 05:57:37+00:00\", \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"title\": \"PraisonAI\", \"version\": \"2.3.42\", \"vulnerability_assessment_state\": \"findings_recorded\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.063018+00:00",
+          "similarity": 0.6086589831586968,
+          "rank": 1.0669271924874222
+        },
+        {
+          "citation_id": "finding:75:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-55529",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-55529\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-55529\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 75, \"finding_status\": \"active\", \"fixed_versions\": [\"4.6.58\"], \"identifiers\": \"CVE-2026-55529, GHSA-wj6g-v78p-6fx3, PYSEC-2026-3896\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:33+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"MODERATE\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI has an origin validation bypass in MCP HTTP Stream transport that allows browser-mediated unauthenticated tool execution on local MCP server\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:33+00:00",
+          "indexed_at": "2026-11-13 07:29:00.459554+00:00",
+          "similarity": 0.5849824707561053,
+          "rank": 0.6979859825653487
+        },
+        {
+          "citation_id": "finding:42:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-61439",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-61439\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-61439\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 42, \"finding_status\": \"active\", \"fixed_versions\": [\"4.6.78\"], \"identifiers\": \"CVE-2026-61439, GHSA-fj8f-m44g-c479, PYSEC-2026-4255\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:34+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"HIGH\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI: Prompt Injection Defense Bypassed for HIGH-Level Threats\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:34+00:00",
+          "indexed_at": "2026-11-13 07:28:59.953727+00:00",
+          "similarity": 0.5805363978560906,
+          "rank": 0.694429124245337
+        },
+        {
+          "citation_id": "finding:8:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-40158",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-40158\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-40158\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 8, \"finding_status\": \"active\", \"fixed_versions\": [\"4.5.128\"], \"identifiers\": \"CVE-2026-40158, GHSA-3c4r-6p77-xwr7, PYSEC-2026-2898\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:25+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"HIGH\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI Vulnerable to Code Injection and Protection Mechanism Failure\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:25+00:00",
+          "indexed_at": "2026-11-13 07:28:59.835328+00:00",
+          "similarity": 0.5762655760815901,
+          "rank": 0.6910124668257366
+        },
+        {
+          "citation_id": "finding:19:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-55536",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-55536\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-55536\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 19, \"finding_status\": \"active\", \"fixed_versions\": [\"4.6.58\"], \"identifiers\": \"CVE-2026-55536, GHSA-6g6r-q6gw-w8fg, PYSEC-2026-3886\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:32+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"CRITICAL\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI has a Browser Server WebSocket origin validation bypass via unanchored regex (patch bypass of CVE-2026-40289 / GHSA-8x8f-54wf-vv92)\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:32+00:00",
+          "indexed_at": "2026-11-13 07:28:59.835328+00:00",
+          "similarity": 0.5740498185693683,
+          "rank": 0.6892398608159591
+        }
+      ],
+      "strategy": "few_shot",
+      "use_retrieval": true,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 29.7,
+      "latency_ms": 1946.7,
+      "input_tokens": 3083,
+      "output_tokens": 144
+    },
+    {
+      "case": "dependency",
+      "question": "Do praisonai dependency findings prove vulnerable packages are installed?",
+      "expected_terms": [
+        "not prove",
+        "not proof",
+        "does not",
+        "do not"
+      ],
+      "fact_check_pass": false,
+      "target_retrieved_at_k": false,
+      "target_chunk_precision_at_k": null,
+      "answer": "There is no evidence provided regarding praisonai dependency findings or whether they prove that vulnerable packages are installed. Without specific evidence, it cannot be determined if such findings confirm the presence of vulnerable packages.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "No evidence about praisonai dependency findings was supplied."
+      ],
+      "sources": [],
+      "strategy": "zero_shot",
+      "use_retrieval": false,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 0.0,
+      "latency_ms": 1534.2,
+      "input_tokens": 397,
+      "output_tokens": 69
+    },
+    {
+      "case": "dependency",
+      "question": "Do praisonai dependency findings prove vulnerable packages are installed?",
+      "expected_terms": [
+        "not prove",
+        "not proof",
+        "does not",
+        "do not"
+      ],
+      "fact_check_pass": false,
+      "target_retrieved_at_k": false,
+      "target_chunk_precision_at_k": null,
+      "answer": "There is no evidence provided regarding praisonai dependency findings or whether they prove that vulnerable packages are installed.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "No evidence about praisonai dependency findings is available.",
+        "No information on installed packages or vulnerability status is provided."
+      ],
+      "sources": [],
+      "strategy": "few_shot",
+      "use_retrieval": false,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 0.0,
+      "latency_ms": 1230.8,
+      "input_tokens": 616,
+      "output_tokens": 62
+    },
+    {
+      "case": "graph_search",
+      "question": "Find an MCP server for querying a Neo4j graph database with Cypher.",
+      "expected_terms": [
+        "neo4j",
+        "cypher"
+      ],
+      "fact_check_pass": true,
+      "target_retrieved_at_k": true,
+      "target_chunk_precision_at_k": 0.8,
+      "answer": "The MCP server named io.github.neo4j-contrib/mcp-neo4j-cypher (server ID 96) is designed specifically for querying a Neo4j graph database using Cypher. It is described as a simple Neo4j MCP server that allows running Cypher queries against a Neo4j database.",
+      "status": "grounded",
+      "citation_ids": [
+        "server:96:0"
+      ],
+      "limitations": [
+        "The information is based on declared package versions, not confirmed installations.",
+        "No runtime or performance details are provided.",
+        "Security advisories are limited and assessed as low severity."
+      ],
+      "sources": [
+        {
+          "citation_id": "server:96:0",
+          "server_id": 96,
+          "server_version_id": 96,
+          "kind": "server",
+          "title": "io.github.neo4j-contrib/mcp-neo4j-cypher: server profile",
+          "content": "io.github.neo4j-contrib/mcp-neo4j-cypher: server profile\n{\"coverage\": \"direct_package_advisories/osv: finding_found (1); endpoint_status/agora: evidence_found (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"pypi:mcp-neo4j-cypher@0.5.1\", \"dependency_advisories\": 0, \"deployment_type\": \"packages_only\", \"description\": \"A simple Neo4j MCP server that allows you to run Cypher queries against a Neo4j database.\", \"direct_advisories\": 1, \"distinct_advisories\": 1, \"ecosystems\": [\"pypi\"], \"highest_advisory_severity\": \"LOW\", \"latest_check_at\": \"2026-10-23 06:33:08+00:00\", \"latest_finding_observed_at\": \"2026-10-23 06:33:08+00:00\", \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.neo4j-contrib/mcp-neo4j-cypher\", \"server_id\": 96, \"server_version_id\": 96, \"title\": null, \"version\": \"1.0.0\", \"vulnerability_assessment_state\": \"findings_recorded\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.582809+00:00",
+          "similarity": 0.6598980641331915,
+          "rank": 0.7079184572670177
+        },
+        {
+          "citation_id": "server:97:0",
+          "server_id": 97,
+          "server_version_id": 97,
+          "kind": "server",
+          "title": "io.github.neo4j-contrib/mcp-neo4j-data-modeling: server profile",
+          "content": "io.github.neo4j-contrib/mcp-neo4j-data-modeling: server profile\n{\"coverage\": \"endpoint_status/agora: evidence_found (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"pypi:mcp-neo4j-data-modeling@0.6.1\", \"dependency_advisories\": null, \"deployment_type\": \"packages_only\", \"description\": \"A simple Neo4j MCP server for creating graph data models.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [\"pypi\"], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 05:29:22+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.neo4j-contrib/mcp-neo4j-data-modeling\", \"server_id\": 97, \"server_version_id\": 97, \"title\": null, \"version\": \"1.0.0\", \"vulnerability_assessment_state\": \"not_assessed\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.582809+00:00",
+          "similarity": 0.6196124199628812,
+          "rank": 0.6756899419307695
+        },
+        {
+          "citation_id": "server:98:0",
+          "server_id": 98,
+          "server_version_id": 98,
+          "kind": "server",
+          "title": "io.github.neo4j-contrib/mcp-neo4j-memory: server profile",
+          "content": "io.github.neo4j-contrib/mcp-neo4j-memory: server profile\n{\"coverage\": \"endpoint_status/agora: evidence_found (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"pypi:mcp-neo4j-memory@0.4.2\", \"dependency_advisories\": null, \"deployment_type\": \"packages_only\", \"description\": \"MCP Neo4j Knowledge Graph Memory Server\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [\"pypi\"], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 05:29:22+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.neo4j-contrib/mcp-neo4j-memory\", \"server_id\": 98, \"server_version_id\": 98, \"title\": null, \"version\": \"1.0.0\", \"vulnerability_assessment_state\": \"not_assessed\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.582809+00:00",
+          "similarity": 0.5898141382319788,
+          "rank": 0.6518513165460476
+        },
+        {
+          "citation_id": "server:95:0",
+          "server_id": 95,
+          "server_version_id": 95,
+          "kind": "server",
+          "title": "io.github.neo4j-contrib/mcp-neo4j-aura-manager: server profile",
+          "content": "io.github.neo4j-contrib/mcp-neo4j-aura-manager: server profile\n{\"coverage\": \"endpoint_status/agora: evidence_found (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"pypi:mcp-neo4j-aura-manager@0.4.5\", \"dependency_advisories\": null, \"deployment_type\": \"packages_only\", \"description\": \"MCP server for Neo4j Aura Database Instance Manager.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [\"pypi\"], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 05:29:22+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.neo4j-contrib/mcp-neo4j-aura-manager\", \"server_id\": 95, \"server_version_id\": 95, \"title\": null, \"version\": \"1.0.0\", \"vulnerability_assessment_state\": \"not_assessed\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.582809+00:00",
+          "similarity": 0.5282410413462335,
+          "rank": 0.6025928390374513
+        },
+        {
+          "citation_id": "server:11:0",
+          "server_id": 11,
+          "server_version_id": 11,
+          "kind": "server",
+          "title": "ai.meetlark/mcp-server: server profile",
+          "content": "ai.meetlark/mcp-server: server profile\n{\"coverage\": \"endpoint_status/agora: evidence_found (1); tool_metadata/policylayer: evidence_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"npm:@meetlark/mcp-server@1.0.3\", \"dependency_advisories\": null, \"deployment_type\": \"packages_and_remotes\", \"description\": \"Agent-first meeting schedule polls for humans and agents. Create polls, vote, find times.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [\"npm\"], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 05:29:22+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"ai.meetlark/mcp-server\", \"server_id\": 11, \"server_version_id\": 11, \"title\": null, \"version\": \"1.0.3\", \"vulnerability_assessment_state\": \"not_assessed\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:57.987659+00:00",
+          "similarity": 0.5253907574589359,
+          "rank": 0.6003126119276132
+        }
+      ],
+      "strategy": "zero_shot",
+      "use_retrieval": true,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 332.9,
+      "latency_ms": 1843.1,
+      "input_tokens": 2704,
+      "output_tokens": 120
+    },
+    {
+      "case": "graph_search",
+      "question": "Find an MCP server for querying a Neo4j graph database with Cypher.",
+      "expected_terms": [
+        "neo4j",
+        "cypher"
+      ],
+      "fact_check_pass": true,
+      "target_retrieved_at_k": true,
+      "target_chunk_precision_at_k": 0.8,
+      "answer": "The MCP server named io.github.neo4j-contrib/mcp-neo4j-cypher (server ID 96) is designed specifically for querying a Neo4j graph database using Cypher. It is described as a simple Neo4j MCP server that allows running Cypher queries against a Neo4j database.",
+      "status": "grounded",
+      "citation_ids": [
+        "server:96:0"
+      ],
+      "limitations": [
+        "The server profile indicates declared package versions, not confirmed installed instances.",
+        "No live deployment or usage data is provided, so actual availability cannot be guaranteed."
+      ],
+      "sources": [
+        {
+          "citation_id": "server:96:0",
+          "server_id": 96,
+          "server_version_id": 96,
+          "kind": "server",
+          "title": "io.github.neo4j-contrib/mcp-neo4j-cypher: server profile",
+          "content": "io.github.neo4j-contrib/mcp-neo4j-cypher: server profile\n{\"coverage\": \"direct_package_advisories/osv: finding_found (1); endpoint_status/agora: evidence_found (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"pypi:mcp-neo4j-cypher@0.5.1\", \"dependency_advisories\": 0, \"deployment_type\": \"packages_only\", \"description\": \"A simple Neo4j MCP server that allows you to run Cypher queries against a Neo4j database.\", \"direct_advisories\": 1, \"distinct_advisories\": 1, \"ecosystems\": [\"pypi\"], \"highest_advisory_severity\": \"LOW\", \"latest_check_at\": \"2026-10-23 06:33:08+00:00\", \"latest_finding_observed_at\": \"2026-10-23 06:33:08+00:00\", \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.neo4j-contrib/mcp-neo4j-cypher\", \"server_id\": 96, \"server_version_id\": 96, \"title\": null, \"version\": \"1.0.0\", \"vulnerability_assessment_state\": \"findings_recorded\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.582809+00:00",
+          "similarity": 0.6598980641331915,
+          "rank": 0.7079184572670177
+        },
+        {
+          "citation_id": "server:97:0",
+          "server_id": 97,
+          "server_version_id": 97,
+          "kind": "server",
+          "title": "io.github.neo4j-contrib/mcp-neo4j-data-modeling: server profile",
+          "content": "io.github.neo4j-contrib/mcp-neo4j-data-modeling: server profile\n{\"coverage\": \"endpoint_status/agora: evidence_found (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"pypi:mcp-neo4j-data-modeling@0.6.1\", \"dependency_advisories\": null, \"deployment_type\": \"packages_only\", \"description\": \"A simple Neo4j MCP server for creating graph data models.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [\"pypi\"], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 05:29:22+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.neo4j-contrib/mcp-neo4j-data-modeling\", \"server_id\": 97, \"server_version_id\": 97, \"title\": null, \"version\": \"1.0.0\", \"vulnerability_assessment_state\": \"not_assessed\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.582809+00:00",
+          "similarity": 0.6196124199628812,
+          "rank": 0.6756899419307695
+        },
+        {
+          "citation_id": "server:98:0",
+          "server_id": 98,
+          "server_version_id": 98,
+          "kind": "server",
+          "title": "io.github.neo4j-contrib/mcp-neo4j-memory: server profile",
+          "content": "io.github.neo4j-contrib/mcp-neo4j-memory: server profile\n{\"coverage\": \"endpoint_status/agora: evidence_found (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"pypi:mcp-neo4j-memory@0.4.2\", \"dependency_advisories\": null, \"deployment_type\": \"packages_only\", \"description\": \"MCP Neo4j Knowledge Graph Memory Server\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [\"pypi\"], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 05:29:22+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.neo4j-contrib/mcp-neo4j-memory\", \"server_id\": 98, \"server_version_id\": 98, \"title\": null, \"version\": \"1.0.0\", \"vulnerability_assessment_state\": \"not_assessed\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.582809+00:00",
+          "similarity": 0.5898141382319788,
+          "rank": 0.6518513165460476
+        },
+        {
+          "citation_id": "server:95:0",
+          "server_id": 95,
+          "server_version_id": 95,
+          "kind": "server",
+          "title": "io.github.neo4j-contrib/mcp-neo4j-aura-manager: server profile",
+          "content": "io.github.neo4j-contrib/mcp-neo4j-aura-manager: server profile\n{\"coverage\": \"endpoint_status/agora: evidence_found (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"pypi:mcp-neo4j-aura-manager@0.4.5\", \"dependency_advisories\": null, \"deployment_type\": \"packages_only\", \"description\": \"MCP server for Neo4j Aura Database Instance Manager.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [\"pypi\"], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 05:29:22+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.neo4j-contrib/mcp-neo4j-aura-manager\", \"server_id\": 95, \"server_version_id\": 95, \"title\": null, \"version\": \"1.0.0\", \"vulnerability_assessment_state\": \"not_assessed\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.582809+00:00",
+          "similarity": 0.5282410413462335,
+          "rank": 0.6025928390374513
+        },
+        {
+          "citation_id": "server:11:0",
+          "server_id": 11,
+          "server_version_id": 11,
+          "kind": "server",
+          "title": "ai.meetlark/mcp-server: server profile",
+          "content": "ai.meetlark/mcp-server: server profile\n{\"coverage\": \"endpoint_status/agora: evidence_found (1); tool_metadata/policylayer: evidence_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"npm:@meetlark/mcp-server@1.0.3\", \"dependency_advisories\": null, \"deployment_type\": \"packages_and_remotes\", \"description\": \"Agent-first meeting schedule polls for humans and agents. Create polls, vote, find times.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [\"npm\"], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 05:29:22+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"ai.meetlark/mcp-server\", \"server_id\": 11, \"server_version_id\": 11, \"title\": null, \"version\": \"1.0.3\", \"vulnerability_assessment_state\": \"not_assessed\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:57.987659+00:00",
+          "similarity": 0.5253907574589359,
+          "rank": 0.6003126119276132
+        }
+      ],
+      "strategy": "few_shot",
+      "use_retrieval": true,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 30.2,
+      "latency_ms": 1893.4,
+      "input_tokens": 2923,
+      "output_tokens": 117
+    },
+    {
+      "case": "graph_search",
+      "question": "Find an MCP server for querying a Neo4j graph database with Cypher.",
+      "expected_terms": [
+        "neo4j",
+        "cypher"
+      ],
+      "fact_check_pass": false,
+      "target_retrieved_at_k": false,
+      "target_chunk_precision_at_k": null,
+      "answer": "There is no evidence provided about any MCP server configured for querying a Neo4j graph database with Cypher. No relevant information is available in the supplied evidence.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "No evidence about MCP servers or Neo4j graph database configurations was supplied."
+      ],
+      "sources": [],
+      "strategy": "zero_shot",
+      "use_retrieval": false,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 0.0,
+      "latency_ms": 1281.2,
+      "input_tokens": 401,
+      "output_tokens": 66
+    },
+    {
+      "case": "graph_search",
+      "question": "Find an MCP server for querying a Neo4j graph database with Cypher.",
+      "expected_terms": [
+        "neo4j",
+        "cypher"
+      ],
+      "fact_check_pass": false,
+      "target_retrieved_at_k": false,
+      "target_chunk_precision_at_k": null,
+      "answer": "There is no evidence available about any MCP server configured for querying a Neo4j graph database with Cypher.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "No information about MCP servers or Neo4j database configurations is provided."
+      ],
+      "sources": [],
+      "strategy": "few_shot",
+      "use_retrieval": false,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 0.0,
+      "latency_ms": 1331.3,
+      "input_tokens": 620,
+      "output_tokens": 55
+    },
+    {
+      "case": "network_search",
+      "question": "Which stored MCP server helps analyze network packets with Wireshark?",
+      "expected_terms": [
+        "wireshark"
+      ],
+      "fact_check_pass": true,
+      "target_retrieved_at_k": true,
+      "target_chunk_precision_at_k": 0.4,
+      "answer": "The stored MCP server named io.github.bx33661/wireshark-mcp is designed for professional network analysis with tshark, which is related to Wireshark. This server helps analyze network packets using Wireshark capabilities.",
+      "status": "grounded",
+      "citation_ids": [
+        "server:77:0"
+      ],
+      "limitations": [
+        "The evidence shows declared registry versions, not observed installations, so actual deployment status is unknown.",
+        "No detailed usage instructions or confirmation of active deployment are provided in the evidence."
+      ],
+      "sources": [
+        {
+          "citation_id": "server:77:0",
+          "server_id": 77,
+          "server_version_id": 77,
+          "kind": "server",
+          "title": "io.github.bx33661/wireshark-mcp: server profile",
+          "content": "io.github.bx33661/wireshark-mcp: server profile\n{\"coverage\": \"direct_package_advisories/osv: finding_found (1); endpoint_status/agora: evidence_found (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"pypi:wireshark-mcp@0.6.5\", \"dependency_advisories\": 0, \"deployment_type\": \"packages_only\", \"description\": \"Professional network analysis with tshark. Security audits, deep-dives, and threat detection.\", \"direct_advisories\": 1, \"distinct_advisories\": 1, \"ecosystems\": [\"pypi\"], \"highest_advisory_severity\": \"MODERATE\", \"latest_check_at\": \"2026-10-23 06:35:34+00:00\", \"latest_finding_observed_at\": \"2026-10-23 06:35:34+00:00\", \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.bx33661/wireshark-mcp\", \"server_id\": 77, \"server_version_id\": 77, \"title\": null, \"version\": \"0.6.5\", \"vulnerability_assessment_state\": \"findings_recorded\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.582809+00:00",
+          "similarity": 0.6262216238760508,
+          "rank": 0.6809773050613052
+        },
+        {
+          "citation_id": "finding:311:0",
+          "server_id": 77,
+          "server_version_id": 77,
+          "kind": "finding",
+          "title": "io.github.bx33661/wireshark-mcp: CVE-2026-43901",
+          "content": "io.github.bx33661/wireshark-mcp: CVE-2026-43901\n{\"affected_version\": \"0.6.5\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-43901\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 311, \"finding_status\": \"active\", \"fixed_versions\": null, \"identifiers\": \"CVE-2026-43901, GHSA-3r68-x3xc-rxpg, PYSEC-2026-3426\", \"match_method\": \"osv_record_range_evaluation\", \"observed_at\": \"2026-10-23 06:35:34+00:00\", \"package\": \"wireshark-mcp\", \"registry_name\": \"io.github.bx33661/wireshark-mcp\", \"server_id\": 77, \"server_version_id\": 77, \"severity_label\": \"MODERATE\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/vulnerability/GHSA-3r68-x3xc-rxpg\", \"summary\": \"wireshark-mcp vulnerable to arbitrary file write via export_objects when WIRESHARK_MCP_ALLOWED_DIRS is not configured\"}",
+          "source_url": "https://osv.dev/vulnerability/GHSA-3r68-x3xc-rxpg",
+          "observed_at": "2026-10-23 06:35:34+00:00",
+          "indexed_at": "2026-11-13 07:29:02.099980+00:00",
+          "similarity": 0.5724822884668266,
+          "rank": 0.6079858367339257
+        },
+        {
+          "citation_id": "server:84:0",
+          "server_id": 84,
+          "server_version_id": 84,
+          "kind": "server",
+          "title": "io.github.elpadev/sample-mcp-server-python-package: server profile",
+          "content": "io.github.elpadev/sample-mcp-server-python-package: server profile\n{\"coverage\": \"dependency_advisories/osv: no_known_finding (1); dependency_resolution/deps_dev: evidence_found (1); direct_package_advisories/ghsa: no_known_finding (1); direct_package_advisories/osv: no_known_finding (1); endpoint_status/agora: evidence_found (1); package_metadata/deps_dev: evidence_found (1); package_metadata/pypi: evidence_found (1); repository_metadata/github: missing_identifier (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"pypi:elias-mcp-server-elpadev@0.0.2\", \"dependency_advisories\": 0, \"deployment_type\": \"packages_only\", \"description\": \"A sample MCP server for testing\", \"direct_advisories\": 0, \"distinct_advisories\": 0, \"ecosystems\": [\"pypi\"], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.elpadev/sample-mcp-server-python-package\", \"server_id\": 84, \"server_version_id\": 84, \"title\": \"Elias MCP Sample Server\", \"version\": \"0.0.1\", \"vulnerability_assessment_state\": \"no_known_findings_in_completed_checks\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.582809+00:00",
+          "similarity": 0.5253121342597394,
+          "rank": 0.600249713368256
+        },
+        {
+          "citation_id": "server:28:0",
+          "server_id": 28,
+          "server_version_id": 28,
+          "kind": "server",
+          "title": "com.circleci/mcp: server profile",
+          "content": "com.circleci/mcp: server profile\n{\"coverage\": \"endpoint_status/agora: evidence_found (1); tool_metadata/policylayer: missing_identifier (1); tool_metadata/toolhive: evidence_found (1)\", \"declarations\": null, \"dependency_advisories\": null, \"deployment_type\": \"remote_only\", \"description\": \"CircleCI's MCP server: inspect projects, runs, workflows, jobs, logs, tests, and artifacts.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 05:29:22+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"com.circleci/mcp\", \"server_id\": 28, \"server_version_id\": 28, \"title\": \"CircleCI\", \"version\": \"1.0.0\", \"vulnerability_assessment_state\": \"not_assessed\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:57.987659+00:00",
+          "similarity": 0.5108310706889404,
+          "rank": 0.5886648625116169
+        },
+        {
+          "citation_id": "server:25:0",
+          "server_id": 25,
+          "server_version_id": 25,
+          "kind": "server",
+          "title": "co.huggingface/hf-mcp-server: server profile",
+          "content": "co.huggingface/hf-mcp-server: server profile\n{\"coverage\": \"endpoint_status/agora: evidence_found (1); tool_metadata/policylayer: missing_identifier (1); tool_metadata/toolhive: evidence_found (1)\", \"declarations\": null, \"dependency_advisories\": null, \"deployment_type\": \"remote_only\", \"description\": \"Connect to Hugging Face Hub and thousands of Gradio AI Applications\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 05:29:22+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"co.huggingface/hf-mcp-server\", \"server_id\": 25, \"server_version_id\": 25, \"title\": \"Hugging Face\", \"version\": \"0.2.33\", \"vulnerability_assessment_state\": \"not_assessed\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:57.987659+00:00",
+          "similarity": 0.509634568519817,
+          "rank": 0.5877076607763181
+        }
+      ],
+      "strategy": "zero_shot",
+      "use_retrieval": true,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 331.4,
+      "latency_ms": 2660.0,
+      "input_tokens": 2756,
+      "output_tokens": 103
+    },
+    {
+      "case": "network_search",
+      "question": "Which stored MCP server helps analyze network packets with Wireshark?",
+      "expected_terms": [
+        "wireshark"
+      ],
+      "fact_check_pass": true,
+      "target_retrieved_at_k": true,
+      "target_chunk_precision_at_k": 0.4,
+      "answer": "The stored MCP server named io.github.bx33661/wireshark-mcp helps analyze network packets with Wireshark. It provides professional network analysis with tshark, including security audits, deep-dives, and threat detection.",
+      "status": "grounded",
+      "citation_ids": [
+        "server:77:0"
+      ],
+      "limitations": [
+        "Registry versions are declared, not observed installed. Modeled dependency exposures are not proof of installation; missing assessment counts remain unknown."
+      ],
+      "sources": [
+        {
+          "citation_id": "server:77:0",
+          "server_id": 77,
+          "server_version_id": 77,
+          "kind": "server",
+          "title": "io.github.bx33661/wireshark-mcp: server profile",
+          "content": "io.github.bx33661/wireshark-mcp: server profile\n{\"coverage\": \"direct_package_advisories/osv: finding_found (1); endpoint_status/agora: evidence_found (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"pypi:wireshark-mcp@0.6.5\", \"dependency_advisories\": 0, \"deployment_type\": \"packages_only\", \"description\": \"Professional network analysis with tshark. Security audits, deep-dives, and threat detection.\", \"direct_advisories\": 1, \"distinct_advisories\": 1, \"ecosystems\": [\"pypi\"], \"highest_advisory_severity\": \"MODERATE\", \"latest_check_at\": \"2026-10-23 06:35:34+00:00\", \"latest_finding_observed_at\": \"2026-10-23 06:35:34+00:00\", \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.bx33661/wireshark-mcp\", \"server_id\": 77, \"server_version_id\": 77, \"title\": null, \"version\": \"0.6.5\", \"vulnerability_assessment_state\": \"findings_recorded\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.582809+00:00",
+          "similarity": 0.6262216238760508,
+          "rank": 0.6809773050613052
+        },
+        {
+          "citation_id": "finding:311:0",
+          "server_id": 77,
+          "server_version_id": 77,
+          "kind": "finding",
+          "title": "io.github.bx33661/wireshark-mcp: CVE-2026-43901",
+          "content": "io.github.bx33661/wireshark-mcp: CVE-2026-43901\n{\"affected_version\": \"0.6.5\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-43901\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 311, \"finding_status\": \"active\", \"fixed_versions\": null, \"identifiers\": \"CVE-2026-43901, GHSA-3r68-x3xc-rxpg, PYSEC-2026-3426\", \"match_method\": \"osv_record_range_evaluation\", \"observed_at\": \"2026-10-23 06:35:34+00:00\", \"package\": \"wireshark-mcp\", \"registry_name\": \"io.github.bx33661/wireshark-mcp\", \"server_id\": 77, \"server_version_id\": 77, \"severity_label\": \"MODERATE\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/vulnerability/GHSA-3r68-x3xc-rxpg\", \"summary\": \"wireshark-mcp vulnerable to arbitrary file write via export_objects when WIRESHARK_MCP_ALLOWED_DIRS is not configured\"}",
+          "source_url": "https://osv.dev/vulnerability/GHSA-3r68-x3xc-rxpg",
+          "observed_at": "2026-10-23 06:35:34+00:00",
+          "indexed_at": "2026-11-13 07:29:02.099980+00:00",
+          "similarity": 0.5724822884668266,
+          "rank": 0.6079858367339257
+        },
+        {
+          "citation_id": "server:84:0",
+          "server_id": 84,
+          "server_version_id": 84,
+          "kind": "server",
+          "title": "io.github.elpadev/sample-mcp-server-python-package: server profile",
+          "content": "io.github.elpadev/sample-mcp-server-python-package: server profile\n{\"coverage\": \"dependency_advisories/osv: no_known_finding (1); dependency_resolution/deps_dev: evidence_found (1); direct_package_advisories/ghsa: no_known_finding (1); direct_package_advisories/osv: no_known_finding (1); endpoint_status/agora: evidence_found (1); package_metadata/deps_dev: evidence_found (1); package_metadata/pypi: evidence_found (1); repository_metadata/github: missing_identifier (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"pypi:elias-mcp-server-elpadev@0.0.2\", \"dependency_advisories\": 0, \"deployment_type\": \"packages_only\", \"description\": \"A sample MCP server for testing\", \"direct_advisories\": 0, \"distinct_advisories\": 0, \"ecosystems\": [\"pypi\"], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.elpadev/sample-mcp-server-python-package\", \"server_id\": 84, \"server_version_id\": 84, \"title\": \"Elias MCP Sample Server\", \"version\": \"0.0.1\", \"vulnerability_assessment_state\": \"no_known_findings_in_completed_checks\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.582809+00:00",
+          "similarity": 0.5253121342597394,
+          "rank": 0.600249713368256
+        },
+        {
+          "citation_id": "server:28:0",
+          "server_id": 28,
+          "server_version_id": 28,
+          "kind": "server",
+          "title": "com.circleci/mcp: server profile",
+          "content": "com.circleci/mcp: server profile\n{\"coverage\": \"endpoint_status/agora: evidence_found (1); tool_metadata/policylayer: missing_identifier (1); tool_metadata/toolhive: evidence_found (1)\", \"declarations\": null, \"dependency_advisories\": null, \"deployment_type\": \"remote_only\", \"description\": \"CircleCI's MCP server: inspect projects, runs, workflows, jobs, logs, tests, and artifacts.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 05:29:22+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"com.circleci/mcp\", \"server_id\": 28, \"server_version_id\": 28, \"title\": \"CircleCI\", \"version\": \"1.0.0\", \"vulnerability_assessment_state\": \"not_assessed\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:57.987659+00:00",
+          "similarity": 0.5108310706889404,
+          "rank": 0.5886648625116169
+        },
+        {
+          "citation_id": "server:25:0",
+          "server_id": 25,
+          "server_version_id": 25,
+          "kind": "server",
+          "title": "co.huggingface/hf-mcp-server: server profile",
+          "content": "co.huggingface/hf-mcp-server: server profile\n{\"coverage\": \"endpoint_status/agora: evidence_found (1); tool_metadata/policylayer: missing_identifier (1); tool_metadata/toolhive: evidence_found (1)\", \"declarations\": null, \"dependency_advisories\": null, \"deployment_type\": \"remote_only\", \"description\": \"Connect to Hugging Face Hub and thousands of Gradio AI Applications\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 05:29:22+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"co.huggingface/hf-mcp-server\", \"server_id\": 25, \"server_version_id\": 25, \"title\": \"Hugging Face\", \"version\": \"0.2.33\", \"vulnerability_assessment_state\": \"not_assessed\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:57.987659+00:00",
+          "similarity": 0.509634568519817,
+          "rank": 0.5877076607763181
+        }
+      ],
+      "strategy": "few_shot",
+      "use_retrieval": true,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 28.1,
+      "latency_ms": 1836.2,
+      "input_tokens": 2975,
+      "output_tokens": 95
+    },
+    {
+      "case": "network_search",
+      "question": "Which stored MCP server helps analyze network packets with Wireshark?",
+      "expected_terms": [
+        "wireshark"
+      ],
+      "fact_check_pass": false,
+      "target_retrieved_at_k": false,
+      "target_chunk_precision_at_k": null,
+      "answer": "There is no evidence provided about any stored MCP server that helps analyze network packets with Wireshark.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "No evidence about MCP servers related to Wireshark or network packet analysis was supplied."
+      ],
+      "sources": [],
+      "strategy": "zero_shot",
+      "use_retrieval": false,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 0.0,
+      "latency_ms": 930.9,
+      "input_tokens": 398,
+      "output_tokens": 56
+    },
+    {
+      "case": "network_search",
+      "question": "Which stored MCP server helps analyze network packets with Wireshark?",
+      "expected_terms": [
+        "wireshark"
+      ],
+      "fact_check_pass": false,
+      "target_retrieved_at_k": false,
+      "target_chunk_precision_at_k": null,
+      "answer": "There is no evidence available about any stored MCP server that helps analyze network packets with Wireshark.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "No information about MCP servers related to Wireshark or network packet analysis is provided."
+      ],
+      "sources": [],
+      "strategy": "few_shot",
+      "use_retrieval": false,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 0.0,
+      "latency_ms": 1169.2,
+      "input_tokens": 617,
+      "output_tokens": 56
+    },
+    {
+      "case": "exact_cve",
+      "question": "What stored evidence connects CVE-2026-40159 to praisonai?",
+      "expected_terms": [
+        "2.3.42",
+        "praisonai"
+      ],
+      "fact_check_pass": true,
+      "target_retrieved_at_k": true,
+      "target_chunk_precision_at_k": 1.0,
+      "answer": "The stored evidence connecting CVE-2026-40159 to praisonai is a direct package finding for the package 'praisonai' version 2.3.42, recorded on server 62. This finding identifies CVE-2026-40159 as a vulnerability titled 'PraisonAI Vulnerable to Sensitive Environment Variable Exposure via Untrusted MCP Subprocess Execution' with a moderate severity label. The evidence includes metadata such as affected version, fixed versions, identifiers, and source attribution from OSV.dev. This connection is explicitly documented in the finding with ID 58 and is associated with the registry name 'io.github.MervinPraison/praisonai'.",
+      "status": "grounded",
+      "citation_ids": [
+        "finding:58:0",
+        "server:62:0"
+      ],
+      "limitations": [
+        "The evidence reflects declared registry versions, not observed installations, so actual deployment status is unknown.",
+        "Modeled dependency exposures do not confirm installation or exploitation.",
+        "The data is from a snapshot dated 2026-10-23 and may not reflect later changes."
+      ],
+      "sources": [
+        {
+          "citation_id": "finding:58:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-40159",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-40159\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-40159\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 58, \"finding_status\": \"active\", \"fixed_versions\": [\"4.5.128\"], \"identifiers\": \"CVE-2026-40159, GHSA-pj2r-f9mw-vrcq, PYSEC-2026-2918\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:29+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"MODERATE\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI Vulnerable to Sensitive Environment Variable Exposure via Untrusted MCP Subprocess Execution\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:29+00:00",
+          "indexed_at": "2026-11-13 07:28:59.953727+00:00",
+          "similarity": 0.6523374679513814,
+          "rank": 1.3518699803215695
+        },
+        {
+          "citation_id": "server:62:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "server",
+          "title": "io.github.MervinPraison/praisonai: server profile",
+          "content": "io.github.MervinPraison/praisonai: server profile\n{\"coverage\": \"dependency_advisories/osv: finding_found (1); dependency_resolution/deps_dev: evidence_found (1); direct_package_advisories/ghsa: finding_found (1); direct_package_advisories/osv: finding_found (1); endpoint_status/agora: evidence_found (1); package_metadata/deps_dev: evidence_found (1); package_metadata/pypi: evidence_found (1); repository_metadata/github: evidence_found (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"pypi:praisonai@2.3.42\", \"dependency_advisories\": 2, \"deployment_type\": \"packages_only\", \"description\": \"AI Agents Framework with Self Reflection and MCP support\", \"direct_advisories\": 80, \"distinct_advisories\": 82, \"ecosystems\": [\"pypi\"], \"highest_advisory_severity\": \"CRITICAL\", \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": \"2026-10-23 05:57:37+00:00\", \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"title\": \"PraisonAI\", \"version\": \"2.3.42\", \"vulnerability_assessment_state\": \"findings_recorded\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.063018+00:00",
+          "similarity": 0.6092902484208608,
+          "rank": 1.0674322046971532
+        },
+        {
+          "citation_id": "finding:40:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-39889",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-39889\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-39889\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 40, \"finding_status\": \"active\", \"fixed_versions\": [\"4.5.115\"], \"identifiers\": \"CVE-2026-39889, GHSA-f292-66h9-fpmf, PYSEC-2026-2911\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:27+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"HIGH\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI Has Unauthenticated SSE Event Stream that Exposes All Agent Activity in A2U Server\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:27+00:00",
+          "indexed_at": "2026-11-13 07:28:59.953727+00:00",
+          "similarity": 0.6810596904770609,
+          "rank": 0.7748477583421132
+        },
+        {
+          "citation_id": "finding:56:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-57119",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-57119\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-57119\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 56, \"finding_status\": \"active\", \"fixed_versions\": [\"4.6.59\"], \"identifiers\": \"CVE-2026-57119, GHSA-p4pj-vh7h-6cqh, PYSEC-2026-3516\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:31+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"HIGH\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI: Unauthenticated Local File Inclusion via agent_file path in PraisonAI Jobs API\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:31+00:00",
+          "indexed_at": "2026-11-13 07:28:59.953727+00:00",
+          "similarity": 0.6746589963178761,
+          "rank": 0.7697272030147653
+        },
+        {
+          "citation_id": "finding:64:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-61431",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-61431\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-61431\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 64, \"finding_status\": \"active\", \"fixed_versions\": [\"4.6.78\"], \"identifiers\": \"CVE-2026-61431, GHSA-q7m5-3jmv-vm48, PYSEC-2026-4258\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:35+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"MODERATE\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI: ContextGatherer include resolution permits absolute and traversal reads outside the workspace\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:35+00:00",
+          "indexed_at": "2026-11-13 07:28:59.953727+00:00",
+          "similarity": 0.6736452883627762,
+          "rank": 0.7689162366506854
+        }
+      ],
+      "strategy": "zero_shot",
+      "use_retrieval": true,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 293.1,
+      "latency_ms": 3019.8,
+      "input_tokens": 2844,
+      "output_tokens": 216
+    },
+    {
+      "case": "exact_cve",
+      "question": "What stored evidence connects CVE-2026-40159 to praisonai?",
+      "expected_terms": [
+        "2.3.42",
+        "praisonai"
+      ],
+      "fact_check_pass": true,
+      "target_retrieved_at_k": true,
+      "target_chunk_precision_at_k": 1.0,
+      "answer": "The stored evidence connecting CVE-2026-40159 to praisonai is a direct package finding recorded for the package praisonai version 2.3.42 under the registry io.github.MervinPraison/praisonai. This finding, sourced from OSV.dev and its upstream databases, identifies CVE-2026-40159 as a vulnerability titled \"PraisonAI Vulnerable to Sensitive Environment Variable Exposure via Untrusted MCP Subprocess Execution.\" The evidence includes metadata such as affected version, fixed versions, severity label (MODERATE), and identifiers linking the CVE to praisonai. This connection is documented in the finding with citation ID finding:58:0 and is also reflected in the server profile for praisonai version 2.3.42 (citation server:62:0).",
+      "status": "grounded",
+      "citation_ids": [
+        "finding:58:0",
+        "server:62:0"
+      ],
+      "limitations": [
+        "Registry versions are declared, not observed installed. Modeled dependency exposures are not proof of installation; missing assessment counts remain unknown."
+      ],
+      "sources": [
+        {
+          "citation_id": "finding:58:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-40159",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-40159\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-40159\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 58, \"finding_status\": \"active\", \"fixed_versions\": [\"4.5.128\"], \"identifiers\": \"CVE-2026-40159, GHSA-pj2r-f9mw-vrcq, PYSEC-2026-2918\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:29+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"MODERATE\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI Vulnerable to Sensitive Environment Variable Exposure via Untrusted MCP Subprocess Execution\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:29+00:00",
+          "indexed_at": "2026-11-13 07:28:59.953727+00:00",
+          "similarity": 0.6523374679513814,
+          "rank": 1.3518699803215695
+        },
+        {
+          "citation_id": "server:62:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "server",
+          "title": "io.github.MervinPraison/praisonai: server profile",
+          "content": "io.github.MervinPraison/praisonai: server profile\n{\"coverage\": \"dependency_advisories/osv: finding_found (1); dependency_resolution/deps_dev: evidence_found (1); direct_package_advisories/ghsa: finding_found (1); direct_package_advisories/osv: finding_found (1); endpoint_status/agora: evidence_found (1); package_metadata/deps_dev: evidence_found (1); package_metadata/pypi: evidence_found (1); repository_metadata/github: evidence_found (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"pypi:praisonai@2.3.42\", \"dependency_advisories\": 2, \"deployment_type\": \"packages_only\", \"description\": \"AI Agents Framework with Self Reflection and MCP support\", \"direct_advisories\": 80, \"distinct_advisories\": 82, \"ecosystems\": [\"pypi\"], \"highest_advisory_severity\": \"CRITICAL\", \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": \"2026-10-23 05:57:37+00:00\", \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"title\": \"PraisonAI\", \"version\": \"2.3.42\", \"vulnerability_assessment_state\": \"findings_recorded\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.063018+00:00",
+          "similarity": 0.6092902484208608,
+          "rank": 1.0674322046971532
+        },
+        {
+          "citation_id": "finding:40:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-39889",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-39889\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-39889\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 40, \"finding_status\": \"active\", \"fixed_versions\": [\"4.5.115\"], \"identifiers\": \"CVE-2026-39889, GHSA-f292-66h9-fpmf, PYSEC-2026-2911\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:27+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"HIGH\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI Has Unauthenticated SSE Event Stream that Exposes All Agent Activity in A2U Server\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:27+00:00",
+          "indexed_at": "2026-11-13 07:28:59.953727+00:00",
+          "similarity": 0.6810596904770609,
+          "rank": 0.7748477583421132
+        },
+        {
+          "citation_id": "finding:56:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-57119",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-57119\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-57119\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 56, \"finding_status\": \"active\", \"fixed_versions\": [\"4.6.59\"], \"identifiers\": \"CVE-2026-57119, GHSA-p4pj-vh7h-6cqh, PYSEC-2026-3516\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:31+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"HIGH\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI: Unauthenticated Local File Inclusion via agent_file path in PraisonAI Jobs API\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:31+00:00",
+          "indexed_at": "2026-11-13 07:28:59.953727+00:00",
+          "similarity": 0.6746589963178761,
+          "rank": 0.7697272030147653
+        },
+        {
+          "citation_id": "finding:64:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-61431",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-61431\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-61431\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 64, \"finding_status\": \"active\", \"fixed_versions\": [\"4.6.78\"], \"identifiers\": \"CVE-2026-61431, GHSA-q7m5-3jmv-vm48, PYSEC-2026-4258\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:35+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"MODERATE\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI: ContextGatherer include resolution permits absolute and traversal reads outside the workspace\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:35+00:00",
+          "indexed_at": "2026-11-13 07:28:59.953727+00:00",
+          "similarity": 0.6736452883627762,
+          "rank": 0.7689162366506854
+        }
+      ],
+      "strategy": "few_shot",
+      "use_retrieval": true,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 28.6,
+      "latency_ms": 4002.1,
+      "input_tokens": 3063,
+      "output_tokens": 221
+    },
+    {
+      "case": "exact_cve",
+      "question": "What stored evidence connects CVE-2026-40159 to praisonai?",
+      "expected_terms": [
+        "2.3.42",
+        "praisonai"
+      ],
+      "fact_check_pass": false,
+      "target_retrieved_at_k": false,
+      "target_chunk_precision_at_k": null,
+      "answer": "There is no stored evidence available that connects CVE-2026-40159 to praisonai.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "No evidence provided regarding CVE-2026-40159 or praisonai."
+      ],
+      "sources": [],
+      "strategy": "zero_shot",
+      "use_retrieval": false,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 0.0,
+      "latency_ms": 1205.2,
+      "input_tokens": 402,
+      "output_tokens": 57
+    },
+    {
+      "case": "exact_cve",
+      "question": "What stored evidence connects CVE-2026-40159 to praisonai?",
+      "expected_terms": [
+        "2.3.42",
+        "praisonai"
+      ],
+      "fact_check_pass": false,
+      "target_retrieved_at_k": false,
+      "target_chunk_precision_at_k": null,
+      "answer": "There is no stored evidence available that connects CVE-2026-40159 to praisonai.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "No evidence records mentioning CVE-2026-40159 or praisonai are available."
+      ],
+      "sources": [],
+      "strategy": "few_shot",
+      "use_retrieval": false,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 0.0,
+      "latency_ms": 1148.3,
+      "input_tokens": 621,
+      "output_tokens": 59
+    },
+    {
+      "case": "coverage",
+      "question": "Does not_assessed mean zero vulnerabilities?",
+      "expected_terms": [
+        "unknown",
+        "not zero",
+        "does not",
+        "no assessment",
+        "no vulnerability"
+      ],
+      "fact_check_pass": true,
+      "target_retrieved_at_k": null,
+      "target_chunk_precision_at_k": null,
+      "answer": "No, not_assessed does not mean zero vulnerabilities. According to the MCP Sentinel methodology, not_assessed means no lookup was recorded and the count is unknown, not zero. Zero vulnerabilities are indicated by no_known_findings_in_completed_checks, which means zero findings in completed checks but is not proof of overall safety.",
+      "status": "grounded",
+      "citation_ids": [
+        "methodology:methodology:0"
+      ],
+      "limitations": [
+        "The explanation is based on the MCP Sentinel methodology document; specific project or server data may vary.",
+        "The term not_assessed indicates missing assessment data rather than confirmed absence of vulnerabilities."
+      ],
+      "sources": [
+        {
+          "citation_id": "methodology:methodology:0",
+          "server_id": null,
+          "server_version_id": null,
+          "kind": "methodology",
+          "title": "MCP Sentinel methodology: assessment coverage",
+          "content": "MCP Sentinel methodology: assessment coverage\n{\"meaning\": \"not_assessed means no lookup was recorded; null counts are unknown, not zero. no_known_findings_in_completed_checks means zero findings in completed checks, not proof of safety. resolved_dependency findings model a fresh install from deps.dev, not installed dependencies. The database is a historical snapshot. Endpoint observations are third-party historical handshakes. There is no live compromise telemetry or validated overall risk score. EPSS is per CVE. Full inventory counts require SQL aggregation, not a top-k sample. The source registry data was collected on 2026-10-23; enrichment coverage is partial.\", \"source_name\": \"MCP Sentinel project methodology\", \"source_url\": null}",
+          "source_url": null,
+          "observed_at": null,
+          "indexed_at": "2026-11-13 07:29:02.099980+00:00",
+          "similarity": 0.5418549814657714,
+          "rank": 0.5834839911330816
+        },
+        {
+          "citation_id": "server:32:0",
+          "server_id": 32,
+          "server_version_id": 32,
+          "kind": "server",
+          "title": "com.ownerspec/mcp: server profile",
+          "content": "com.ownerspec/mcp: server profile\n{\"coverage\": \"dependency_advisories/osv: not_applicable (1); dependency_resolution/deps_dev: not_applicable (1); direct_package_advisories/ghsa: not_applicable (1); direct_package_advisories/osv: not_applicable (1); endpoint_status/agora: evidence_found (1); repository_metadata/github: evidence_found (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": null, \"dependency_advisories\": null, \"deployment_type\": \"remote_only\", \"description\": \"Cited home water treatment answers, part matching and sizing calculators for AI agents.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"com.ownerspec/mcp\", \"server_id\": 32, \"server_version_id\": 32, \"title\": \"OwnerSpec\", \"version\": \"1.0.0\", \"vulnerability_assessment_state\": \"no_package_vulnerability_path\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:57.987659+00:00",
+          "similarity": 0.45181032054273107,
+          "rank": 0.5414482623946494
+        },
+        {
+          "citation_id": "server:123:0",
+          "server_id": 123,
+          "server_version_id": 123,
+          "kind": "server",
+          "title": "link.snip/snip: server profile",
+          "content": "link.snip/snip: server profile\n{\"coverage\": \"dependency_advisories/osv: not_applicable (1); dependency_resolution/deps_dev: not_applicable (1); direct_package_advisories/ghsa: not_applicable (1); direct_package_advisories/osv: not_applicable (1); endpoint_status/agora: evidence_found (1); repository_metadata/github: missing_identifier (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: missing_identifier (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": null, \"dependency_advisories\": null, \"deployment_type\": \"remote_only\", \"description\": \"Free QR codes that never expire and free short links with click stats.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"link.snip/snip\", \"server_id\": 123, \"server_version_id\": 123, \"title\": \"Snip\", \"version\": \"1.0.0\", \"vulnerability_assessment_state\": \"no_package_vulnerability_path\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:59.042913+00:00",
+          "similarity": 0.45066914344767384,
+          "rank": 0.5405353207186037
+        },
+        {
+          "citation_id": "server:107:0",
+          "server_id": 107,
+          "server_version_id": 107,
+          "kind": "server",
+          "title": "io.github.ranawaqas-ai/mdreview: server profile",
+          "content": "io.github.ranawaqas-ai/mdreview: server profile\n{\"coverage\": \"dependency_advisories/osv: not_applicable (1); dependency_resolution/deps_dev: not_applicable (1); direct_package_advisories/ghsa: not_applicable (1); direct_package_advisories/osv: not_applicable (1); endpoint_status/agora: evidence_found (1); repository_metadata/github: evidence_found (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": null, \"dependency_advisories\": null, \"deployment_type\": \"remote_only\", \"description\": \"Human-in-the-loop document review: an agent pushes a draft, a person comments, the agent revises.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.ranawaqas-ai/mdreview\", \"server_id\": 107, \"server_version_id\": 107, \"title\": \"mdreview\", \"version\": \"0.7.0\", \"vulnerability_assessment_state\": \"no_package_vulnerability_path\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:59.042913+00:00",
+          "similarity": 0.4412856937642544,
+          "rank": 0.5330285609718681
+        },
+        {
+          "citation_id": "server:106:0",
+          "server_id": 106,
+          "server_version_id": 106,
+          "kind": "server",
+          "title": "io.github.puglieseweb/systemdox: server profile",
+          "content": "io.github.puglieseweb/systemdox: server profile\n{\"coverage\": \"dependency_advisories/osv: no_known_finding (1); dependency_resolution/deps_dev: evidence_found (1); direct_package_advisories/ghsa: no_known_finding (1); direct_package_advisories/osv: no_known_finding (1); endpoint_status/agora: evidence_found (1); package_metadata/deps_dev: evidence_found (1); package_metadata/npm: evidence_found (1); repository_metadata/github: not_found (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"npm:@systemdox/mcp-server@0.1.38\", \"dependency_advisories\": 0, \"deployment_type\": \"packages_only\", \"description\": \"Your architecture in your agents' context: checks, specs, ADRs and docs over MCP, at write time.\", \"direct_advisories\": 0, \"distinct_advisories\": 0, \"ecosystems\": [\"npm\"], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 06:51:25+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.puglieseweb/systemdox\", \"server_id\": 106, \"server_version_id\": 106, \"title\": null, \"version\": \"0.1.38\", \"vulnerability_assessment_state\": \"no_known_findings_in_completed_checks\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:59.042913+00:00",
+          "similarity": 0.44116313617434555,
+          "rank": 0.532930514899941
+        }
+      ],
+      "strategy": "zero_shot",
+      "use_retrieval": true,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 227.9,
+      "latency_ms": 1836.0,
+      "input_tokens": 2712,
+      "output_tokens": 123
+    },
+    {
+      "case": "coverage",
+      "question": "Does not_assessed mean zero vulnerabilities?",
+      "expected_terms": [
+        "unknown",
+        "not zero",
+        "does not",
+        "no assessment",
+        "no vulnerability"
+      ],
+      "fact_check_pass": true,
+      "target_retrieved_at_k": null,
+      "target_chunk_precision_at_k": null,
+      "answer": "No, 'not_assessed' does not mean zero vulnerabilities. According to the MCP Sentinel methodology, 'not_assessed' means no vulnerability lookup was recorded, so the count of vulnerabilities is unknown, not zero. Zero vulnerabilities are indicated by 'no_known_findings_in_completed_checks', which means zero findings in completed checks but is not proof of overall safety.",
+      "status": "grounded",
+      "citation_ids": [
+        "methodology:methodology:0"
+      ],
+      "limitations": [
+        "The absence of assessment ('not_assessed') means unknown vulnerability status, not confirmed absence of vulnerabilities."
+      ],
+      "sources": [
+        {
+          "citation_id": "methodology:methodology:0",
+          "server_id": null,
+          "server_version_id": null,
+          "kind": "methodology",
+          "title": "MCP Sentinel methodology: assessment coverage",
+          "content": "MCP Sentinel methodology: assessment coverage\n{\"meaning\": \"not_assessed means no lookup was recorded; null counts are unknown, not zero. no_known_findings_in_completed_checks means zero findings in completed checks, not proof of safety. resolved_dependency findings model a fresh install from deps.dev, not installed dependencies. The database is a historical snapshot. Endpoint observations are third-party historical handshakes. There is no live compromise telemetry or validated overall risk score. EPSS is per CVE. Full inventory counts require SQL aggregation, not a top-k sample. The source registry data was collected on 2026-10-23; enrichment coverage is partial.\", \"source_name\": \"MCP Sentinel project methodology\", \"source_url\": null}",
+          "source_url": null,
+          "observed_at": null,
+          "indexed_at": "2026-11-13 07:29:02.099980+00:00",
+          "similarity": 0.5418549814657714,
+          "rank": 0.5834839911330816
+        },
+        {
+          "citation_id": "server:32:0",
+          "server_id": 32,
+          "server_version_id": 32,
+          "kind": "server",
+          "title": "com.ownerspec/mcp: server profile",
+          "content": "com.ownerspec/mcp: server profile\n{\"coverage\": \"dependency_advisories/osv: not_applicable (1); dependency_resolution/deps_dev: not_applicable (1); direct_package_advisories/ghsa: not_applicable (1); direct_package_advisories/osv: not_applicable (1); endpoint_status/agora: evidence_found (1); repository_metadata/github: evidence_found (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": null, \"dependency_advisories\": null, \"deployment_type\": \"remote_only\", \"description\": \"Cited home water treatment answers, part matching and sizing calculators for AI agents.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"com.ownerspec/mcp\", \"server_id\": 32, \"server_version_id\": 32, \"title\": \"OwnerSpec\", \"version\": \"1.0.0\", \"vulnerability_assessment_state\": \"no_package_vulnerability_path\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:57.987659+00:00",
+          "similarity": 0.45181032054273107,
+          "rank": 0.5414482623946494
+        },
+        {
+          "citation_id": "server:123:0",
+          "server_id": 123,
+          "server_version_id": 123,
+          "kind": "server",
+          "title": "link.snip/snip: server profile",
+          "content": "link.snip/snip: server profile\n{\"coverage\": \"dependency_advisories/osv: not_applicable (1); dependency_resolution/deps_dev: not_applicable (1); direct_package_advisories/ghsa: not_applicable (1); direct_package_advisories/osv: not_applicable (1); endpoint_status/agora: evidence_found (1); repository_metadata/github: missing_identifier (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: missing_identifier (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": null, \"dependency_advisories\": null, \"deployment_type\": \"remote_only\", \"description\": \"Free QR codes that never expire and free short links with click stats.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"link.snip/snip\", \"server_id\": 123, \"server_version_id\": 123, \"title\": \"Snip\", \"version\": \"1.0.0\", \"vulnerability_assessment_state\": \"no_package_vulnerability_path\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:59.042913+00:00",
+          "similarity": 0.45066914344767384,
+          "rank": 0.5405353207186037
+        },
+        {
+          "citation_id": "server:107:0",
+          "server_id": 107,
+          "server_version_id": 107,
+          "kind": "server",
+          "title": "io.github.ranawaqas-ai/mdreview: server profile",
+          "content": "io.github.ranawaqas-ai/mdreview: server profile\n{\"coverage\": \"dependency_advisories/osv: not_applicable (1); dependency_resolution/deps_dev: not_applicable (1); direct_package_advisories/ghsa: not_applicable (1); direct_package_advisories/osv: not_applicable (1); endpoint_status/agora: evidence_found (1); repository_metadata/github: evidence_found (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": null, \"dependency_advisories\": null, \"deployment_type\": \"remote_only\", \"description\": \"Human-in-the-loop document review: an agent pushes a draft, a person comments, the agent revises.\", \"direct_advisories\": null, \"distinct_advisories\": null, \"ecosystems\": [], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.ranawaqas-ai/mdreview\", \"server_id\": 107, \"server_version_id\": 107, \"title\": \"mdreview\", \"version\": \"0.7.0\", \"vulnerability_assessment_state\": \"no_package_vulnerability_path\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:59.042913+00:00",
+          "similarity": 0.4412856937642544,
+          "rank": 0.5330285609718681
+        },
+        {
+          "citation_id": "server:106:0",
+          "server_id": 106,
+          "server_version_id": 106,
+          "kind": "server",
+          "title": "io.github.puglieseweb/systemdox: server profile",
+          "content": "io.github.puglieseweb/systemdox: server profile\n{\"coverage\": \"dependency_advisories/osv: no_known_finding (1); dependency_resolution/deps_dev: evidence_found (1); direct_package_advisories/ghsa: no_known_finding (1); direct_package_advisories/osv: no_known_finding (1); endpoint_status/agora: evidence_found (1); package_metadata/deps_dev: evidence_found (1); package_metadata/npm: evidence_found (1); repository_metadata/github: not_found (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"npm:@systemdox/mcp-server@0.1.38\", \"dependency_advisories\": 0, \"deployment_type\": \"packages_only\", \"description\": \"Your architecture in your agents' context: checks, specs, ADRs and docs over MCP, at write time.\", \"direct_advisories\": 0, \"distinct_advisories\": 0, \"ecosystems\": [\"npm\"], \"highest_advisory_severity\": null, \"latest_check_at\": \"2026-10-23 06:51:25+00:00\", \"latest_finding_observed_at\": null, \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.puglieseweb/systemdox\", \"server_id\": 106, \"server_version_id\": 106, \"title\": null, \"version\": \"0.1.38\", \"vulnerability_assessment_state\": \"no_known_findings_in_completed_checks\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:59.042913+00:00",
+          "similarity": 0.44116313617434555,
+          "rank": 0.532930514899941
+        }
+      ],
+      "strategy": "few_shot",
+      "use_retrieval": true,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 20.8,
+      "latency_ms": 1646.1,
+      "input_tokens": 2931,
+      "output_tokens": 117
+    },
+    {
+      "case": "coverage",
+      "question": "Does not_assessed mean zero vulnerabilities?",
+      "expected_terms": [
+        "unknown",
+        "not zero",
+        "does not",
+        "no assessment",
+        "no vulnerability"
+      ],
+      "fact_check_pass": false,
+      "target_retrieved_at_k": null,
+      "target_chunk_precision_at_k": null,
+      "answer": "No, 'not_assessed' does not mean zero vulnerabilities. It indicates that the security status has not been evaluated or assessed, so no conclusions about vulnerabilities can be drawn from it.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "No specific evidence provided regarding the meaning of 'not_assessed' in this context."
+      ],
+      "sources": [],
+      "strategy": "zero_shot",
+      "use_retrieval": false,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 0.0,
+      "latency_ms": 1128.3,
+      "input_tokens": 393,
+      "output_tokens": 73
+    },
+    {
+      "case": "coverage",
+      "question": "Does not_assessed mean zero vulnerabilities?",
+      "expected_terms": [
+        "unknown",
+        "not zero",
+        "does not",
+        "no assessment",
+        "no vulnerability"
+      ],
+      "fact_check_pass": false,
+      "target_retrieved_at_k": null,
+      "target_chunk_precision_at_k": null,
+      "answer": "The term 'not_assessed' does not mean zero vulnerabilities. It indicates that no vulnerability assessment has been performed, so the presence or absence of vulnerabilities is unknown.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "No evidence was provided to define 'not_assessed' explicitly."
+      ],
+      "sources": [],
+      "strategy": "few_shot",
+      "use_retrieval": false,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 0.0,
+      "latency_ms": 1136.6,
+      "input_tokens": 612,
+      "output_tokens": 65
+    },
+    {
+      "case": "live_unknown",
+      "question": "Was praisonai compromised today?",
+      "expected_terms": [],
+      "fact_check_pass": true,
+      "target_retrieved_at_k": true,
+      "target_chunk_precision_at_k": 1.0,
+      "answer": "The stored historical evidence cannot establish whether a server was compromised today. MCP Sentinel does not collect live compromise telemetry.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "Historical vulnerability findings do not establish a current compromise."
+      ],
+      "sources": [
+        {
+          "citation_id": "server:62:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "server",
+          "title": "io.github.MervinPraison/praisonai: server profile",
+          "content": "io.github.MervinPraison/praisonai: server profile\n{\"coverage\": \"dependency_advisories/osv: finding_found (1); dependency_resolution/deps_dev: evidence_found (1); direct_package_advisories/ghsa: finding_found (1); direct_package_advisories/osv: finding_found (1); endpoint_status/agora: evidence_found (1); package_metadata/deps_dev: evidence_found (1); package_metadata/pypi: evidence_found (1); repository_metadata/github: evidence_found (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"pypi:praisonai@2.3.42\", \"dependency_advisories\": 2, \"deployment_type\": \"packages_only\", \"description\": \"AI Agents Framework with Self Reflection and MCP support\", \"direct_advisories\": 80, \"distinct_advisories\": 82, \"ecosystems\": [\"pypi\"], \"highest_advisory_severity\": \"CRITICAL\", \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": \"2026-10-23 05:57:37+00:00\", \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"title\": \"PraisonAI\", \"version\": \"2.3.42\", \"vulnerability_assessment_state\": \"findings_recorded\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.063018+00:00",
+          "similarity": 0.43847916312552015,
+          "rank": 0.9307833364608807
+        },
+        {
+          "citation_id": "finding:57:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-57124",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-57124\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-57124\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 57, \"finding_status\": \"active\", \"fixed_versions\": [\"4.6.59\"], \"identifiers\": \"CVE-2026-57124, GHSA-p75f-6fp4-p57w, PYSEC-2026-3517\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:31+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"CRITICAL\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI: Missing Authentication for Critical Function and Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection') in praisonai\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:31+00:00",
+          "indexed_at": "2026-11-13 07:28:59.953727+00:00",
+          "similarity": 0.49790737395784457,
+          "rank": 0.6283259051267401
+        },
+        {
+          "citation_id": "finding:35:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-41497",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-41497\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-41497\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 35, \"finding_status\": \"active\", \"fixed_versions\": [\"4.5.149\"], \"identifiers\": \"CVE-2026-41497, GHSA-9qhq-v63v-fv3j, PYSEC-2026-473\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:37+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"CRITICAL\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI has an incomplete fix for CVE-2026-34935 - OS Command Injection \"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:37+00:00",
+          "indexed_at": "2026-11-13 07:28:59.953727+00:00",
+          "similarity": 0.4880826120958859,
+          "rank": 0.6204660956371731
+        },
+        {
+          "citation_id": "finding:42:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-61439",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-61439\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-61439\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 42, \"finding_status\": \"active\", \"fixed_versions\": [\"4.6.78\"], \"identifiers\": \"CVE-2026-61439, GHSA-fj8f-m44g-c479, PYSEC-2026-4255\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:34+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"HIGH\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI: Prompt Injection Defense Bypassed for HIGH-Level Threats\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:34+00:00",
+          "indexed_at": "2026-11-13 07:28:59.953727+00:00",
+          "similarity": 0.48612631081142976,
+          "rank": 0.6189010546096082
+        },
+        {
+          "citation_id": "finding:75:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-55529",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-55529\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-55529\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 75, \"finding_status\": \"active\", \"fixed_versions\": [\"4.6.58\"], \"identifiers\": \"CVE-2026-55529, GHSA-wj6g-v78p-6fx3, PYSEC-2026-3896\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:33+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"MODERATE\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI has an origin validation bypass in MCP HTTP Stream transport that allows browser-mediated unauthenticated tool execution on local MCP server\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:33+00:00",
+          "indexed_at": "2026-11-13 07:29:00.459554+00:00",
+          "similarity": 0.4826111339141058,
+          "rank": 0.6160889130917492
+        }
+      ],
+      "strategy": "zero_shot",
+      "use_retrieval": true,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 232.7,
+      "latency_ms": 232.8,
+      "input_tokens": 0,
+      "output_tokens": 0
+    },
+    {
+      "case": "live_unknown",
+      "question": "Was praisonai compromised today?",
+      "expected_terms": [],
+      "fact_check_pass": true,
+      "target_retrieved_at_k": true,
+      "target_chunk_precision_at_k": 1.0,
+      "answer": "The stored historical evidence cannot establish whether a server was compromised today. MCP Sentinel does not collect live compromise telemetry.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "Historical vulnerability findings do not establish a current compromise."
+      ],
+      "sources": [
+        {
+          "citation_id": "server:62:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "server",
+          "title": "io.github.MervinPraison/praisonai: server profile",
+          "content": "io.github.MervinPraison/praisonai: server profile\n{\"coverage\": \"dependency_advisories/osv: finding_found (1); dependency_resolution/deps_dev: evidence_found (1); direct_package_advisories/ghsa: finding_found (1); direct_package_advisories/osv: finding_found (1); endpoint_status/agora: evidence_found (1); package_metadata/deps_dev: evidence_found (1); package_metadata/pypi: evidence_found (1); repository_metadata/github: evidence_found (1); tool_metadata/glama: access_restricted (1); tool_metadata/policylayer: not_found (1); tool_metadata/toolhive: not_found (1)\", \"declarations\": \"pypi:praisonai@2.3.42\", \"dependency_advisories\": 2, \"deployment_type\": \"packages_only\", \"description\": \"AI Agents Framework with Self Reflection and MCP support\", \"direct_advisories\": 80, \"distinct_advisories\": 82, \"ecosystems\": [\"pypi\"], \"highest_advisory_severity\": \"CRITICAL\", \"latest_check_at\": \"2026-10-23 06:51:07+00:00\", \"latest_finding_observed_at\": \"2026-10-23 05:57:37+00:00\", \"observed_at\": \"2026-10-23 05:27:25+00:00\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"title\": \"PraisonAI\", \"version\": \"2.3.42\", \"vulnerability_assessment_state\": \"findings_recorded\"}",
+          "source_url": "https://registry.modelcontextprotocol.io",
+          "observed_at": "2026-10-23 05:27:25+00:00",
+          "indexed_at": "2026-11-13 07:28:58.063018+00:00",
+          "similarity": 0.43847916312552015,
+          "rank": 0.9307833364608807
+        },
+        {
+          "citation_id": "finding:57:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-57124",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-57124\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-57124\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 57, \"finding_status\": \"active\", \"fixed_versions\": [\"4.6.59\"], \"identifiers\": \"CVE-2026-57124, GHSA-p75f-6fp4-p57w, PYSEC-2026-3517\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:31+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"CRITICAL\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI: Missing Authentication for Critical Function and Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection') in praisonai\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:31+00:00",
+          "indexed_at": "2026-11-13 07:28:59.953727+00:00",
+          "similarity": 0.49790737395784457,
+          "rank": 0.6283259051267401
+        },
+        {
+          "citation_id": "finding:35:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-41497",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-41497\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-41497\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 35, \"finding_status\": \"active\", \"fixed_versions\": [\"4.5.149\"], \"identifiers\": \"CVE-2026-41497, GHSA-9qhq-v63v-fv3j, PYSEC-2026-473\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:37+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"CRITICAL\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI has an incomplete fix for CVE-2026-34935 - OS Command Injection \"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:37+00:00",
+          "indexed_at": "2026-11-13 07:28:59.953727+00:00",
+          "similarity": 0.4880826120958859,
+          "rank": 0.6204660956371731
+        },
+        {
+          "citation_id": "finding:42:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-61439",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-61439\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-61439\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 42, \"finding_status\": \"active\", \"fixed_versions\": [\"4.6.78\"], \"identifiers\": \"CVE-2026-61439, GHSA-fj8f-m44g-c479, PYSEC-2026-4255\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:34+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"HIGH\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI: Prompt Injection Defense Bypassed for HIGH-Level Threats\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:34+00:00",
+          "indexed_at": "2026-11-13 07:28:59.953727+00:00",
+          "similarity": 0.48612631081142976,
+          "rank": 0.6189010546096082
+        },
+        {
+          "citation_id": "finding:75:0",
+          "server_id": 62,
+          "server_version_id": 62,
+          "kind": "finding",
+          "title": "io.github.MervinPraison/praisonai: CVE-2026-55529",
+          "content": "io.github.MervinPraison/praisonai: CVE-2026-55529\n{\"affected_version\": \"2.3.42\", \"attribution\": \"Vulnerability data from OSV.dev and its upstream databases\", \"canonical_id\": \"CVE-2026-55529\", \"ecosystem\": \"pypi\", \"finding_category\": \"direct_package\", \"finding_id\": 75, \"finding_status\": \"active\", \"fixed_versions\": [\"4.6.58\"], \"identifiers\": \"CVE-2026-55529, GHSA-wj6g-v78p-6fx3, PYSEC-2026-3896\", \"match_method\": \"osv_exact_version_query\", \"observed_at\": \"2026-10-23 05:57:33+00:00\", \"package\": \"praisonai\", \"registry_name\": \"io.github.MervinPraison/praisonai\", \"server_id\": 62, \"server_version_id\": 62, \"severity_label\": \"MODERATE\", \"source_name\": \"OSV.dev\", \"source_url\": \"https://osv.dev/list?ecosystem=PyPI&q=praisonai\", \"summary\": \"PraisonAI has an origin validation bypass in MCP HTTP Stream transport that allows browser-mediated unauthenticated tool execution on local MCP server\"}",
+          "source_url": "https://osv.dev/list?ecosystem=PyPI&q=praisonai",
+          "observed_at": "2026-10-23 05:57:33+00:00",
+          "indexed_at": "2026-11-13 07:29:00.459554+00:00",
+          "similarity": 0.4826111339141058,
+          "rank": 0.6160889130917492
+        }
+      ],
+      "strategy": "few_shot",
+      "use_retrieval": true,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 16.6,
+      "latency_ms": 16.7,
+      "input_tokens": 0,
+      "output_tokens": 0
+    },
+    {
+      "case": "live_unknown",
+      "question": "Was praisonai compromised today?",
+      "expected_terms": [],
+      "fact_check_pass": true,
+      "target_retrieved_at_k": false,
+      "target_chunk_precision_at_k": null,
+      "answer": "The stored historical evidence cannot establish whether a server was compromised today. MCP Sentinel does not collect live compromise telemetry.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "Historical vulnerability findings do not establish a current compromise."
+      ],
+      "sources": [],
+      "strategy": "zero_shot",
+      "use_retrieval": false,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 0.0,
+      "latency_ms": 0.0,
+      "input_tokens": 0,
+      "output_tokens": 0
+    },
+    {
+      "case": "live_unknown",
+      "question": "Was praisonai compromised today?",
+      "expected_terms": [],
+      "fact_check_pass": true,
+      "target_retrieved_at_k": false,
+      "target_chunk_precision_at_k": null,
+      "answer": "The stored historical evidence cannot establish whether a server was compromised today. MCP Sentinel does not collect live compromise telemetry.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "Historical vulnerability findings do not establish a current compromise."
+      ],
+      "sources": [],
+      "strategy": "few_shot",
+      "use_retrieval": false,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 0.0,
+      "latency_ms": 0.0,
+      "input_tokens": 0,
+      "output_tokens": 0
+    },
+    {
+      "case": "absent_server",
+      "question": "Is ac.inference.sh/mcp safe?",
+      "expected_terms": [],
+      "fact_check_pass": true,
+      "target_retrieved_at_k": null,
+      "target_chunk_precision_at_k": null,
+      "answer": "The retrieved evidence does not contain the exact server you named. I cannot substitute another server or establish its security status.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "No matching server evidence was retrieved."
+      ],
+      "sources": [],
+      "strategy": "zero_shot",
+      "use_retrieval": true,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 266.3,
+      "latency_ms": 266.4,
+      "input_tokens": 0,
+      "output_tokens": 0
+    },
+    {
+      "case": "absent_server",
+      "question": "Is ac.inference.sh/mcp safe?",
+      "expected_terms": [],
+      "fact_check_pass": true,
+      "target_retrieved_at_k": null,
+      "target_chunk_precision_at_k": null,
+      "answer": "The retrieved evidence does not contain the exact server you named. I cannot substitute another server or establish its security status.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "No matching server evidence was retrieved."
+      ],
+      "sources": [],
+      "strategy": "few_shot",
+      "use_retrieval": true,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 13.9,
+      "latency_ms": 13.9,
+      "input_tokens": 0,
+      "output_tokens": 0
+    },
+    {
+      "case": "absent_server",
+      "question": "Is ac.inference.sh/mcp safe?",
+      "expected_terms": [],
+      "fact_check_pass": true,
+      "target_retrieved_at_k": null,
+      "target_chunk_precision_at_k": null,
+      "answer": "There is no evidence provided regarding the safety of ac.inference.sh/mcp. Without specific security findings or assessments related to this domain, its safety cannot be determined.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "No evidence about ac.inference.sh/mcp was supplied."
+      ],
+      "sources": [],
+      "strategy": "zero_shot",
+      "use_retrieval": false,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 0.0,
+      "latency_ms": 1098.4,
+      "input_tokens": 394,
+      "output_tokens": 64
+    },
+    {
+      "case": "absent_server",
+      "question": "Is ac.inference.sh/mcp safe?",
+      "expected_terms": [],
+      "fact_check_pass": true,
+      "target_retrieved_at_k": null,
+      "target_chunk_precision_at_k": null,
+      "answer": "There is no evidence available regarding the safety or security status of ac.inference.sh/mcp.",
+      "status": "insufficient_evidence",
+      "citation_ids": [],
+      "limitations": [
+        "No security assessment or vulnerability data is available for ac.inference.sh/mcp."
+      ],
+      "sources": [],
+      "strategy": "few_shot",
+      "use_retrieval": false,
+      "model": "gpt-4.1-mini",
+      "retrieval_ms": 0.0,
+      "latency_ms": 1330.7,
+      "input_tokens": 613,
+      "output_tokens": 54
+    }
+  ]
+}

@@ -377,10 +377,79 @@ def compare():
     st.dataframe(pd.DataFrame(rows), width="stretch", height=760)
 
 
+def ai_assistant():
+    st.title("AI assistant")
+    st.caption("Ask about stored MCP server records and security evidence. Answers cite historical sources; assessment coverage is partial.")
+    state = call("/api/ai/status")
+    if not state["configured"]:
+        st.info("The AI assistant needs to be configured by the project administrator.")
+        return
+    if not state["chunks"]:
+        st.info("The project data has not been indexed for AI search yet.")
+        return
+    st.caption(f"{state['chunks']:,} searchable evidence chunks · Last indexed {fmt_date(state['last_indexed_at'])}")
+    with st.expander("Answer settings"):
+        strategy = st.selectbox("Prompt strategy", ["few_shot", "zero_shot"],
+                                format_func={"few_shot": "Few-shot (with examples)", "zero_shot": "Zero-shot"}.get)
+        top_k = st.slider("Sources to retrieve", min_value=1, max_value=10, value=5)
+    messages = st.session_state.setdefault("ai_messages", [])
+    if st.button("Clear conversation", disabled=not messages):
+        st.session_state["ai_messages"] = []
+        st.rerun()
+
+    def show_answer(result, key):
+        st.markdown(result["answer"])
+        if result["status"] == "insufficient_evidence":
+            st.caption("The available evidence is insufficient for a complete answer.")
+        for limitation in result["limitations"]:
+            st.caption(limitation)
+        cited = set(result["citation_ids"])
+        if result["sources"]:
+            with st.expander(f"Evidence sources ({len(cited)} cited, {len(result['sources'])} retrieved)"):
+                for i, source in enumerate(result["sources"]):
+                    st.markdown(f"**{source['title']}** · {'Cited' if source['citation_id'] in cited else 'Retrieved'}")
+                    st.caption(f"Observed {fmt_date(source['observed_at'])} · Similarity {source['similarity']:.3f}")
+                    st.text(source["content"])
+                    url = source.get("source_url") or ""
+                    if url.startswith("https://"):
+                        st.link_button("Original data source", url)
+                    if source["server_id"] and st.button("Open server profile", key=f"{key}_source_{i}"):
+                        open_profile(source["server_id"])
+        st.caption(f"{result['latency_ms'] / 1000:.1f}s · {result['input_tokens']:,} input / {result['output_tokens']:,} output tokens")
+
+    for i, message in enumerate(messages):
+        with st.chat_message(message["role"]):
+            if message["role"] == "assistant":
+                show_answer(message["result"], f"history_{i}")
+            else:
+                st.markdown(message["content"])
+    if question := st.chat_input("Ask about a server, vulnerability, or missing assessment", max_chars=1500):
+        history = [{"role": m["role"], "content": m["content"][:4000]} for m in messages[-6:]]
+        with st.chat_message("user"):
+            st.markdown(question)
+        try:
+            with st.spinner("Searching stored evidence and preparing an answer…"):
+                response = requests.post(f"{BACKEND_URL}/api/ai/chat", json={"question": question, "history": history,
+                                         "strategy": strategy, "top_k": top_k}, timeout=110)
+                if not response.ok:
+                    detail = response.json().get("detail", "The assistant could not complete this request.")
+                    st.error(detail if isinstance(detail, str) else "Please check your question and try again.")
+                    return
+                result = response.json()
+        except (requests.RequestException, ValueError):
+            st.error("The assistant is unavailable or took too long to respond. Please try again.")
+            return
+        messages.extend([{"role": "user", "content": question},
+                         {"role": "assistant", "content": result["answer"], "result": result}])
+        del messages[:-20]
+        st.rerun()
+
+
 PAGES = {
     "dashboard": st.Page(dashboard, title="Dashboard", icon=":material/dashboard:", default=True),
     "search": st.Page(search, title="Server search", icon=":material/search:", url_path="search"),
     "profile": st.Page(profile, title="Server profile", icon=":material/description:", url_path="profile"),
     "compare": st.Page(compare, title="Compare", icon=":material/compare_arrows:", url_path="compare"),
+    "ai": st.Page(ai_assistant, title="AI assistant", icon=":material/chat:", url_path="ai"),
 }
 st.navigation(list(PAGES.values())).run()

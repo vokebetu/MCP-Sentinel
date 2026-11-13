@@ -1,0 +1,14 @@
+{
+  "source": "Official MCP Registry",
+  "endpoint": "https://registry.modelcontextprotocol.io/v0.1/servers",
+  "query_parameters": {
+    "limit": 100,
+    "version": "latest",
+    "include_deleted": "true"
+  },
+  "collection_started_at": "2026-10-23T05:27:25Z",
+  "collection_finished_at": "2026-10-23T05:53:35Z",
+  "complete": true,
+  "records_collected": 50019,
+  "records_in_this_file": 50019
+}

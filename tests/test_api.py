@@ -100,3 +100,76 @@ def test_keyword_is_parameterized(client):
     response = client.get("/api/servers", params={"q": "x'; DROP TABLE servers; --"})
     assert response.status_code == 200
     assert client.get("/health").json()["servers"] == before
+
+
+def test_ai_configuration_and_request_limits(client, monkeypatch):
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    assert client.get("/api/ai/status").json()["configured"] is False
+    assert client.post("/api/ai/chat", json={"question": ""}).status_code == 422
+    assert client.post("/api/ai/chat", json={"question": "   "}).status_code == 422
+    assert client.post("/api/ai/chat", json={"question": "hello", "top_k": 11}).status_code == 422
+    assert client.post("/api/ai/chat", json={"question": "hello", "strategy": "bogus"}).status_code == 422
+    assert client.post("/api/ai/chat", json={"question": "hello", "use_retrieval": False}).status_code == 503
+    ai = importlib.import_module("app.ai")
+    assert ai.fetch_one("SHOW transaction_read_only")["transaction_read_only"] == "on"
+
+
+def test_ai_rejects_fabricated_citations_and_handles_timeouts(client, monkeypatch):
+    import json
+    import httpx
+    from fastapi import HTTPException
+    ai = importlib.import_module("app.ai")
+    monkeypatch.setenv("OPENAI_API_KEY", "test-not-a-real-key")
+    source = {"citation_id": "server:1:0", "title": "test", "content": "not_assessed"}
+    monkeypatch.setattr(ai, "retrieve", lambda *args: [source])
+
+    def result(citation):
+        return {"status": "completed", "output": [{"type": "message", "content": [{"type": "output_text", "text": json.dumps({
+            "answer": "The count is unknown.", "status": "grounded", "citation_ids": [citation], "limitations": []})}]}]}
+
+    monkeypatch.setattr(ai, "post", lambda *args: result("invented-source"))
+    assert client.post("/api/ai/chat", json={"question": "Is it safe?"}).status_code == 502
+    monkeypatch.setattr(ai, "post", lambda *args: result("server:1:0"))
+    response = client.post("/api/ai/chat", json={"question": "Is it safe?"})
+    assert response.status_code == 200 and response.json()["citation_ids"] == ["server:1:0"]
+    monkeypatch.undo()
+    monkeypatch.setenv("OPENAI_API_KEY", "test-not-a-real-key")
+
+    class Offline:
+        def post(self, *args, **kwargs):
+            raise httpx.ReadTimeout("simulated timeout")
+
+    monkeypatch.setattr(ai, "provider", lambda: Offline())
+    with pytest.raises(HTTPException) as caught:
+        ai.post("responses", {})
+    assert caught.value.status_code == 504
+
+
+def test_ai_incremental_index_and_retrieval_use_only_current_versions(client, monkeypatch):
+    import json
+    import psycopg
+    ai = importlib.import_module("app.ai")
+    vector = [1.0] + [0.0] * 511
+    monkeypatch.setattr(ai, "embed", lambda texts: ([vector] * len(texts), len(texts)))
+    monkeypatch.setattr(ai, "query_embedding", lambda text: tuple(vector))
+    ai.query_embedding.cache_clear = lambda: None
+    first = ai.index_corpus(workers=2)
+    second = ai.index_corpus(workers=1)
+    assert first["embedded"] > 0 and first["chunks"] > 131
+    assert second["embedded"] == 0 and second["embedding_tokens"] == 0
+    sources = ai.retrieve("praisonai", 5)
+    assert sources and len(sources) <= 5
+    named = ai.retrieve("Is ai.agentplaybooks/agentplaybooks safe?", 5)
+    assert named[0]["title"].startswith("ai.agentplaybooks/agentplaybooks:")
+    exact = ai.retrieve("What evidence connects CVE-2026-40159 to praisonai?", 5)
+    assert any("CVE-2026-40159" in source["content"] for source in exact)
+    with psycopg.connect(ai.database_url()) as conn:
+        sid = conn.execute("SELECT server_id FROM servers WHERE registry_status = 'deleted' LIMIT 1").fetchone()[0]
+        version = conn.execute("SELECT latest_version_id FROM servers WHERE server_id=%s", (sid,)).fetchone()[0]
+        conn.execute("""INSERT INTO ai_chunks (chunk_key,server_id,server_version_id,kind,title,content,content_hash,
+                     embedding_model,embedding,seen_run) VALUES ('deleted-test',%s,%s,'server','praisonai deleted test',
+                     'praisonai deleted test','test',%s,%s::vector,'00000000-0000-0000-0000-000000000000')""",
+                     (sid, version, ai.EMBEDDING_MODEL, json.dumps(vector)))
+    assert all(s["citation_id"] != "deleted-test" for s in ai.retrieve("praisonai deleted test", 10))
+    third = ai.index_corpus()
+    assert third["removed"] == 1 and third["embedded"] == 0

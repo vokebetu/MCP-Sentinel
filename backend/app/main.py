@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 from psycopg_pool import PoolTimeout
 
 from .db import fetch_all, fetch_one, pool
+from .ai import close_client, router as ai_router
 from .models import (
     CheckRecord, CheckTypeCoverage, CompareEntry, CompareResponse, CoverageResponse, CveContext, EndpointObservation, EvidenceSource, Finding,
     Health, PackageDeclaration, RemoteEndpoint, Repository, SecurityResponse, SecuritySummary, ServerDetail, ServerPage, ServerSummary, SourceInfo,
@@ -61,9 +62,11 @@ async def lifespan(app):
     pool.open(wait=False)
     yield
     pool.close()
+    close_client()
 
 
-app = FastAPI(title="MCP Sentinel API", version="0.2.0", lifespan=lifespan)
+app = FastAPI(title="MCP Sentinel API", version="0.3.0", lifespan=lifespan)
+app.include_router(ai_router)
 
 
 @app.exception_handler(PoolTimeout)

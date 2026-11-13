@@ -1,0 +1,10 @@
+{
+  "file": "toolhive_official.json",
+  "url": "https://raw.githubusercontent.com/stacklok/toolhive-catalog/main/pkg/catalog/official/data/registry-upstream.json",
+  "status": 200,
+  "error": null,
+  "fetched_at": "2026-10-23T04:20:31Z",
+  "bytes": 2482115,
+  "sha256": "77e85bc312d3635929f09154b98f6d991fbf738e4abe525243c54af6f528dca9",
+  "content_type": "text/plain; charset=utf-8"
+}

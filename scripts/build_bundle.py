@@ -16,7 +16,7 @@ from sentinel_common import (
     normalize_package_name,
 )
 
-RESEARCH = ROOT / "research"
+RESEARCH = ROOT / "data" / "research"
 STUDY = RESEARCH / "registry_study"
 CACHE = RESEARCH / "cache" / "http"
 DOWNLOADS = RESEARCH / "cache" / "downloads"

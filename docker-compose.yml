@@ -7,7 +7,8 @@ x-database-env: &database-env
 
 services:
   db:
-    image: postgres:17.11-alpine
+    build: ./database
+    image: mcp-sentinel-db:pg17-vector
     environment:
       <<: *database-env
     volumes:
@@ -26,6 +27,8 @@ services:
       <<: *database-env
       POSTGRES_HOST: db
       POSTGRES_PORT: "5432"
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_CHAT_MODEL: ${OPENAI_CHAT_MODEL:-gpt-4.1-mini}
     expose:
       - "8000"
     depends_on:

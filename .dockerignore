@@ -1,0 +1,13 @@
+.git
+.env
+.env.*
+.venv
+artifacts
+research
+data/bundle
+data/dump
+data/research
+**/__pycache__
+.pytest_cache
+.DS_Store
+*.zip

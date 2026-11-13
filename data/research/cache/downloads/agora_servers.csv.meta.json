@@ -1,0 +1,10 @@
+{
+  "file": "agora_servers.csv",
+  "url": "https://openforallofus.com/data/servers.csv",
+  "status": 200,
+  "error": null,
+  "fetched_at": "2026-10-23T04:20:28Z",
+  "bytes": 8197062,
+  "sha256": "3cf19d93b91c80d1fe7f14ab7d6762e6e6b2391a8f4928d04c80f05162fa3ae6",
+  "content_type": "text/csv; charset=utf-8"
+}

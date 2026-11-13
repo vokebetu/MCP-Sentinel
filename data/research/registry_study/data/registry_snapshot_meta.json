@@ -1,0 +1,4027 @@
+{
+  "source": "Official MCP Registry",
+  "endpoint": "https://registry.modelcontextprotocol.io/v0.1/servers",
+  "query_parameters": {
+    "limit": 100,
+    "version": "latest",
+    "include_deleted": "true"
+  },
+  "openapi_version": "1.0.0",
+  "collection_started_at": "2026-10-23T05:27:25Z",
+  "collection_finished_at": "2026-10-23T05:53:35Z",
+  "complete": true,
+  "pages": [
+    {
+      "cursor": null,
+      "http_status": 200,
+      "seconds": 0.33,
+      "fetched_at": "2026-10-23T05:27:26Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.agentutility/mcp-edge-market:0.15.6",
+      "http_status": 200,
+      "seconds": 7.3,
+      "fetched_at": "2026-10-23T05:27:34Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.augenix/build:1.0.0",
+      "http_status": 200,
+      "seconds": 11.93,
+      "fetched_at": "2026-10-23T05:27:46Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.bourdon/bourdon:0.32.1",
+      "http_status": 200,
+      "seconds": 12.14,
+      "fetched_at": "2026-10-23T05:27:59Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.cocuyo/cocuyo:1.0.1",
+      "http_status": 200,
+      "seconds": 7.94,
+      "fetched_at": "2026-10-23T05:28:07Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.deinai/creator-skill-v2:0.2.1",
+      "http_status": 200,
+      "seconds": 6.28,
+      "fetched_at": "2026-10-23T05:28:14Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.eosl/eosl:1.0.0",
+      "http_status": 200,
+      "seconds": 5.36,
+      "fetched_at": "2026-10-23T05:28:20Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.gavelin/mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 5.08,
+      "fetched_at": "2026-10-23T05:28:25Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.getvda/rabbitmq-elasticsearch-mysql-stack-generator:1.0.0",
+      "http_status": 200,
+      "seconds": 4.79,
+      "fetched_at": "2026-10-23T05:28:31Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.immopix/mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 14.16,
+      "fetched_at": "2026-10-23T05:28:45Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.kosmodrom/kosmodrom:1.2.1589",
+      "http_status": 200,
+      "seconds": 6.89,
+      "fetched_at": "2026-10-23T05:28:53Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.masaro/masaro:0.1.0",
+      "http_status": 200,
+      "seconds": 6.69,
+      "fetched_at": "2026-10-23T05:29:00Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.nitrino/nitrino:1.0.1",
+      "http_status": 200,
+      "seconds": 9.66,
+      "fetched_at": "2026-10-23T05:29:10Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.partsgraph/catalog:1.4.0",
+      "http_status": 200,
+      "seconds": 10.82,
+      "fetched_at": "2026-10-23T05:29:21Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.qlane/qlane:1.0.0",
+      "http_status": 200,
+      "seconds": 7.93,
+      "fetched_at": "2026-10-23T05:29:30Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.rootdata/public-directory:1.0.0",
+      "http_status": 200,
+      "seconds": 10.42,
+      "fetched_at": "2026-10-23T05:29:41Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.shiplight/shiplight:0.2.3",
+      "http_status": 200,
+      "seconds": 11.34,
+      "fetched_at": "2026-10-23T05:29:53Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.smithery/arjunkmrm-ahoy:1.13.1",
+      "http_status": 200,
+      "seconds": 11.57,
+      "fetched_at": "2026-10-23T05:30:05Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.smithery/mfukushim-map-traveler-mcp:0.2.0",
+      "http_status": 200,
+      "seconds": 15.2,
+      "fetched_at": "2026-10-23T05:30:20Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.stimhaus/emma-for-agents:1.0.0",
+      "http_status": 200,
+      "seconds": 13.87,
+      "fetched_at": "2026-10-23T05:30:35Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.timeml/time-machine:1.0.0",
+      "http_status": 200,
+      "seconds": 15.97,
+      "fetched_at": "2026-10-23T05:30:51Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.undetectedgpt/humanizer:1.0.1",
+      "http_status": 200,
+      "seconds": 13.31,
+      "fetched_at": "2026-10-23T05:31:05Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ai.webhound/webhound:0.5.2",
+      "http_status": 200,
+      "seconds": 15.62,
+      "fetched_at": "2026-10-23T05:31:21Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "app.ainovelist/novelist:1.0.0",
+      "http_status": 200,
+      "seconds": 13.72,
+      "fetched_at": "2026-10-23T05:31:35Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "app.cutgpt/research:0.3.0",
+      "http_status": 200,
+      "seconds": 12.04,
+      "fetched_at": "2026-10-23T05:31:48Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "app.getfleek/partners:0.1.0",
+      "http_status": 200,
+      "seconds": 16.13,
+      "fetched_at": "2026-10-23T05:32:04Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "app.lexpad/lexpad:1.0.0",
+      "http_status": 200,
+      "seconds": 30.04,
+      "fetched_at": "2026-10-23T05:32:35Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "app.nomac/all:1.0.0",
+      "http_status": 200,
+      "seconds": 3.45,
+      "fetched_at": "2026-10-23T05:32:39Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "app.ortakliste/ortakliste:1.0.0",
+      "http_status": 200,
+      "seconds": 2.74,
+      "fetched_at": "2026-10-23T05:32:42Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "app.rowb.gbu-compliance/assessment:1.0.0",
+      "http_status": 200,
+      "seconds": 18.29,
+      "fetched_at": "2026-10-23T05:33:01Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "app.studio99/calligraphy:1.1.1",
+      "http_status": 200,
+      "seconds": 18.33,
+      "fetched_at": "2026-10-23T05:33:20Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "app.vercel.personalos-kappa/personalos:1.0.0",
+      "http_status": 200,
+      "seconds": 12.71,
+      "fetched_at": "2026-10-23T05:33:33Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "app.wishpool/kazakhstan-payments-mcp:0.1.0",
+      "http_status": 200,
+      "seconds": 8.67,
+      "fetched_at": "2026-10-23T05:33:42Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ar.superonline/supermercado:2.0.0",
+      "http_status": 200,
+      "seconds": 7.78,
+      "fetched_at": "2026-10-23T05:33:50Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "be.florealholidays/workspace:0.8.0",
+      "http_status": 200,
+      "seconds": 0.81,
+      "fetched_at": "2026-10-23T05:33:52Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "br.com.nineoneninetwo/9192:1.0.0",
+      "http_status": 200,
+      "seconds": 5.86,
+      "fetched_at": "2026-10-23T05:33:58Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ca.swiftsign/mcp:0.5.2",
+      "http_status": 200,
+      "seconds": 4.46,
+      "fetched_at": "2026-10-23T05:34:03Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "ch.kulalabs.pazair/pazair:0.1.0",
+      "http_status": 200,
+      "seconds": 0.46,
+      "fetched_at": "2026-10-23T05:34:04Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "cloud.atatravel/travel-agency:2.4.0",
+      "http_status": 200,
+      "seconds": 3.7,
+      "fetched_at": "2026-10-23T05:34:08Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "cn.tandiu/data:0.1.4",
+      "http_status": 200,
+      "seconds": 0.42,
+      "fetched_at": "2026-10-23T05:34:09Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "co.firecms/mcp:3.5.1",
+      "http_status": 200,
+      "seconds": 0.58,
+      "fetched_at": "2026-10-23T05:34:10Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "co.policyforge/mcp:0.8.0",
+      "http_status": 200,
+      "seconds": 3.04,
+      "fetched_at": "2026-10-23T05:34:14Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "co.youraitools/x402fix:0.1.0",
+      "http_status": 200,
+      "seconds": 1.08,
+      "fetched_at": "2026-10-23T05:34:15Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.a2awire/agent-inbox:0.1.1",
+      "http_status": 200,
+      "seconds": 0.66,
+      "fetched_at": "2026-10-23T05:34:17Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.a2awire/data-product-launch-upcoming-product-tracker:0.1.1",
+      "http_status": 200,
+      "seconds": 0.76,
+      "fetched_at": "2026-10-23T05:34:18Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.advisorfinder/mcp:2.1.0",
+      "http_status": 200,
+      "seconds": 3.02,
+      "fetched_at": "2026-10-23T05:34:21Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.agentspodium/hosting:1.0.4",
+      "http_status": 200,
+      "seconds": 2.36,
+      "fetched_at": "2026-10-23T05:34:24Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.ainetcafe/netcafe-devkit:1.0.0",
+      "http_status": 200,
+      "seconds": 2.35,
+      "fetched_at": "2026-10-23T05:34:27Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.alphanume/datasets:1.7.0",
+      "http_status": 200,
+      "seconds": 1.45,
+      "fetched_at": "2026-10-23T05:34:29Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.app-dex/appdex:1.1.1",
+      "http_status": 200,
+      "seconds": 2.12,
+      "fetched_at": "2026-10-23T05:34:32Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.askedthrice/askedthrice:1.1.0",
+      "http_status": 200,
+      "seconds": 0.67,
+      "fetched_at": "2026-10-23T05:34:33Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.avalara/bl:1.0.0",
+      "http_status": 200,
+      "seconds": 2.19,
+      "fetched_at": "2026-10-23T05:34:36Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.bereviewable/reviewable-artifacts:0.4.3",
+      "http_status": 200,
+      "seconds": 0.61,
+      "fetched_at": "2026-10-23T05:34:37Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.blackwaterwindowcleaning/site-mcp:2026.09.15",
+      "http_status": 200,
+      "seconds": 1.72,
+      "fetched_at": "2026-10-23T05:34:39Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.brainiall/image:1.0.0",
+      "http_status": 200,
+      "seconds": 1.86,
+      "fetched_at": "2026-10-23T05:34:41Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.cadprops/cadprops:1.0.0",
+      "http_status": 200,
+      "seconds": 0.42,
+      "fetched_at": "2026-10-23T05:34:42Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.causabi/geo-optimizer-mcp:0.5.1",
+      "http_status": 200,
+      "seconds": 2.26,
+      "fetched_at": "2026-10-23T05:34:45Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.circleci/mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 1.37,
+      "fetched_at": "2026-10-23T05:34:47Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.clauxel.skybridgepackager/skybridgepackager-mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 1.66,
+      "fetched_at": "2026-10-23T05:34:49Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.commercialrefinancequotes/site:1.0.1",
+      "http_status": 200,
+      "seconds": 0.73,
+      "fetched_at": "2026-10-23T05:34:50Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.coresignal/mcp:2.0.0",
+      "http_status": 200,
+      "seconds": 0.6,
+      "fetched_at": "2026-10-23T05:34:51Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.cryptohopper/mcp-data:1.0.0",
+      "http_status": 200,
+      "seconds": 2.42,
+      "fetched_at": "2026-10-23T05:34:54Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.datakoot/base-intel-mcp:2.0.0",
+      "http_status": 200,
+      "seconds": 1.16,
+      "fetched_at": "2026-10-23T05:34:56Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.deploytoagents/server:0.3.0",
+      "http_status": 200,
+      "seconds": 0.49,
+      "fetched_at": "2026-10-23T05:34:57Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.docketnexus/docketnexus:1.0.0",
+      "http_status": 200,
+      "seconds": 2.54,
+      "fetched_at": "2026-10-23T05:35:00Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.dropwatchhq/trial-overdue:1.0.0",
+      "http_status": 200,
+      "seconds": 2.01,
+      "fetched_at": "2026-10-23T05:35:02Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.edgethirteen.www/slopcheck:1.0.0",
+      "http_status": 200,
+      "seconds": 7.92,
+      "fetched_at": "2026-10-23T05:35:11Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.envoapi/envoapi:1.1.2",
+      "http_status": 200,
+      "seconds": 14.67,
+      "fetched_at": "2026-10-23T05:35:26Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.experiencebamfield/experience-bamfield:2026.10.8",
+      "http_status": 200,
+      "seconds": 8.26,
+      "fetched_at": "2026-10-23T05:35:35Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.feode/feode-mcp:1.4.0",
+      "http_status": 200,
+      "seconds": 5.0,
+      "fetched_at": "2026-10-23T05:35:40Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.flevy/flevy:1.0.0",
+      "http_status": 200,
+      "seconds": 4.33,
+      "fetched_at": "2026-10-23T05:35:45Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.framertonextjs/fnj:1.0.0",
+      "http_status": 200,
+      "seconds": 3.24,
+      "fetched_at": "2026-10-23T05:35:49Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.geiant/mcp-perception:0.3.3",
+      "http_status": 200,
+      "seconds": 3.5,
+      "fetched_at": "2026-10-23T05:35:53Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.getlandlens/landlens:1.0.0",
+      "http_status": 200,
+      "seconds": 2.18,
+      "fetched_at": "2026-10-23T05:35:55Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.glitchwire/news:1.1.0",
+      "http_status": 200,
+      "seconds": 1.77,
+      "fetched_at": "2026-10-23T05:35:58Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.gositehunt/gositehunt:1.4.0",
+      "http_status": 200,
+      "seconds": 2.37,
+      "fetched_at": "2026-10-23T05:36:01Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.guruwalk/mcp:1.0.1",
+      "http_status": 200,
+      "seconds": 3.25,
+      "fetched_at": "2026-10-23T05:36:04Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.hellogymmy/gymmy:1.0.0",
+      "http_status": 200,
+      "seconds": 1.09,
+      "fetched_at": "2026-10-23T05:36:06Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.hreflangly/site:1.0.1",
+      "http_status": 200,
+      "seconds": 2.55,
+      "fetched_at": "2026-10-23T05:36:09Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.indiapropertyregister/mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 0.79,
+      "fetched_at": "2026-10-23T05:36:10Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.invoiceparserpro/ipp:1.0.1",
+      "http_status": 200,
+      "seconds": 2.06,
+      "fetched_at": "2026-10-23T05:36:13Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.jithox/eu-energy-label-preflight:0.3.1",
+      "http_status": 200,
+      "seconds": 3.04,
+      "fetched_at": "2026-10-23T05:36:16Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.juicedresume/mcp:0.4.2",
+      "http_status": 200,
+      "seconds": 8.2,
+      "fetched_at": "2026-10-23T05:36:25Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.kindwise/agents:1.0.0",
+      "http_status": 200,
+      "seconds": 8.96,
+      "fetched_at": "2026-10-23T05:36:35Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.landthelab/interview-prep:1.0.0",
+      "http_status": 200,
+      "seconds": 7.92,
+      "fetched_at": "2026-10-23T05:36:43Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.likelyread/likelyread:1.0.0",
+      "http_status": 200,
+      "seconds": 6.47,
+      "fetched_at": "2026-10-23T05:36:50Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.lovpics/mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 8.54,
+      "fetched_at": "2026-10-23T05:36:59Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.mailzzy/mcp:1.0.1",
+      "http_status": 200,
+      "seconds": 16.74,
+      "fetched_at": "2026-10-23T05:37:16Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.managelm/managelm:1.6.5",
+      "http_status": 200,
+      "seconds": 4.41,
+      "fetched_at": "2026-10-23T05:37:21Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.mcparmory/clickup:1.0.4",
+      "http_status": 200,
+      "seconds": 12.32,
+      "fetched_at": "2026-10-23T05:37:34Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.mcpscores/food-facts:1.0.2",
+      "http_status": 200,
+      "seconds": 2.64,
+      "fetched_at": "2026-10-23T05:37:37Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.metalminer/mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 8.15,
+      "fetched_at": "2026-10-23T05:37:46Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.modeltested/llm-benchmarks:1.0.0",
+      "http_status": 200,
+      "seconds": 5.21,
+      "fetched_at": "2026-10-23T05:37:51Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.modevc/stage-pre-seed:2.0.2",
+      "http_status": 200,
+      "seconds": 3.97,
+      "fetched_at": "2026-10-23T05:37:56Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.munimind/munimind-mcp:0.3.2",
+      "http_status": 200,
+      "seconds": 4.88,
+      "fetched_at": "2026-10-23T05:38:01Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.neilpatelapi/ubersuggest:0.1.0",
+      "http_status": 200,
+      "seconds": 6.15,
+      "fetched_at": "2026-10-23T05:38:08Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.northreachinteractive/northreach:1.8.0",
+      "http_status": 200,
+      "seconds": 0.87,
+      "fetched_at": "2026-10-23T05:38:09Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.olyport/bls:1.1.0",
+      "http_status": 200,
+      "seconds": 0.59,
+      "fetched_at": "2026-10-23T05:38:10Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.openmapp/openmapp:0.1.0",
+      "http_status": 200,
+      "seconds": 2.89,
+      "fetched_at": "2026-10-23T05:38:14Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.pageproofer/pageproofer:1.0.1",
+      "http_status": 200,
+      "seconds": 2.4,
+      "fetched_at": "2026-10-23T05:38:17Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.penguindriver/aitools:1.0.0",
+      "http_status": 200,
+      "seconds": 0.96,
+      "fetched_at": "2026-10-23T05:38:18Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.pipe0/pipe0:2.3.0",
+      "http_status": 200,
+      "seconds": 3.55,
+      "fetched_at": "2026-10-23T05:38:22Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.postboxservices/postbox-tools:0.1.1",
+      "http_status": 200,
+      "seconds": 1.09,
+      "fetched_at": "2026-10-23T05:38:24Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.prognyx/oncology-intelligence:1.0.0",
+      "http_status": 200,
+      "seconds": 0.98,
+      "fetched_at": "2026-10-23T05:38:25Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.pythonanywhere.conclavex402p04/conclave-agent-rails:0.1.0",
+      "http_status": 200,
+      "seconds": 0.79,
+      "fetched_at": "2026-10-23T05:38:27Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.ranovam/instagram-hashtag-discovery:0.1.1",
+      "http_status": 200,
+      "seconds": 1.87,
+      "fetched_at": "2026-10-23T05:38:29Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.reguscilabs.www/innovation-lab:1.0.3",
+      "http_status": 200,
+      "seconds": 0.81,
+      "fetched_at": "2026-10-23T05:38:30Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.revisionme/revisionme:1.0.0",
+      "http_status": 200,
+      "seconds": 1.15,
+      "fetched_at": "2026-10-23T05:38:32Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.royashbrook/hush:1.3.0",
+      "http_status": 200,
+      "seconds": 0.47,
+      "fetched_at": "2026-10-23T05:38:33Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.satmarin/catalog:0.4",
+      "http_status": 200,
+      "seconds": 2.92,
+      "fetched_at": "2026-10-23T05:38:36Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.searchcode/mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 0.77,
+      "fetched_at": "2026-10-23T05:38:38Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.serpgrab/google-search:0.1.1",
+      "http_status": 200,
+      "seconds": 3.07,
+      "fetched_at": "2026-10-23T05:38:41Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.signupbouncer/checker:1.1.1",
+      "http_status": 200,
+      "seconds": 3.36,
+      "fetched_at": "2026-10-23T05:38:45Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.smirnovlabs/hypr-cua-mcp:0.1.2",
+      "http_status": 200,
+      "seconds": 3.5,
+      "fetched_at": "2026-10-23T05:38:49Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.sparklingtracks/mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 0.65,
+      "fetched_at": "2026-10-23T05:38:50Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.statsmapped/public-data:0.3.2",
+      "http_status": 200,
+      "seconds": 3.12,
+      "fetched_at": "2026-10-23T05:38:54Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.sunshineatlas/sunshine-atlas:1.1.0",
+      "http_status": 200,
+      "seconds": 1.64,
+      "fetched_at": "2026-10-23T05:38:56Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.talkaboutmartin/lounge:1.0.0",
+      "http_status": 200,
+      "seconds": 1.42,
+      "fetched_at": "2026-10-23T05:38:58Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.texaswaterdamagecost/site:1.0.1",
+      "http_status": 200,
+      "seconds": 2.39,
+      "fetched_at": "2026-10-23T05:39:01Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.textforagents/span-level-replay-fork-from-failure:1.0.0",
+      "http_status": 200,
+      "seconds": 3.38,
+      "fetched_at": "2026-10-23T05:39:05Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.thenextgennexus/domain-intelligence-mcp-server:1.0.0",
+      "http_status": 200,
+      "seconds": 4.85,
+      "fetched_at": "2026-10-23T05:39:10Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.ticketsea/ticketsea:1.5.0",
+      "http_status": 200,
+      "seconds": 7.64,
+      "fetched_at": "2026-10-23T05:39:18Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.traceflowlabs.lens/geo-audit:1.0.0",
+      "http_status": 200,
+      "seconds": 3.35,
+      "fetched_at": "2026-10-23T05:39:22Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.tryadlicio/adlicio:1.1.0",
+      "http_status": 200,
+      "seconds": 2.39,
+      "fetched_at": "2026-10-23T05:39:25Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.udslib/uds-toolbox:1.1.0",
+      "http_status": 200,
+      "seconds": 1.23,
+      "fetched_at": "2026-10-23T05:39:27Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.uservane/mcp:1.0.1",
+      "http_status": 200,
+      "seconds": 5.21,
+      "fetched_at": "2026-10-23T05:39:32Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.vextorium.api/vextorium:1.0.5",
+      "http_status": 200,
+      "seconds": 1.77,
+      "fetched_at": "2026-10-23T05:39:35Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.vtc/mcp:0.5.1",
+      "http_status": 200,
+      "seconds": 0.74,
+      "fetched_at": "2026-10-23T05:39:36Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.whalesync/whalesync:1.2.0",
+      "http_status": 200,
+      "seconds": 0.81,
+      "fetched_at": "2026-10-23T05:39:37Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.workspace369/mcp:2026.3.1",
+      "http_status": 200,
+      "seconds": 0.74,
+      "fetched_at": "2026-10-23T05:39:38Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "com.yourmatflow/matflow:1.0.1",
+      "http_status": 200,
+      "seconds": 4.06,
+      "fetched_at": "2026-10-23T05:39:43Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "cy.palmera/catalog:1.0.0",
+      "http_status": 200,
+      "seconds": 3.08,
+      "fetched_at": "2026-10-23T05:39:47Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "de.kubora/self-storage:1.0.0",
+      "http_status": 200,
+      "seconds": 3.77,
+      "fetched_at": "2026-10-23T05:39:51Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "dev.adsgpt/adsgpt:1.0.1",
+      "http_status": 200,
+      "seconds": 4.08,
+      "fetched_at": "2026-10-23T05:39:55Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "dev.blvkware/hallux:0.1.0",
+      "http_status": 200,
+      "seconds": 4.67,
+      "fetched_at": "2026-10-23T05:40:01Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "dev.dudko/pdf-to-md:1.0.0",
+      "http_status": 200,
+      "seconds": 3.17,
+      "fetched_at": "2026-10-23T05:40:04Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "dev.hatchloop/company-verification:0.2.13",
+      "http_status": 200,
+      "seconds": 0.5,
+      "fetched_at": "2026-10-23T05:40:05Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "dev.marksiazon/profile:1.0.0",
+      "http_status": 200,
+      "seconds": 5.55,
+      "fetched_at": "2026-10-23T05:40:11Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "dev.pages.scrapemole/social:1.1.0",
+      "http_status": 200,
+      "seconds": 7.39,
+      "fetched_at": "2026-10-23T05:40:19Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "dev.repowise/repowise:0.58.0",
+      "http_status": 200,
+      "seconds": 4.97,
+      "fetched_at": "2026-10-23T05:40:25Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "dev.stylelock/stylelock:1.35.0",
+      "http_status": 200,
+      "seconds": 16.54,
+      "fetched_at": "2026-10-23T05:40:42Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "dev.volato/errors:1.0.0",
+      "http_status": 200,
+      "seconds": 19.08,
+      "fetched_at": "2026-10-23T05:41:01Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "dev.workers.ghost-agent-os.ghost-identity/ghost:1.0.0",
+      "http_status": 200,
+      "seconds": 15.59,
+      "fetched_at": "2026-10-23T05:41:17Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "dev.workers.panda198271.tw-game-release/game-release:1.0.0",
+      "http_status": 200,
+      "seconds": 21.27,
+      "fetched_at": "2026-10-23T05:41:39Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "dev.yeku/yeku:0.1.0",
+      "http_status": 200,
+      "seconds": 4.35,
+      "fetched_at": "2026-10-23T05:41:44Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "es.juntamos/grupos:0.1.0",
+      "http_status": 200,
+      "seconds": 13.15,
+      "fetched_at": "2026-10-23T05:41:58Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "eu.ansvar/serbian-law-mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 0.71,
+      "fetched_at": "2026-10-23T05:41:59Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "eu.spotwave/prices:1.0.0",
+      "http_status": 200,
+      "seconds": 10.64,
+      "fetched_at": "2026-10-23T05:42:10Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "fr.aucadastre/aucadastre:0.1.0",
+      "http_status": 200,
+      "seconds": 4.71,
+      "fetched_at": "2026-10-23T05:42:15Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "fr.swipify/facturation:1.0.0",
+      "http_status": 200,
+      "seconds": 3.27,
+      "fetched_at": "2026-10-23T05:42:19Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "global.uain/network:0.1.0",
+      "http_status": 200,
+      "seconds": 10.86,
+      "fetched_at": "2026-10-23T05:42:30Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "hr.rifk/public-knowledge:1.0.0",
+      "http_status": 200,
+      "seconds": 1.14,
+      "fetched_at": "2026-10-23T05:42:32Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "info.agentrank/agentrank:0.1.0",
+      "http_status": 200,
+      "seconds": 9.75,
+      "fetched_at": "2026-10-23T05:42:42Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.aimeat/aimeat:4.0.1",
+      "http_status": 200,
+      "seconds": 3.35,
+      "fetched_at": "2026-10-23T05:42:46Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.boardbriefai/boardbrief-ai:1.0.0",
+      "http_status": 200,
+      "seconds": 0.99,
+      "fetched_at": "2026-10-23T05:42:48Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.datavessel/mcp:0.1.0",
+      "http_status": 200,
+      "seconds": 0.43,
+      "fetched_at": "2026-10-23T05:42:48Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.flexyield/gateway:1.4.0",
+      "http_status": 200,
+      "seconds": 1.41,
+      "fetched_at": "2026-10-23T05:42:50Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.0xzr/freellmpool:0.13.0",
+      "http_status": 200,
+      "seconds": 3.04,
+      "fetched_at": "2026-10-23T05:42:54Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.4hmetuyar/mcp-server-auditor:0.1.5",
+      "http_status": 200,
+      "seconds": 1.18,
+      "fetched_at": "2026-10-23T05:42:56Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.AFontana77/3d-printer-on-demand:1.0.1",
+      "http_status": 200,
+      "seconds": 0.9,
+      "fetched_at": "2026-10-23T05:42:57Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.ARAS-Workspace/claude-kvm:2.0.12",
+      "http_status": 200,
+      "seconds": 1.65,
+      "fetched_at": "2026-10-23T05:42:59Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.AdevAarons/specularis-mcp-audit:1.0.1",
+      "http_status": 200,
+      "seconds": 1.68,
+      "fetched_at": "2026-10-23T05:43:01Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Ajey95/drawarch:0.2.0",
+      "http_status": 200,
+      "seconds": 1.02,
+      "fetched_at": "2026-10-23T05:43:03Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.AmirK-S/a2a-to-mcp:0.1.0",
+      "http_status": 200,
+      "seconds": 3.19,
+      "fetched_at": "2026-10-23T05:43:07Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Ansvar-Systems/security-controls:0.4.0",
+      "http_status": 200,
+      "seconds": 0.72,
+      "fetched_at": "2026-10-23T05:43:08Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.ArpitGandhi1934/yugenox-instagram-reels-transcript:1.2.0",
+      "http_status": 200,
+      "seconds": 1.4,
+      "fetched_at": "2026-10-23T05:43:10Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Autonomy-Labs-Tech/autonomy-x402-tools:1.0.0",
+      "http_status": 200,
+      "seconds": 1.22,
+      "fetched_at": "2026-10-23T05:43:11Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Bayway/janusmcp:0.6.2",
+      "http_status": 200,
+      "seconds": 1.13,
+      "fetched_at": "2026-10-23T05:43:13Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Botagram/trust-gate:1.0.1",
+      "http_status": 200,
+      "seconds": 0.62,
+      "fetched_at": "2026-10-23T05:43:14Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Br0ski777/vector-search:1.1.0",
+      "http_status": 200,
+      "seconds": 1.11,
+      "fetched_at": "2026-10-23T05:43:16Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.CGSeb/lessonfolk:1.2.5",
+      "http_status": 200,
+      "seconds": 0.74,
+      "fetched_at": "2026-10-23T05:43:17Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.CSOAI-ORG/csv-tools-ai-mcp:1.0.10",
+      "http_status": 200,
+      "seconds": 0.78,
+      "fetched_at": "2026-10-23T05:43:18Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.CSOAI-ORG/meal-planner-ai-mcp:1.0.9",
+      "http_status": 200,
+      "seconds": 0.78,
+      "fetched_at": "2026-10-23T05:43:20Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.CSOAI-ORG/planthire-ai-mcp:1.0.8",
+      "http_status": 200,
+      "seconds": 0.55,
+      "fetched_at": "2026-10-23T05:43:21Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.CarbonDataSolutions/carbon:1.0.2",
+      "http_status": 200,
+      "seconds": 1.11,
+      "fetched_at": "2026-10-23T05:43:22Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.CloudCorpRecords/actionpin:0.1.6",
+      "http_status": 200,
+      "seconds": 1.94,
+      "fetched_at": "2026-10-23T05:43:25Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.CorantGmbH/mcp-airq-cloud:1.4.6",
+      "http_status": 200,
+      "seconds": 1.11,
+      "fetched_at": "2026-10-23T05:43:26Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.CyberMax-tools/zip-data-api:1.0.0",
+      "http_status": 200,
+      "seconds": 1.17,
+      "fetched_at": "2026-10-23T05:43:28Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.DataLeadsPRO/rank-tracker:1.0.1",
+      "http_status": 200,
+      "seconds": 0.72,
+      "fetched_at": "2026-10-23T05:43:29Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Destrayon/connapse:0.3.2",
+      "http_status": 200,
+      "seconds": 0.88,
+      "fetched_at": "2026-10-23T05:43:31Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.DuhoKim/nebulamind:0.1.0",
+      "http_status": 200,
+      "seconds": 0.82,
+      "fetched_at": "2026-10-23T05:43:32Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.EternaHybridExchange/eterna-mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 1.53,
+      "fetched_at": "2026-10-23T05:43:34Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Evozim/atomic-swap-coordinator-mcp:2.0.0",
+      "http_status": 200,
+      "seconds": 0.71,
+      "fetched_at": "2026-10-23T05:43:35Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Evozim/cloudflare-turnstile-bypass-mcp:2.0.0",
+      "http_status": 200,
+      "seconds": 1.21,
+      "fetched_at": "2026-10-23T05:43:37Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Evozim/dialogue-distiller-mcp:2.0.0",
+      "http_status": 200,
+      "seconds": 1.35,
+      "fetched_at": "2026-10-23T05:43:39Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.ExpertVagabond/hedera-mcp:0.5.0",
+      "http_status": 200,
+      "seconds": 1.39,
+      "fetched_at": "2026-10-23T05:43:41Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Fizzl13/presign-guard:1.6.0",
+      "http_status": 200,
+      "seconds": 1.13,
+      "fetched_at": "2026-10-23T05:43:42Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.GSterlingPress/postfact:0.1.1",
+      "http_status": 200,
+      "seconds": 0.78,
+      "fetched_at": "2026-10-23T05:43:43Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.GoDavai01/godavaii-mcp-server:1.0.2",
+      "http_status": 200,
+      "seconds": 1.46,
+      "fetched_at": "2026-10-23T05:43:45Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.GuardBee/oauth-auditor:0.3.0",
+      "http_status": 200,
+      "seconds": 0.88,
+      "fetched_at": "2026-10-23T05:43:47Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.HewlettPackard/greenlake-devices-mcp:1.1.2",
+      "http_status": 200,
+      "seconds": 1.04,
+      "fetched_at": "2026-10-23T05:43:48Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.IOServicesLabs/searchio:0.1.1",
+      "http_status": 200,
+      "seconds": 1.8,
+      "fetched_at": "2026-10-23T05:43:51Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.IrtezaAsadRizvi/mern-mcp:0.1.0",
+      "http_status": 200,
+      "seconds": 0.78,
+      "fetched_at": "2026-10-23T05:43:52Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.JaniJegoroff/agent-connectors-mcp:0.1.0",
+      "http_status": 200,
+      "seconds": 0.68,
+      "fetched_at": "2026-10-23T05:43:53Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.JonathanRReed/apple-maps-mcp:1.1.3",
+      "http_status": 200,
+      "seconds": 0.67,
+      "fetched_at": "2026-10-23T05:43:54Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.K1ta141k/mcp-bench-router:1.0.1",
+      "http_status": 200,
+      "seconds": 0.52,
+      "fetched_at": "2026-10-23T05:43:55Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.KilianPA/pryx:0.5.0",
+      "http_status": 200,
+      "seconds": 0.59,
+      "fetched_at": "2026-10-23T05:43:56Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.LAHutchins91/desk:1.0.3",
+      "http_status": 200,
+      "seconds": 1.22,
+      "fetched_at": "2026-10-23T05:43:58Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Lfaykus/flatway-estimate:1.2.0",
+      "http_status": 200,
+      "seconds": 1.3,
+      "fetched_at": "2026-10-23T05:44:00Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.LunarPerovskite/docalyze:0.2.1",
+      "http_status": 200,
+      "seconds": 0.63,
+      "fetched_at": "2026-10-23T05:44:01Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.MajaHelferbiene/rekwebrew:1.0.0-1",
+      "http_status": 200,
+      "seconds": 1.08,
+      "fetched_at": "2026-10-23T05:44:03Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Mediaeater/swarm-at:0.7.1",
+      "http_status": 200,
+      "seconds": 1.55,
+      "fetched_at": "2026-10-23T05:44:05Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.MitchSingh/402shield:0.1.0",
+      "http_status": 200,
+      "seconds": 1.55,
+      "fetched_at": "2026-10-23T05:44:07Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Muse-Nexus/socialfanout-mcp:0.1.6",
+      "http_status": 200,
+      "seconds": 1.9,
+      "fetched_at": "2026-10-23T05:44:09Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Nero-Engine/dataset-join-merge:0.1.0",
+      "http_status": 200,
+      "seconds": 1.44,
+      "fetched_at": "2026-10-23T05:44:11Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Nitmi/blea:0.7.0",
+      "http_status": 200,
+      "seconds": 2.85,
+      "fetched_at": "2026-10-23T05:44:14Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.OjasKord/local-model-suitability-mcp:1.1.23",
+      "http_status": 200,
+      "seconds": 2.61,
+      "fetched_at": "2026-10-23T05:44:18Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Ostico/bruno-mcp-studio:2.5.0",
+      "http_status": 200,
+      "seconds": 2.55,
+      "fetched_at": "2026-10-23T05:44:21Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.PasiutusVovere/tickerrisk-mcp:0.1.3",
+      "http_status": 200,
+      "seconds": 0.95,
+      "fetched_at": "2026-10-23T05:44:22Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.PostSyncer/postsyncer:1.0.1",
+      "http_status": 200,
+      "seconds": 1.24,
+      "fetched_at": "2026-10-23T05:44:24Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.QuLi-ops/agent-reality-layer:1.2.0",
+      "http_status": 200,
+      "seconds": 1.95,
+      "fetched_at": "2026-10-23T05:44:26Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.ReedStories/mcpbinder:1.2.0",
+      "http_status": 200,
+      "seconds": 2.55,
+      "fetched_at": "2026-10-23T05:44:29Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Royalti-io/ikenga-pkg-mcp-iyke:0.1.2",
+      "http_status": 200,
+      "seconds": 0.96,
+      "fetched_at": "2026-10-23T05:44:31Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Ryan-Clinton/financial-crime-screening-mcp:1.0.1",
+      "http_status": 200,
+      "seconds": 1.44,
+      "fetched_at": "2026-10-23T05:44:33Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.SPerekrestova/interactive-leetcode-mcp:3.2.6",
+      "http_status": 200,
+      "seconds": 2.66,
+      "fetched_at": "2026-10-23T05:44:36Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Seamgrin/seamgrin:0.1.0",
+      "http_status": 200,
+      "seconds": 1.16,
+      "fetched_at": "2026-10-23T05:44:38Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Servosity/ninjaone-mcp:0.1.19",
+      "http_status": 200,
+      "seconds": 1.4,
+      "fetched_at": "2026-10-23T05:44:39Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Siddharth-coder13/secure-schema:1.0.1",
+      "http_status": 200,
+      "seconds": 1.5,
+      "fetched_at": "2026-10-23T05:44:41Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.SongT-50/korean-news-mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 0.99,
+      "fetched_at": "2026-10-23T05:44:43Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.SunrisesIllNeverSee/sigrank-mcp:1.0.47",
+      "http_status": 200,
+      "seconds": 1.07,
+      "fetched_at": "2026-10-23T05:44:44Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Taru0208/openfda-mcp-server:1.1.0",
+      "http_status": 200,
+      "seconds": 0.71,
+      "fetched_at": "2026-10-23T05:44:46Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.TheNextGenNexus/google-maps-mcp-server:1.0.1",
+      "http_status": 200,
+      "seconds": 0.56,
+      "fetched_at": "2026-10-23T05:44:47Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.TonyWang-hub/mcp-cn-commerce:0.1.6",
+      "http_status": 200,
+      "seconds": 0.6,
+      "fetched_at": "2026-10-23T05:44:48Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Ukraine-Territorial-MCP/ua71080490010015879:1.0.0",
+      "http_status": 200,
+      "seconds": 1.01,
+      "fetched_at": "2026-10-23T05:44:49Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.VibeTensor/attestix:0.4.3",
+      "http_status": 200,
+      "seconds": 1.01,
+      "fetched_at": "2026-10-23T05:44:51Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.WYRE-AI/huntress-mcp:1.2.23",
+      "http_status": 200,
+      "seconds": 0.89,
+      "fetched_at": "2026-10-23T05:44:52Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.WhoSoEverM8/knowmind:0.1.14",
+      "http_status": 200,
+      "seconds": 1.16,
+      "fetched_at": "2026-10-23T05:44:54Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Wxt-ai/delivery-signature-requirement-identifier:1.3.0",
+      "http_status": 200,
+      "seconds": 0.57,
+      "fetched_at": "2026-10-23T05:44:55Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Wxt-ai/renewal-schedule-desk:1.0.7",
+      "http_status": 200,
+      "seconds": 1.11,
+      "fetched_at": "2026-10-23T05:44:57Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.Xyz3R/svgapp:1.0.0",
+      "http_status": 200,
+      "seconds": 1.32,
+      "fetched_at": "2026-10-23T05:44:58Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.ZahiriNatZuke/whisper-transcribe-mcp:1.1.3",
+      "http_status": 200,
+      "seconds": 3.39,
+      "fetched_at": "2026-10-23T05:45:02Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.abe238/hotin:0.9.21",
+      "http_status": 200,
+      "seconds": 1.08,
+      "fetched_at": "2026-10-23T05:45:04Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.adelaidasofia/vault-sync-mcp:0.1.0",
+      "http_status": 200,
+      "seconds": 23.65,
+      "fetched_at": "2026-10-23T05:45:28Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.agentbodegastore/agentbodega-mcp:0.1.7",
+      "http_status": 200,
+      "seconds": 12.8,
+      "fetched_at": "2026-10-23T05:45:41Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.aiagenticdeveloper/sparewise:0.3.52",
+      "http_status": 200,
+      "seconds": 20.77,
+      "fetched_at": "2026-10-23T05:46:03Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.akougkas/cite-nexus-mcp:0.2.2",
+      "http_status": 200,
+      "seconds": 63.89,
+      "fetched_at": "2026-10-23T05:47:07Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.alghanim/universal-db-mcp:0.2.0",
+      "http_status": 200,
+      "seconds": 0.78,
+      "fetched_at": "2026-10-23T05:47:08Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.alphaparkinc/genpark-streaming-ndjson-jsonl-schema-validator-skill:1.0.1",
+      "http_status": 200,
+      "seconds": 0.56,
+      "fetched_at": "2026-10-23T05:47:09Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.analitikisler/ai-tag-debugger:0.18.0",
+      "http_status": 200,
+      "seconds": 0.64,
+      "fetched_at": "2026-10-23T05:47:11Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.ankitsharma-tech/kickjolly:1.0.0",
+      "http_status": 200,
+      "seconds": 1.5,
+      "fetched_at": "2026-10-23T05:47:13Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.apifymcpfactory-droid/tech-stack-detector:1.0.0",
+      "http_status": 200,
+      "seconds": 0.56,
+      "fetched_at": "2026-10-23T05:47:14Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.arifulislamat/database-mcp-mysql:0.5.0",
+      "http_status": 200,
+      "seconds": 1.33,
+      "fetched_at": "2026-10-23T05:47:15Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.asfbay-bit/opchain-skills:2.0.4",
+      "http_status": 200,
+      "seconds": 1.03,
+      "fetched_at": "2026-10-23T05:47:17Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.atlasbyauro/atlas-fda:1.0.0",
+      "http_status": 200,
+      "seconds": 0.51,
+      "fetched_at": "2026-10-23T05:47:18Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.aurelio-nakamura/dataloupe:0.15.0",
+      "http_status": 200,
+      "seconds": 0.76,
+      "fetched_at": "2026-10-23T05:47:19Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.bahdanhal/stackhal:1.2.0",
+      "http_status": 200,
+      "seconds": 0.47,
+      "fetched_at": "2026-10-23T05:47:20Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.bdimic-bluecat/livenxmcp:0.30.1-test1",
+      "http_status": 200,
+      "seconds": 0.69,
+      "fetched_at": "2026-10-23T05:47:21Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.bepunk/zoogent:0.4.2",
+      "http_status": 200,
+      "seconds": 1.21,
+      "fetched_at": "2026-10-23T05:47:23Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.bjornj12/trackman-mcp:0.4.0",
+      "http_status": 200,
+      "seconds": 0.86,
+      "fetched_at": "2026-10-23T05:47:24Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.bolyra/shield:0.1.0",
+      "http_status": 200,
+      "seconds": 0.59,
+      "fetched_at": "2026-10-23T05:47:26Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.brntech/myotp:0.1.14",
+      "http_status": 200,
+      "seconds": 1.06,
+      "fetched_at": "2026-10-23T05:47:27Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.caelo-cms/caelo:0.10.64",
+      "http_status": 200,
+      "seconds": 0.5,
+      "fetched_at": "2026-10-23T05:47:28Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.carsonroell-debug/linkrescue-mcp:0.1.1",
+      "http_status": 200,
+      "seconds": 0.61,
+      "fetched_at": "2026-10-23T05:47:29Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.cgrtml/reasongate:0.7.0",
+      "http_status": 200,
+      "seconds": 0.49,
+      "fetched_at": "2026-10-23T05:47:30Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.chrischall/compass-mcp:1.1.11",
+      "http_status": 200,
+      "seconds": 0.76,
+      "fetched_at": "2026-10-23T05:47:31Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.cicerosmoura-alt/goloop-mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 1.26,
+      "fetched_at": "2026-10-23T05:47:33Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.cmdenney/logicnodes-mcp:1.0.2",
+      "http_status": 200,
+      "seconds": 0.43,
+      "fetched_at": "2026-10-23T05:47:34Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.codespar/mcp-chargebee:0.1.2",
+      "http_status": 200,
+      "seconds": 0.48,
+      "fetched_at": "2026-10-23T05:47:35Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.codespar/mcp-zoop:0.1.4",
+      "http_status": 200,
+      "seconds": 0.48,
+      "fetched_at": "2026-10-23T05:47:36Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.context-foundry/context-foundry:2.2.1",
+      "http_status": 200,
+      "seconds": 0.53,
+      "fetched_at": "2026-10-23T05:47:37Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.crowdintel-xyz/polymarket-agent-kit:1.0.0",
+      "http_status": 200,
+      "seconds": 0.57,
+      "fetched_at": "2026-10-23T05:47:38Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.cyanheads/cpsc-recalls-mcp-server:0.2.2",
+      "http_status": 200,
+      "seconds": 0.57,
+      "fetched_at": "2026-10-23T05:47:39Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.cyanheads/seerr-mcp-server:0.1.5",
+      "http_status": 200,
+      "seconds": 0.52,
+      "fetched_at": "2026-10-23T05:47:40Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.daedalus/mcp-reverse-engineering:0.1.4",
+      "http_status": 200,
+      "seconds": 5.41,
+      "fetched_at": "2026-10-23T05:47:46Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.danielenricocahall/lorcana-mcp:2.5.1",
+      "http_status": 200,
+      "seconds": 0.46,
+      "fetched_at": "2026-10-23T05:47:47Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.dave1362/rca-mcp-connector:4.1.20",
+      "http_status": 200,
+      "seconds": 0.57,
+      "fetched_at": "2026-10-23T05:47:48Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.debugmcp/mcp-debugger:0.25.1",
+      "http_status": 200,
+      "seconds": 0.97,
+      "fetched_at": "2026-10-23T05:47:50Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.devilsfave/dagpipe:0.2.3",
+      "http_status": 200,
+      "seconds": 0.41,
+      "fetched_at": "2026-10-23T05:47:51Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.dimitr-io/carmaker-mcp:0.2.2",
+      "http_status": 200,
+      "seconds": 0.41,
+      "fetched_at": "2026-10-23T05:47:52Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.doc2mcp/freefirecommunity:1.0.1785564364",
+      "http_status": 200,
+      "seconds": 0.47,
+      "fetched_at": "2026-10-23T05:47:53Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.donmangudata-ops/jobs-mcp-server:1.0.0",
+      "http_status": 200,
+      "seconds": 0.58,
+      "fetched_at": "2026-10-23T05:47:54Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.dryow1/steel-brain:1.1.0",
+      "http_status": 200,
+      "seconds": 0.55,
+      "fetched_at": "2026-10-23T05:47:55Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.ebeirne/lians:0.5.0",
+      "http_status": 200,
+      "seconds": 0.41,
+      "fetched_at": "2026-10-23T05:47:56Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.elViRafa/memory-fabric:1.4.4",
+      "http_status": 200,
+      "seconds": 0.69,
+      "fetched_at": "2026-10-23T05:47:57Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.engrmaziz/git-archaeologist:0.1.1",
+      "http_status": 200,
+      "seconds": 0.38,
+      "fetched_at": "2026-10-23T05:47:58Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.esaio/esa:0.15.0",
+      "http_status": 200,
+      "seconds": 0.43,
+      "fetched_at": "2026-10-23T05:47:59Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.f-tiger/agentic-commerce-tools:1.1.0",
+      "http_status": 200,
+      "seconds": 0.42,
+      "fetched_at": "2026-10-23T05:47:59Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.fauguste/boondmanager-mcp-server:2.15.2",
+      "http_status": 200,
+      "seconds": 0.42,
+      "fetched_at": "2026-10-23T05:48:00Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.figgy-ops/agentsite:4.0.0",
+      "http_status": 200,
+      "seconds": 0.72,
+      "fetched_at": "2026-10-23T05:48:02Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.flowpackplugin/flowpack:2.0.0",
+      "http_status": 200,
+      "seconds": 0.6,
+      "fetched_at": "2026-10-23T05:48:03Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.fr0ster/mcp-abap-adt-compact-http:20.0.0",
+      "http_status": 200,
+      "seconds": 1.13,
+      "fetched_at": "2026-10-23T05:48:04Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.furkan708/skillkit:1.0.2",
+      "http_status": 200,
+      "seconds": 0.46,
+      "fetched_at": "2026-10-23T05:48:05Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.gateio-dev/gate-dex:1.0.0",
+      "http_status": 200,
+      "seconds": 0.96,
+      "fetched_at": "2026-10-23T05:48:07Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.geraservicesuk/mcp-geraquest:0.1.1",
+      "http_status": 200,
+      "seconds": 0.43,
+      "fetched_at": "2026-10-23T05:48:08Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.gitlumen-team/gitlumen-mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 0.81,
+      "fetched_at": "2026-10-23T05:48:09Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.govcontractscout/govcontractscout-mcp:1.0.5",
+      "http_status": 200,
+      "seconds": 0.58,
+      "fetched_at": "2026-10-23T05:48:10Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.groupdocs-redaction/groupdocs-redaction-mcp:26.9.0",
+      "http_status": 200,
+      "seconds": 0.57,
+      "fetched_at": "2026-10-23T05:48:11Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.habedi/omni-lpr:0.3.6",
+      "http_status": 200,
+      "seconds": 0.74,
+      "fetched_at": "2026-10-23T05:48:12Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.hassaanali723/giggal-mcp:0.2.0",
+      "http_status": 200,
+      "seconds": 0.74,
+      "fetched_at": "2026-10-23T05:48:14Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.heyiamluke/spinwheelnames:1.0.0",
+      "http_status": 200,
+      "seconds": 1.31,
+      "fetched_at": "2026-10-23T05:48:16Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.horustechltd/horus-flow-mcp:1.0.2",
+      "http_status": 200,
+      "seconds": 0.53,
+      "fetched_at": "2026-10-23T05:48:17Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.hyperdrift-io/deputy-workforce-mcp:0.1.0",
+      "http_status": 200,
+      "seconds": 0.69,
+      "fetched_at": "2026-10-23T05:48:18Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.ignaciohermosillacornejo/copilot-money-mcp:2.3.0",
+      "http_status": 200,
+      "seconds": 0.86,
+      "fetched_at": "2026-10-23T05:48:19Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.imsovikde/anneal:1.2.6",
+      "http_status": 200,
+      "seconds": 0.53,
+      "fetched_at": "2026-10-23T05:48:20Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.integromat/make:0.2.0",
+      "http_status": 200,
+      "seconds": 0.58,
+      "fetched_at": "2026-10-23T05:48:21Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.istefox/dt-mcp:0.5.2",
+      "http_status": 200,
+      "seconds": 1.22,
+      "fetched_at": "2026-10-23T05:48:23Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.jadenpxrk/mcp-piazza:0.1.0",
+      "http_status": 200,
+      "seconds": 0.89,
+      "fetched_at": "2026-10-23T05:48:24Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.jarmstrong158/context-keeper-remote:0.2.0",
+      "http_status": 200,
+      "seconds": 0.51,
+      "fetched_at": "2026-10-23T05:48:25Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.jdhart81/taxcredit-engine:0.1.0",
+      "http_status": 200,
+      "seconds": 0.53,
+      "fetched_at": "2026-10-23T05:48:26Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.jhicks935-lab/opsdoctor:2.1.0",
+      "http_status": 200,
+      "seconds": 0.69,
+      "fetched_at": "2026-10-23T05:48:28Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.jmshinhwa/config-dsl-lint-snippet-pack:0.1.4",
+      "http_status": 200,
+      "seconds": 0.66,
+      "fetched_at": "2026-10-23T05:48:29Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.jmshinhwa/security-headers-csp-lint:0.1.3",
+      "http_status": 200,
+      "seconds": 0.85,
+      "fetched_at": "2026-10-23T05:48:30Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.johnisanerd/yandex-search:1.0.0",
+      "http_status": 200,
+      "seconds": 0.92,
+      "fetched_at": "2026-10-23T05:48:31Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.jrainsberger/orthotomeo:0.1.0",
+      "http_status": 200,
+      "seconds": 0.65,
+      "fetched_at": "2026-10-23T05:48:33Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.junoventures/tatuape-sampa-br:1.0.0",
+      "http_status": 200,
+      "seconds": 0.75,
+      "fetched_at": "2026-10-23T05:48:34Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.kakunin-ai/kakunin:0.2.4",
+      "http_status": 200,
+      "seconds": 0.49,
+      "fetched_at": "2026-10-23T05:48:35Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.keploy/mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 0.73,
+      "fetched_at": "2026-10-23T05:48:36Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.kirillradchenko96/fresh402:2.4.0",
+      "http_status": 200,
+      "seconds": 0.49,
+      "fetched_at": "2026-10-23T05:48:37Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.kota1026/quantumguard-mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 0.52,
+      "fetched_at": "2026-10-23T05:48:38Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.kunwar-shah/claudex:1.3.4",
+      "http_status": 200,
+      "seconds": 0.57,
+      "fetched_at": "2026-10-23T05:48:39Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.lavanry/docfarm:1.0.0",
+      "http_status": 200,
+      "seconds": 0.48,
+      "fetched_at": "2026-10-23T05:48:40Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.left-handed-grannies/comitelligence:1.1.1",
+      "http_status": 200,
+      "seconds": 0.5,
+      "fetched_at": "2026-10-23T05:48:41Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.limey/cal-scheduler-mcp:1.1.3",
+      "http_status": 200,
+      "seconds": 0.69,
+      "fetched_at": "2026-10-23T05:48:42Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.lofder/dsers-mcp-product:1.5.7",
+      "http_status": 200,
+      "seconds": 0.72,
+      "fetched_at": "2026-10-23T05:48:44Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.lucdu/anteos-booking:1.1.0",
+      "http_status": 200,
+      "seconds": 0.76,
+      "fetched_at": "2026-10-23T05:48:45Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.madjik-io/mcp-server:2.0.2",
+      "http_status": 200,
+      "seconds": 0.61,
+      "fetched_at": "2026-10-23T05:48:46Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.malamutemayhem/tmdb:0.1.0",
+      "http_status": 200,
+      "seconds": 0.45,
+      "fetched_at": "2026-10-23T05:48:47Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.manuel-cubiko/mifori-cert-agent:1.0.0",
+      "http_status": 200,
+      "seconds": 0.54,
+      "fetched_at": "2026-10-23T05:48:48Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.markusvankempen/code-engine-mcp-server:1.4.2",
+      "http_status": 200,
+      "seconds": 0.63,
+      "fetched_at": "2026-10-23T05:48:49Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.matematicsolutions/lu-eli-mcp:0.3.3",
+      "http_status": 200,
+      "seconds": 0.4,
+      "fetched_at": "2026-10-23T05:48:50Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mayim-mayim/ln-church-agent-mcp:1.18.16",
+      "http_status": 200,
+      "seconds": 0.71,
+      "fetched_at": "2026-10-23T05:48:51Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mcp-dir/cadin_estadual-mcp:0.1.0",
+      "http_status": 200,
+      "seconds": 0.4,
+      "fetched_at": "2026-10-23T05:48:52Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mcp-dir/credito_negativo-mcp:0.1.0",
+      "http_status": 200,
+      "seconds": 0.45,
+      "fetched_at": "2026-10-23T05:48:53Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mcp-dir/detran_mt_veiculo-mcp:0.1.0",
+      "http_status": 200,
+      "seconds": 0.41,
+      "fetched_at": "2026-10-23T05:48:54Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mcp-dir/gestaoclick-mcp:0.1.0",
+      "http_status": 200,
+      "seconds": 0.39,
+      "fetched_at": "2026-10-23T05:48:55Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mcp-dir/mpt_ms_cnf-mcp:0.1.0",
+      "http_status": 200,
+      "seconds": 0.44,
+      "fetched_at": "2026-10-23T05:48:56Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mcp-dir/pref_go_perolandia_licitacoes-mcp:0.1.0",
+      "http_status": 200,
+      "seconds": 0.43,
+      "fetched_at": "2026-10-23T05:48:57Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mcp-dir/pref_sp_sao_paulo_nfs-mcp:0.1.0",
+      "http_status": 200,
+      "seconds": 0.41,
+      "fetched_at": "2026-10-23T05:48:58Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mcp-dir/sefaz_ba_certidao_debitos-mcp:0.1.0",
+      "http_status": 200,
+      "seconds": 0.38,
+      "fetched_at": "2026-10-23T05:48:59Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mcp-dir/sefaz_rs_debitos-mcp:0.1.0",
+      "http_status": 200,
+      "seconds": 0.43,
+      "fetched_at": "2026-10-23T05:48:59Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mcp-dir/tiny-mcp:0.1.0",
+      "http_status": 200,
+      "seconds": 0.44,
+      "fetched_at": "2026-10-23T05:49:00Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mcp-dir/tribunal_trt6_processo-mcp:0.1.0",
+      "http_status": 200,
+      "seconds": 0.52,
+      "fetched_at": "2026-10-23T05:49:01Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mdfifty50-boop/trace-forge:0.1.1",
+      "http_status": 200,
+      "seconds": 0.42,
+      "fetched_at": "2026-10-23T05:49:02Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.metlem80/eighty:0.1.0",
+      "http_status": 200,
+      "seconds": 0.89,
+      "fetched_at": "2026-10-23T05:49:04Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mifactory-bot/mifactory-contratos:1.2.0",
+      "http_status": 200,
+      "seconds": 0.58,
+      "fetched_at": "2026-10-23T05:49:05Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mindstone/mcp-server-runway:0.4.1",
+      "http_status": 200,
+      "seconds": 0.54,
+      "fetched_at": "2026-10-23T05:49:06Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mlava/scholar-sidekick-mcp:0.8.13",
+      "http_status": 200,
+      "seconds": 0.64,
+      "fetched_at": "2026-10-23T05:49:07Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.montanetech/codeix:0.5.0",
+      "http_status": 200,
+      "seconds": 0.49,
+      "fetched_at": "2026-10-23T05:49:08Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mrfentmen/appwrite-mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 0.41,
+      "fetched_at": "2026-10-23T05:49:09Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mrfentmen/citi-bike-mcp:1.0.1",
+      "http_status": 200,
+      "seconds": 0.36,
+      "fetched_at": "2026-10-23T05:49:10Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mrfentmen/dummyjson-mcp:1.0.1",
+      "http_status": 200,
+      "seconds": 0.36,
+      "fetched_at": "2026-10-23T05:49:11Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mrfentmen/gitignore-mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 0.44,
+      "fetched_at": "2026-10-23T05:49:12Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mrfentmen/klaviyo-mcp:1.1.0",
+      "http_status": 200,
+      "seconds": 0.4,
+      "fetched_at": "2026-10-23T05:49:12Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mrfentmen/netdata-mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 0.84,
+      "fetched_at": "2026-10-23T05:49:14Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mrfentmen/postman-echo-mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 0.73,
+      "fetched_at": "2026-10-23T05:49:15Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mrfentmen/spoonacular-mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 0.32,
+      "fetched_at": "2026-10-23T05:49:16Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mrfentmen/urlscan-mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 0.33,
+      "fetched_at": "2026-10-23T05:49:17Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.mrsergeiluzhnov/xonta-docs:1.3.0",
+      "http_status": 200,
+      "seconds": 0.83,
+      "fetched_at": "2026-10-23T05:49:18Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.musyta-labs/mcpcut:0.1.1",
+      "http_status": 200,
+      "seconds": 0.64,
+      "fetched_at": "2026-10-23T05:49:19Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.narinthon-so/thailand-data-mcp:0.1.2",
+      "http_status": 200,
+      "seconds": 0.67,
+      "fetched_at": "2026-10-23T05:49:20Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.newrelic-experimental/preflight:1.67.2",
+      "http_status": 200,
+      "seconds": 0.68,
+      "fetched_at": "2026-10-23T05:49:22Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.nicklee002e/docconv-mcp:1.0.2",
+      "http_status": 200,
+      "seconds": 0.41,
+      "fetched_at": "2026-10-23T05:49:22Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.nirholas/intel-mcp:0.1.3",
+      "http_status": 200,
+      "seconds": 0.77,
+      "fetched_at": "2026-10-23T05:49:24Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.nodemaven/nodemaven-mcp:0.1.0",
+      "http_status": 200,
+      "seconds": 0.98,
+      "fetched_at": "2026-10-23T05:49:25Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.nubiia-dev/mcp-quipu:1.0.2",
+      "http_status": 200,
+      "seconds": 0.89,
+      "fetched_at": "2026-10-23T05:49:27Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.ofershap/s3:1.0.1",
+      "http_status": 200,
+      "seconds": 0.51,
+      "fetched_at": "2026-10-23T05:49:28Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.omarkhandji-commits/youtube-data:1.0.0",
+      "http_status": 200,
+      "seconds": 0.48,
+      "fetched_at": "2026-10-23T05:49:29Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.openhook-dev/openhook-inbox:0.1.0",
+      "http_status": 200,
+      "seconds": 0.5,
+      "fetched_at": "2026-10-23T05:49:30Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.ownedbyly/weather:1.0.1",
+      "http_status": 200,
+      "seconds": 0.5,
+      "fetched_at": "2026-10-23T05:49:31Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.park11innyc-lgtm/mcp-uptime:0.1.1",
+      "http_status": 200,
+      "seconds": 0.61,
+      "fetched_at": "2026-10-23T05:49:32Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pavellunev/appmetrica-mcp:0.3.1",
+      "http_status": 200,
+      "seconds": 0.72,
+      "fetched_at": "2026-10-23T05:49:33Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.penfieldlabs/penfield-mcp:1.22.0",
+      "http_status": 200,
+      "seconds": 0.5,
+      "fetched_at": "2026-10-23T05:49:34Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.phuongddx/jarvis:0.10.0",
+      "http_status": 200,
+      "seconds": 0.65,
+      "fetched_at": "2026-10-23T05:49:35Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pipeworx-io/analyst-ratings:0.1.4",
+      "http_status": 200,
+      "seconds": 0.61,
+      "fetched_at": "2026-10-23T05:49:36Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pipeworx-io/arcgis-pima:0.1.4",
+      "http_status": 200,
+      "seconds": 0.45,
+      "fetched_at": "2026-10-23T05:49:37Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pipeworx-io/boardgames:0.1.0",
+      "http_status": 200,
+      "seconds": 2.04,
+      "fetched_at": "2026-10-23T05:49:40Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pipeworx-io/cisa-kev:0.1.3",
+      "http_status": 200,
+      "seconds": 1.99,
+      "fetched_at": "2026-10-23T05:49:42Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pipeworx-io/dart-kr:0.1.4",
+      "http_status": 200,
+      "seconds": 0.9,
+      "fetched_at": "2026-10-23T05:49:44Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pipeworx-io/datamuse:0.1.1",
+      "http_status": 200,
+      "seconds": 0.61,
+      "fetched_at": "2026-10-23T05:49:45Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pipeworx-io/ema-medicines:0.2.3",
+      "http_status": 200,
+      "seconds": 0.52,
+      "fetched_at": "2026-10-23T05:49:46Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pipeworx-io/finra-fixed-income:0.1.3",
+      "http_status": 200,
+      "seconds": 0.69,
+      "fetched_at": "2026-10-23T05:49:47Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pipeworx-io/gov-auctions:0.1.3",
+      "http_status": 200,
+      "seconds": 0.55,
+      "fetched_at": "2026-10-23T05:49:48Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pipeworx-io/illinois-code:0.1.5",
+      "http_status": 200,
+      "seconds": 1.06,
+      "fetched_at": "2026-10-23T05:49:49Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pipeworx-io/launch-library:0.1.0",
+      "http_status": 200,
+      "seconds": 0.96,
+      "fetched_at": "2026-10-23T05:49:51Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pipeworx-io/mixpanel:0.1.2",
+      "http_status": 200,
+      "seconds": 0.56,
+      "fetched_at": "2026-10-23T05:49:52Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pipeworx-io/nsi-bg:0.1.2",
+      "http_status": 200,
+      "seconds": 5.09,
+      "fetched_at": "2026-10-23T05:49:58Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pipeworx-io/outlook-contacts:0.1.3",
+      "http_status": 200,
+      "seconds": 1.92,
+      "fetched_at": "2026-10-23T05:50:00Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pipeworx-io/puerto-rico-code:0.1.2",
+      "http_status": 200,
+      "seconds": 3.28,
+      "fetched_at": "2026-10-23T05:50:04Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pipeworx-io/sec-xbrl:0.1.4",
+      "http_status": 200,
+      "seconds": 2.53,
+      "fetched_at": "2026-10-23T05:50:07Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pipeworx-io/superhero:1.0.2",
+      "http_status": 200,
+      "seconds": 2.16,
+      "fetched_at": "2026-10-23T05:50:10Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pipeworx-io/uk-epc:0.1.0",
+      "http_status": 200,
+      "seconds": 0.76,
+      "fetched_at": "2026-10-23T05:50:11Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pipeworx-io/who-euro:0.1.2",
+      "http_status": 200,
+      "seconds": 2.39,
+      "fetched_at": "2026-10-23T05:50:14Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pmady/gpu-mcp-server:0.1.0",
+      "http_status": 200,
+      "seconds": 2.11,
+      "fetched_at": "2026-10-23T05:50:16Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pquattro/memoraeu-mcp:0.1.2",
+      "http_status": 200,
+      "seconds": 2.01,
+      "fetched_at": "2026-10-23T05:50:19Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.projectworks007/google-maps-leads:1.0.0",
+      "http_status": 200,
+      "seconds": 0.64,
+      "fetched_at": "2026-10-23T05:50:20Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.pvliesdonk/paperless-mcp:3.0.0",
+      "http_status": 200,
+      "seconds": 1.08,
+      "fetched_at": "2026-10-23T05:50:22Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.quietforgestudio/x402-tools:1.3.0",
+      "http_status": 200,
+      "seconds": 0.81,
+      "fetched_at": "2026-10-23T05:50:23Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.randomizedhoomanity/ox-alpha-signals:1.1.0",
+      "http_status": 200,
+      "seconds": 1.99,
+      "fetched_at": "2026-10-23T05:50:25Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.redpath1/the-roofing-list:0.1.1",
+      "http_status": 200,
+      "seconds": 0.59,
+      "fetched_at": "2026-10-23T05:50:26Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.rgejman/simplelabtools-labels:1.0.0",
+      "http_status": 200,
+      "seconds": 1.42,
+      "fetched_at": "2026-10-23T05:50:28Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.rmzlb/notifyd:0.4.0",
+      "http_status": 200,
+      "seconds": 0.73,
+      "fetched_at": "2026-10-23T05:50:30Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.rocnubie/pvz-fusion-mcp:0.1.0",
+      "http_status": 200,
+      "seconds": 0.47,
+      "fetched_at": "2026-10-23T05:50:31Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.rosch100/mcp-encrypted-sqlite:0.4.1",
+      "http_status": 200,
+      "seconds": 0.67,
+      "fetched_at": "2026-10-23T05:50:32Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.runrelay/mcp-relay:0.1.0",
+      "http_status": 200,
+      "seconds": 1.55,
+      "fetched_at": "2026-10-23T05:50:34Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.ryudi84/shadow:1.0.3",
+      "http_status": 200,
+      "seconds": 0.51,
+      "fetched_at": "2026-10-23T05:50:35Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/ascii-len:1.0.0",
+      "http_status": 200,
+      "seconds": 0.53,
+      "fetched_at": "2026-10-23T05:50:36Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/cc-ag:1.0.0",
+      "http_status": 200,
+      "seconds": 2.27,
+      "fetched_at": "2026-10-23T05:50:39Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/cc-in:1.0.0",
+      "http_status": 200,
+      "seconds": 0.52,
+      "fetched_at": "2026-10-23T05:50:40Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/cc-sn:1.0.0",
+      "http_status": 200,
+      "seconds": 0.96,
+      "fetched_at": "2026-10-23T05:50:41Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/coop-ok:1.0.0",
+      "http_status": 200,
+      "seconds": 0.4,
+      "fetched_at": "2026-10-23T05:50:42Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/dotfile-ok:1.0.0",
+      "http_status": 200,
+      "seconds": 1.22,
+      "fetched_at": "2026-10-23T05:50:44Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/fx-cny:1.0.0",
+      "http_status": 200,
+      "seconds": 6.4,
+      "fetched_at": "2026-10-23T05:50:51Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/hashtag-n:1.0.0",
+      "http_status": 200,
+      "seconds": 10.47,
+      "fetched_at": "2026-10-23T05:51:02Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/http-505:1.0.0",
+      "http_status": 200,
+      "seconds": 12.32,
+      "fetched_at": "2026-10-23T05:51:14Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/jpeg-magic:1.0.0",
+      "http_status": 200,
+      "seconds": 8.08,
+      "fetched_at": "2026-10-23T05:51:23Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/lang-he:1.0.0",
+      "http_status": 200,
+      "seconds": 4.31,
+      "fetched_at": "2026-10-23T05:51:28Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/lockfile-ok:1.0.0",
+      "http_status": 200,
+      "seconds": 1.89,
+      "fetched_at": "2026-10-23T05:51:30Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/msgpack-ok:1.0.0",
+      "http_status": 200,
+      "seconds": 3.6,
+      "fetched_at": "2026-10-23T05:51:34Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/persian-ok:1.0.0",
+      "http_status": 200,
+      "seconds": 2.04,
+      "fetched_at": "2026-10-23T05:51:37Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/quoted-printable-ok:1.0.0",
+      "http_status": 200,
+      "seconds": 1.15,
+      "fetched_at": "2026-10-23T05:51:38Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/shake128:1.0.0",
+      "http_status": 200,
+      "seconds": 0.84,
+      "fetched_at": "2026-10-23T05:51:40Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/st-ny:1.0.0",
+      "http_status": 200,
+      "seconds": 0.75,
+      "fetched_at": "2026-10-23T05:51:41Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/typeid-ok:1.0.0",
+      "http_status": 200,
+      "seconds": 0.99,
+      "fetched_at": "2026-10-23T05:51:43Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/tz-asia-bahrain:1.0.0",
+      "http_status": 200,
+      "seconds": 0.81,
+      "fetched_at": "2026-10-23T05:51:44Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/tz-europe-monaco:1.0.0",
+      "http_status": 200,
+      "seconds": 1.13,
+      "fetched_at": "2026-10-23T05:51:45Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/utc-clock:1.0.0",
+      "http_status": 200,
+      "seconds": 1.39,
+      "fetched_at": "2026-10-23T05:51:47Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/util-088:1.0.0",
+      "http_status": 200,
+      "seconds": 0.67,
+      "fetched_at": "2026-10-23T05:51:49Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/uuid7-ok:1.0.0",
+      "http_status": 200,
+      "seconds": 0.66,
+      "fetched_at": "2026-10-23T05:51:50Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sadri-dridi/zip-magic:1.0.0",
+      "http_status": 200,
+      "seconds": 0.75,
+      "fetched_at": "2026-10-23T05:51:51Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sapientsai/dokploy-mcp-server:1.10.0",
+      "http_status": 200,
+      "seconds": 1.04,
+      "fetched_at": "2026-10-23T05:51:52Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sbosscher/relay-agents:0.2.0",
+      "http_status": 200,
+      "seconds": 0.74,
+      "fetched_at": "2026-10-23T05:51:54Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sebastienrousseau/pacs008-mcp:0.0.14",
+      "http_status": 200,
+      "seconds": 0.52,
+      "fetched_at": "2026-10-23T05:51:55Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sepehr071/jabama-mcp:0.4.1",
+      "http_status": 200,
+      "seconds": 0.58,
+      "fetched_at": "2026-10-23T05:51:56Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sha-net/community-board:1.0.0",
+      "http_status": 200,
+      "seconds": 0.56,
+      "fetched_at": "2026-10-23T05:51:57Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.shenwell/stillonline:0.3.6",
+      "http_status": 200,
+      "seconds": 0.83,
+      "fetched_at": "2026-10-23T05:51:58Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sidduHERE/agentpool:0.1.13",
+      "http_status": 200,
+      "seconds": 0.83,
+      "fetched_at": "2026-10-23T05:52:00Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.siweina/dsh-novel-writer:6.9.0",
+      "http_status": 200,
+      "seconds": 0.58,
+      "fetched_at": "2026-10-23T05:52:01Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.smeet666/mcp-tvsubtitles:1.0.1",
+      "http_status": 200,
+      "seconds": 0.45,
+      "fetched_at": "2026-10-23T05:52:02Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.somacoffeekyoto/imgx:1.6.1",
+      "http_status": 200,
+      "seconds": 0.76,
+      "fetched_at": "2026-10-23T05:52:03Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.srbsa/diffgate:0.8.0",
+      "http_status": 200,
+      "seconds": 0.61,
+      "fetched_at": "2026-10-23T05:52:04Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.stabgan/openrouter-multimodal:4.5.1",
+      "http_status": 200,
+      "seconds": 0.54,
+      "fetched_at": "2026-10-23T05:52:05Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.stillmarcus24/stillos-ratings-mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 0.61,
+      "fetched_at": "2026-10-23T05:52:06Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sumedhchatse/agentraas:0.12.0",
+      "http_status": 200,
+      "seconds": 0.79,
+      "fetched_at": "2026-10-23T05:52:07Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.sylenzor/solana-mcp:1.2.4",
+      "http_status": 200,
+      "seconds": 0.82,
+      "fetched_at": "2026-10-23T05:52:09Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.tavily-ai/tavily-mcp:0.2.15",
+      "http_status": 200,
+      "seconds": 0.58,
+      "fetched_at": "2026-10-23T05:52:10Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.terrorproforma/explore-better:0.2.8",
+      "http_status": 200,
+      "seconds": 1.03,
+      "fetched_at": "2026-10-23T05:52:11Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.thecombatwombat/replicant-mcp:1.6.7",
+      "http_status": 200,
+      "seconds": 0.89,
+      "fetched_at": "2026-10-23T05:52:13Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.theluckystrike/delivery-schedule:0.22.7",
+      "http_status": 200,
+      "seconds": 0.93,
+      "fetched_at": "2026-10-23T05:52:14Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.theluckystrike/pdf-merger:0.22.0",
+      "http_status": 200,
+      "seconds": 0.88,
+      "fetched_at": "2026-10-23T05:52:16Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.theluckystrike/zip-archive-create-extract-bomb-guard:0.22.6",
+      "http_status": 200,
+      "seconds": 0.52,
+      "fetched_at": "2026-10-23T05:52:17Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.tidydata-dev/tidydata:1.0.0",
+      "http_status": 200,
+      "seconds": 0.97,
+      "fetched_at": "2026-10-23T05:52:18Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.tombaldwin/candor:0.40.15",
+      "http_status": 200,
+      "seconds": 0.71,
+      "fetched_at": "2026-10-23T05:52:19Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.trellislabs-hq/fooddata-central-mcp:1.2.1",
+      "http_status": 200,
+      "seconds": 0.62,
+      "fetched_at": "2026-10-23T05:52:20Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.tudorbotezan/unitemfg:1.0.0",
+      "http_status": 200,
+      "seconds": 0.7,
+      "fetched_at": "2026-10-23T05:52:22Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.ugur-murat-alt/agz-rust-coder:0.2.0",
+      "http_status": 200,
+      "seconds": 0.71,
+      "fetched_at": "2026-10-23T05:52:23Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.ux-xd/llms-txt:0.1.1",
+      "http_status": 200,
+      "seconds": 1.19,
+      "fetched_at": "2026-10-23T05:52:24Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.vassiliylakhonin/vizier:0.5.12",
+      "http_status": 200,
+      "seconds": 0.57,
+      "fetched_at": "2026-10-23T05:52:26Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.victorgulchenko/mimiq-mcp:0.5.1",
+      "http_status": 200,
+      "seconds": 0.67,
+      "fetched_at": "2026-10-23T05:52:27Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.vladimirbakalov/secretguard-mcp:0.1.4",
+      "http_status": 200,
+      "seconds": 0.71,
+      "fetched_at": "2026-10-23T05:52:28Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.vvvvking/novai-prices:1.0.1",
+      "http_status": 200,
+      "seconds": 0.91,
+      "fetched_at": "2026-10-23T05:52:29Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.weiseer/api-changelog:0.1.1",
+      "http_status": 200,
+      "seconds": 0.71,
+      "fetched_at": "2026-10-23T05:52:31Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.winters-works-co/domain-whois:1.0.0",
+      "http_status": 200,
+      "seconds": 0.86,
+      "fetched_at": "2026-10-23T05:52:32Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.wstierhout/ableton-live-mcp:1.8.1",
+      "http_status": 200,
+      "seconds": 0.67,
+      "fetched_at": "2026-10-23T05:52:33Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.wzltmp/mcp-automations:0.1.0",
+      "http_status": 200,
+      "seconds": 0.72,
+      "fetched_at": "2026-10-23T05:52:34Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.xpaysh/mcp-server:1.0.0",
+      "http_status": 200,
+      "seconds": 0.69,
+      "fetched_at": "2026-10-23T05:52:35Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.yk647/globalrules:1.1.2",
+      "http_status": 200,
+      "seconds": 1.06,
+      "fetched_at": "2026-10-23T05:52:37Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.yy05idiot/finewisdom:1.0.0",
+      "http_status": 200,
+      "seconds": 0.84,
+      "fetched_at": "2026-10-23T05:52:38Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.zeroatflops/flopsindex-mcp:0.12.5",
+      "http_status": 200,
+      "seconds": 0.65,
+      "fetched_at": "2026-10-23T05:52:40Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.github.zurferr/dot:1.0.2",
+      "http_status": 200,
+      "seconds": 0.42,
+      "fetched_at": "2026-10-23T05:52:40Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.illumora/craft:1.0.1",
+      "http_status": 200,
+      "seconds": 0.58,
+      "fetched_at": "2026-10-23T05:52:42Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.mammoth/docs:1.0.0",
+      "http_status": 200,
+      "seconds": 0.69,
+      "fetched_at": "2026-10-23T05:52:43Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.orbitwan/orbitwan:1.0.3",
+      "http_status": 200,
+      "seconds": 0.42,
+      "fetched_at": "2026-10-23T05:52:44Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.roraima/guest:1.1.1",
+      "http_status": 200,
+      "seconds": 0.43,
+      "fetched_at": "2026-10-23T05:52:45Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.sovrnti/graph:1.0.0",
+      "http_status": 200,
+      "seconds": 0.67,
+      "fetched_at": "2026-10-23T05:52:46Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.tkllabs.bh.mcp-servers/ethereum-toolkit:1.0.1",
+      "http_status": 200,
+      "seconds": 0.72,
+      "fetched_at": "2026-10-23T05:52:47Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.uniplay/uniplay:1.0.0",
+      "http_status": 200,
+      "seconds": 0.95,
+      "fetched_at": "2026-10-23T05:52:48Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.usefulapi/elvanto:1.16.4",
+      "http_status": 200,
+      "seconds": 0.44,
+      "fetched_at": "2026-10-23T05:52:49Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.usefulapi/metriport:1.16.4",
+      "http_status": 200,
+      "seconds": 0.43,
+      "fetched_at": "2026-10-23T05:52:50Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.usefulapi/swell:1.16.4",
+      "http_status": 200,
+      "seconds": 0.59,
+      "fetched_at": "2026-10-23T05:52:51Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "io.wsender/wsender:1.0.0",
+      "http_status": 200,
+      "seconds": 0.47,
+      "fetched_at": "2026-10-23T05:52:52Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "jp.yomitasu/datasetsearch-jp:1.0.1",
+      "http_status": 200,
+      "seconds": 0.67,
+      "fetched_at": "2026-10-23T05:52:54Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "life.lhr.10f69524d81262/uptime-marketplace:1.0.67538",
+      "http_status": 200,
+      "seconds": 0.76,
+      "fetched_at": "2026-10-23T05:52:55Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "live.alpic.clouddj-ce0f8cfd/clouddj:0.0.1",
+      "http_status": 200,
+      "seconds": 0.55,
+      "fetched_at": "2026-10-23T05:52:56Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "llc.facet/ucp-shopping:1.0.0",
+      "http_status": 200,
+      "seconds": 0.52,
+      "fetched_at": "2026-10-23T05:52:57Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "me.drwho/tools:2.0.0",
+      "http_status": 200,
+      "seconds": 0.58,
+      "fetched_at": "2026-10-23T05:52:58Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "mx.scan/diagnostics:1.1.0",
+      "http_status": 200,
+      "seconds": 0.33,
+      "fetched_at": "2026-10-23T05:52:59Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "net.gamebattle/catalog:1.0.0",
+      "http_status": 200,
+      "seconds": 0.36,
+      "fetched_at": "2026-10-23T05:53:00Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "net.programmes/developer-tools:1.0.1",
+      "http_status": 200,
+      "seconds": 0.55,
+      "fetched_at": "2026-10-23T05:53:01Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "network.flint/agent-transaction-control:0.2.1",
+      "http_status": 200,
+      "seconds": 0.43,
+      "fetched_at": "2026-10-23T05:53:02Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "no.kulturbase/catalogue:1.1.0",
+      "http_status": 200,
+      "seconds": 0.5,
+      "fetched_at": "2026-10-23T05:53:03Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "online.aihomeservices/home-services:0.7.0",
+      "http_status": 200,
+      "seconds": 1.3,
+      "fetched_at": "2026-10-23T05:53:04Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "org.cieltech.pathguard/pathguard:1.0.0",
+      "http_status": 200,
+      "seconds": 0.78,
+      "fetched_at": "2026-10-23T05:53:06Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "org.memoryapi/patent:1.0.0",
+      "http_status": 200,
+      "seconds": 0.71,
+      "fetched_at": "2026-10-23T05:53:07Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "org.thewaterhub/site:1.0.0",
+      "http_status": 200,
+      "seconds": 0.49,
+      "fetched_at": "2026-10-23T05:53:08Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "press.gps/gps-public-data:1.0.0",
+      "http_status": 200,
+      "seconds": 0.68,
+      "fetched_at": "2026-10-23T05:53:09Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "rent.quub/hotels:1.0.0",
+      "http_status": 200,
+      "seconds": 0.51,
+      "fetched_at": "2026-10-23T05:53:10Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "run.chromeflow/chromeflow:0.9.8",
+      "http_status": 200,
+      "seconds": 0.69,
+      "fetched_at": "2026-10-23T05:53:11Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "sh.fenn/fenn:1.0.0",
+      "http_status": 200,
+      "seconds": 0.5,
+      "fetched_at": "2026-10-23T05:53:12Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "si.fourzerotwo/health:1.0.0",
+      "http_status": 200,
+      "seconds": 1.02,
+      "fetched_at": "2026-10-23T05:53:14Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "sk.autoisto/intents:0.1.1",
+      "http_status": 200,
+      "seconds": 1.32,
+      "fetched_at": "2026-10-23T05:53:16Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "space.muse/mcp:1.0.0",
+      "http_status": 200,
+      "seconds": 0.59,
+      "fetched_at": "2026-10-23T05:53:17Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "tech.atomadic/atomadic:0.6.9",
+      "http_status": 200,
+      "seconds": 0.67,
+      "fetched_at": "2026-10-23T05:53:18Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "technology.draup/api-server:1.0.0",
+      "http_status": 200,
+      "seconds": 1.44,
+      "fetched_at": "2026-10-23T05:53:20Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "trade.axel/filing-public:1.0.0",
+      "http_status": 200,
+      "seconds": 1.2,
+      "fetched_at": "2026-10-23T05:53:22Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "uk.co.commercialepccost/site:1.0.1",
+      "http_status": 200,
+      "seconds": 0.41,
+      "fetched_at": "2026-10-23T05:53:22Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "uk.co.idvdeadline/site:1.0.1",
+      "http_status": 200,
+      "seconds": 5.47,
+      "fetched_at": "2026-10-23T05:53:28Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "uk.co.seopersonalinjurylawyers/site:1.0.1",
+      "http_status": 200,
+      "seconds": 0.63,
+      "fetched_at": "2026-10-23T05:53:30Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "uk.webdesignbasingstoke/site:1.0.1",
+      "http_status": 200,
+      "seconds": 0.58,
+      "fetched_at": "2026-10-23T05:53:31Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "work.agentexchange.planets/agent-planets:0.1.0",
+      "http_status": 200,
+      "seconds": 0.67,
+      "fetched_at": "2026-10-23T05:53:32Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "xyz.economyos/economyos:0.1.0",
+      "http_status": 200,
+      "seconds": 1.55,
+      "fetched_at": "2026-10-23T05:53:34Z",
+      "attempts": 1,
+      "count": 100
+    },
+    {
+      "cursor": "xyz.verifiedky/sentinel-402:1.0.1",
+      "http_status": 200,
+      "seconds": 0.22,
+      "fetched_at": "2026-10-23T05:53:35Z",
+      "attempts": 1,
+      "count": 19
+    }
+  ],
+  "failed_pages": [],
+  "record_count": 50019,
+  "note": "include_deleted=true so deleted entries can be counted; the main inventory excludes status 'deleted'.",
+  "next_cursor_at_stop": null
+}

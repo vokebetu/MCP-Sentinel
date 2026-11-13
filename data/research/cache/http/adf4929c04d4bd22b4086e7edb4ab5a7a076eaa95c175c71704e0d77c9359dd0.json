@@ -1,0 +1,1 @@
+{"url": "https://cveawg.mitre.org/api/cve/CVE-2026-111769", "status": 404, "error": "http_404", "body": "{\"error\":\"CVE_RECORD_DNE\",\"message\":\"The cve record for the cve id does not exist.\"}", "fetched_at": "2026-10-23T06:01:57Z", "content_type": "application/json; charset=utf-8", "bytes": 84, "final_url": "https://cveawg.mitre.org/api/cve/CVE-2026-111769"}

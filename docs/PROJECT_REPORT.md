@@ -9,14 +9,15 @@
 
 | Part | Result |
 |---|---|
-| Database | PostgreSQL 17: 23 tables, 4 views, 71 indexes (29 secondary) |
+| Database | PostgreSQL 17 + pgvector: 24 tables, 4 views, 75 indexes (32 secondary) |
 | Registry import | 50,019 servers (48,673 not deleted) |
 | Research data import | OSV, deps.dev, NVD, CVE.org, EPSS, CISA KEV, GitHub, npm, PyPI, Agora, PolicyLayer, ToolHive |
 | Security findings | 204 findings on 22 servers |
 | Coverage records | 148,923 checks |
+| AI assistant | answers with sources from 48,878 indexed records (OpenAI embeddings + `gpt-4.1-mini`) |
 | App | FastAPI + Streamlit in Docker Compose |
-| Backup | 26 MB dump, restore tested |
-| Tests | 50 automated tests, 42 database checks |
+| Backup | 84 MB dump with AI index, restore tested |
+| Tests | 54 automated tests, 42 database checks |
 
 ## 2. Data Modeling and Database Design
 
@@ -85,6 +86,8 @@ erDiagram
     evidence_observations ||--|| endpoint_observations : "evidence"
     data_sources ||--o{ cve_observations : "from"
     collection_runs ||--o{ import_errors : "logs"
+    servers ||--o{ ai_chunks : "AI text"
+    server_versions ||--o{ ai_chunks : "AI text"
 ```
 
 ### C. Logical model
@@ -114,6 +117,7 @@ erDiagram
 | `collection_runs` | `run_id` | | source |
 | `import_errors` | `error_id` | | run |
 | `schema_migrations` | `version` | | |
+| `ai_chunks` | `chunk_key` | same | server, server version (both nullable) |
 
 | View | Purpose |
 |---|---|
@@ -140,6 +144,7 @@ erDiagram
 | `BOOLEAN` (nullable) | `NULL` = not observed |
 | `JSONB` | original registry record, version ranges, tool schemas, source payloads |
 | `TSVECTOR` | keyword search |
+| `vector(512)` | AI text embeddings |
 
 | Index | For |
 |---|---|
@@ -148,6 +153,7 @@ erDiagram
 | advisory identifier indexes | alias lookup |
 | findings and checks by server | profile pages |
 | checks by (type, outcome) | coverage statistics |
+| HNSW (cosine) on `ai_chunks.embedding`, GIN on chunk text | AI search |
 
 **Assessment outcomes:**
 
@@ -179,13 +185,13 @@ erDiagram
 | Document (MongoDB) | raw API documents | flexible schema | no foreign keys; duplicated data |
 | Graph (Neo4j) | dependency paths | natural path queries | second system; our graphs are small (21,571 edges) |
 | Time-series | repeated observations | time windows | only one snapshot |
-| Vector (pgvector) | text similarity search | finds similar text | not needed: the app uses keyword search |
-| Data lake | raw archives | cheap storage | too heavy for a database of about 280 MB |
+| Vector (pgvector) | AI search | finds similar text inside PostgreSQL | added as an extension for the AI assistant |
+| Data lake | raw archives | cheap storage | too heavy for a database of about 660 MB |
 
-**Selected: PostgreSQL 17.**
+**Selected: PostgreSQL 17 with pgvector.**
 
 - Constraints enforce the safety rules: no finding without evidence, no fake versions, one advisory per identifier.
-- One engine, one backup file.
+- One engine, one backup file. AI vectors live next to the facts they describe.
 - Supports search, filters, profiles, comparison and statistics.
 
 No benchmarks were run.
@@ -201,6 +207,8 @@ flowchart LR
     E --> F[Views]
     F --> G[FastAPI, read-only]
     G --> H[Streamlit]
+    F --> I[ai.py index<br/>text chunks + embeddings]
+    I --> E
 ```
 
 | Step | What happens |
@@ -208,6 +216,7 @@ flowchart LR
 | Ingestion | `build_bundle.py` reads saved files (no internet) and keeps only redistributable sources |
 | Storage | importers load the bundle in one transaction each; every fact gets a source and a date |
 | Access | FastAPI runs parameterised, read-only queries; Streamlit calls FastAPI |
+| AI index | `python -m app.ai index` turns profiles and findings into text chunks with embeddings |
 | Updates | re-import changes nothing; new snapshots add history |
 
 ## 5. Database Implementation
@@ -230,6 +239,7 @@ flowchart LR
 | `endpoint_observations` | 31,485 |
 | `cve_observations` | 777 |
 | `import_errors` | 0 |
+| `ai_chunks` | 48,878 |
 
 ### Data sources
 
@@ -270,11 +280,11 @@ Rule: only individual records are loaded. Summary counts are never turned into r
 
 | Test | Result |
 |---|---|
-| Automated tests (`pytest`) | 50 passed: 16 unit, 20 database, 9 API, 5 browser |
+| Automated tests (`pytest`) | 54 passed: 16 unit, 20 database, 12 API, 6 browser (including one live AI test) |
 | Database checks (`importer validate`) | 42/42 passed |
 | Import twice | identical row counts |
 | `docker compose down` + `up` | data kept |
-| Restore dump on a new volume | 42/42 passed, identical counts and query results |
+| Restore dump on a new volume | 42/42 passed, identical counts, AI index works |
 | Public ports | only 8501 |
 | Secrets in dump | none |
 
@@ -285,6 +295,8 @@ Rule: only individual records are loaded. Summary counts are never turned into r
 ![Coverage for praisonai](screenshots/05_profile_praisonai_coverage.png)
 
 ![Compare](screenshots/07_compare.png)
+
+![AI answer](screenshots/08_ai_answer.png)
 
 ## 6. Query and Retrieval Demonstration
 
@@ -350,14 +362,79 @@ Both are PyPI servers with zero recorded findings. Only the first was checked.
 
 `0` means checked. `NULL` means never checked.
 
-## 7. Updated System Architecture
+## 7. AI Assistant
+
+**Goal:** answer questions about the stored data in plain language, with sources, and keep the rule "unknown is not zero".
+
+```mermaid
+flowchart LR
+    A[Saved bundles<br/>Bronze] --> B[(Normalized tables<br/>Silver)]
+    B --> C[Profiles and findings<br/>Gold]
+    C --> D[(ai_chunks<br/>text + vectors)]
+    Q[Question] --> E[FastAPI retrieval<br/>vector + keyword + exact IDs]
+    D --> E
+    E --> F[OpenAI answer<br/>JSON + citation check]
+    F --> G[Streamlit<br/>answer + sources]
+```
+
+| Layer | Contents |
+|---|---|
+| Bronze | saved registry and evidence bundles (`data/`) |
+| Silver | normalized tables: versions, packages, advisories, findings, checks |
+| Gold | SQL views and `ai_chunks`: one text record per server profile and per finding, with source URL, date and hash |
+
+| Step | How |
+|---|---|
+| Chunks | one JSON text per record; long ones split at 2,400 characters with 240 overlap |
+| Embeddings | `text-embedding-3-small`, 512 dimensions, batches of 32, 2 workers |
+| Updates | content hash per chunk; unchanged chunks are not sent again; old chunks removed only after a full run |
+| Retrieval | HNSW cosine + full-text + exact server name and CVE/GHSA match; top 5 |
+| Prompts | zero-shot or few-shot (3 examples); strict JSON answer schema |
+| Citations | must be IDs of retrieved chunks; checked again in code |
+| Guards | named server not found, or "compromised today?": answer is "not enough evidence" |
+| Safety | questions use the read-only connection; key only in the backend; `store: false` |
+
+Indexing, measured:
+
+| Data | Chunks | Embedding tokens | Time | Rerun without changes |
+|---|---|---|---|---|
+| Demo (131 servers) | 333 | 96,551 | 6 s | 0 chunks sent, 1 s |
+| Full (50,019 servers) | 48,878 | 12,460,545 | 9.7 min | 0 chunks sent, 71 s |
+
+Evaluation (`docs/AI_EVALUATION.json`): demo data, 9 questions × 2 prompts × retrieval on/off = 36 runs.
+
+| Prompt | Retrieval | Passed | Mean time | Input / output tokens |
+|---|---|---|---|---|
+| Zero-shot | yes | 8/9 | 1.94 s | 19,551 / 980 |
+| Few-shot (default) | yes | 9/9 | 1.64 s | 21,084 / 885 |
+| Zero-shot | no | 2/9 | 1.05 s | 3,183 / 508 |
+| Few-shot | no | 2/9 | 1.25 s | 4,935 / 483 |
+
+- Retrieval makes the difference: 2/9 without it, 8–9/9 with it.
+- The named server was retrieved in 14 of 14 cases; 77% of retrieved chunks were about it.
+- The zero-shot miss gave a correct explanation but marked it "not enough evidence".
+- 9 questions do not measure general accuracy.
+
+| Problem found during evaluation | Fix |
+|---|---|
+| Answered about a similar server when the named one was missing | name check, then "not enough evidence" |
+| Missed an exact CVE | exact CVE/GHSA match in retrieval |
+| Cited sources it was not given | citation choices limited to retrieved IDs, checked in code |
+| Said vulnerable dependencies were installed | interpretation rule and few-shot example |
+| Full data: plain words in a question ("graph", "server") matched server names | a short name counts only if exactly one server has it |
+| Full data: search took 7.7 s | vector index used directly, cheaper keyword ranking: 0.4–0.7 s |
+
+Full-data check: 5 test questions (Neo4j, Wireshark, praisonai count, exact CVE, unassessed server) all return the right server first.
+
+## 8. Updated System Architecture
 
 ```mermaid
 flowchart LR
     A[Data sources] --> B[Ingestion<br/>build_bundle.py + importers]
-    B --> C[Storage<br/>PostgreSQL 17]
-    C --> D[Processing<br/>SQL views + checks]
+    B --> C[Storage<br/>PostgreSQL 17 + pgvector]
+    C --> D[Processing<br/>SQL views + checks + AI index]
     D --> F[App<br/>FastAPI :8000 internal, Streamlit :8501]
+    F <--> G[OpenAI<br/>embeddings + answers]
 ```
 
 | Change from the first design | Reason |
@@ -365,15 +442,16 @@ flowchart LR
 | Official MCP Registry is the only identity source | other lists could not be linked reliably |
 | Offline, repeatable import | same input gives the same database |
 | Coverage is its own table | "not checked" must be visible |
-| One database engine | see Section 3 |
+| One database engine, with pgvector | see Section 3 |
 
-## 8. Reflection
+## 9. Reflection
 
 **Hard:**
 
 - Knowing which research files had real records and which had only counts.
 - Getting identities right: shared repositories, alias IDs, inexact versions.
 - Showing that 48,269 servers were never checked for vulnerabilities, without storing fake rows.
+- Making the AI say "not enough evidence" instead of guessing.
 
 **Worked well:**
 
@@ -386,8 +464,9 @@ flowchart LR
 - A security database must record what is unknown.
 - Database constraints catch data mistakes early.
 - A backup counts only after a restore is tested.
+- AI answers need the same rule as the database: unknown stays unknown.
 
-## 9. Checklist
+## 10. Checklist
 
 | Item | Done |
 |---|---|
@@ -400,3 +479,5 @@ flowchart LR
 | Updated architecture | yes |
 | App runs with Docker Compose | yes |
 | Backup restores on a new volume | yes |
+| AI assistant with sources | yes |
+| AI evaluation | yes |

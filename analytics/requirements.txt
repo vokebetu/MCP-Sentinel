@@ -1,0 +1,4 @@
+pyspark==4.0.1
+numpy==2.3.3
+psycopg[binary]==3.3.6
+pytest==9.1.1

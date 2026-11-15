@@ -1,6 +1,6 @@
 # Plan from feedback from Vanessa Vreeland
 
-# This is a plan and no adaptations from this feedback have been made yet.
+# Status: all three steps are implemented (2026-11-14). See "Status" at the end.
 
 ## The feedback
 
@@ -74,3 +74,15 @@ Numbers are for the 48,673 non-deleted servers in the current database.
 ## Pitch
 
 MCP Sentinel gives a bank's third-party risk team an evidence pack for each MCP server: what was checked, what was found, and what was not checked, with sources and dates. The bank keeps the runtime controls: sandbox, pinned versions and a logging gateway.
+
+## Status
+
+| Step | Status | Result |
+|---|---|---|
+| 1. Review checklist and evidence export | done | `GET /api/servers/{id}/review` and `/sbom`; "Review checklist" tab with JSON, Markdown and CycloneDX SBOM downloads |
+| 2. Tool risk | done, without the optional AI classifier | permission summary, four text-pattern hints (24 servers), SHA-256 tool fingerprint, "Tool review hints" search filter |
+| 3. Full vulnerability and provenance run | done | 16,669 package versions looked up with 35,404 free API requests; 16,514 servers checked; 19,406 findings on 6,048 servers; SLSA provenance for 2,773 and attestations for 4,880 package versions |
+| After all steps | done | two dump files (37 MB data, 77 MB AI index), updated docs, 64 tests passing, AI evaluation 26/26 |
+
+- NVD was not queried for the 1,265 new CVEs: its public limit (5 requests per 30 seconds) would add about 2.3 hours. CVE.org records were collected instead.
+- The optional AI classifier for tool descriptions was not built; the text patterns cover the same review hints without extra cost.

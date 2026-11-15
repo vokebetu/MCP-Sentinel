@@ -63,7 +63,7 @@ def test_praisonai_direct_findings_group_aliases(db):
     rows = findings_for(db, "io.github.MervinPraison/praisonai")
     direct = {r[1] for r in rows if r[0] == "direct_package"}
     dependency = {r[1] for r in rows if r[0] == "resolved_dependency"}
-    assert len(direct) == 80
+    assert len(direct) == 81
     assert dependency and not (direct & dependency)
     assert advisory_for(db, "CVE-2026-40159") in {one(db, "SELECT advisory_id FROM advisories WHERE canonical_id = %s", (c,)) for c in direct}
     assert all(r[3] == "affected" and r[4] == "active" for r in rows)
@@ -93,13 +93,15 @@ def test_registry_versions_after_the_control_fix_are_not_flagged(db):
     assert advisory_for(db, "CVE-2026-35402") in {one(db, "SELECT advisory_id FROM advisories WHERE canonical_id = %s", (r[1],)) for r in neo4j}
 
 
-def test_wireshark_finding_comes_from_range_evaluation(db):
+def test_wireshark_finding_is_a_direct_package_finding(db):
     rows = findings_for(db, "io.github.bx33661/wireshark-mcp")
-    assert rows and all(r[0] == "direct_package" and r[2] == "osv_record_range_evaluation" for r in rows)
+    assert rows and all(r[0] == "direct_package" and r[2] in ("osv_exact_version_query", "osv_record_range_evaluation") for r in rows)
     assert advisory_for(db, "CVE-2026-43901") in {one(db, "SELECT advisory_id FROM advisories WHERE canonical_id = %s", (r[1],)) for r in rows}
-    reason = one(db, """SELECT c.reason FROM assessment_checks c JOIN servers s ON s.latest_version_id = c.server_version_id
-                         WHERE s.registry_name = 'io.github.bx33661/wireshark-mcp' AND c.check_type = 'direct_package_advisories'""")
-    assert "not a complete OSV query" in reason
+    outcome = one(db, """SELECT c.outcome FROM assessment_checks c JOIN servers s ON s.latest_version_id = c.server_version_id
+                          JOIN data_sources ds ON ds.source_id = c.source_id
+                          WHERE s.registry_name = 'io.github.bx33661/wireshark-mcp' AND c.check_type = 'direct_package_advisories'
+                            AND ds.source_key = 'osv'""")
+    assert outcome == "finding_found"
 
 
 def test_dependency_findings_keep_their_resolution_context(db):

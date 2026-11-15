@@ -49,7 +49,7 @@ def choose_server(page, label, query):
 def test_dashboard_shows_database_statistics(page):
     page.goto(FRONTEND_URL)
     wait_text(page, "Registry records")
-    wait_text(page, "Enrichment is partial")
+    wait_text(page, "Package vulnerability lookups cover")
     wait_text(page, "Non-deleted servers")
     wait_text(page, "Vulnerability assessment state")
     wait_text(page, "Known limitations")
@@ -78,10 +78,21 @@ def test_profile_shows_findings_and_coverage(page):
     shot(page, "05_profile_praisonai_coverage")
 
 
+def test_profile_review_checklist(page):
+    page.goto(f"{FRONTEND_URL}/profile")
+    choose_server(page, "Find a server", "praisonai")
+    wait_text(page, "io.github.MervinPraison/praisonai")
+    page.get_by_role("tab", name="Review checklist").click()
+    wait_text(page, "items need attention")
+    wait_text(page, "Software bill of materials (SBOM)")
+    wait_text(page, "Download SBOM (CycloneDX JSON)")
+    shot(page, "09_review_checklist")
+
+
 def test_unassessed_server_is_not_shown_as_safe(page):
     page.goto(f"{FRONTEND_URL}/profile")
     choose_server(page, "Find a server", "ai.agentplaybooks/agentplaybooks")
-    wait_text(page, "No vulnerability lookup has been recorded")
+    wait_text(page, "No installable package is declared")
     page.get_by_role("tab", name="Observed concerns").click()
     wait_text(page, "unknown, not zero")
 
@@ -103,7 +114,7 @@ def test_ai_assistant_answers_with_sources_and_clears_history(page):
     question.fill("How many direct advisories are recorded for praisonai?")
     question.press("Enter")
     wait_text(page, "Evidence sources", timeout=110000)
-    assert "80" in page.get_by_test_id("stChatMessage").last.inner_text()
+    assert "81" in page.get_by_test_id("stChatMessage").last.inner_text()
     if SCREENSHOTS:
         page.screenshot(path=str(Path(SCREENSHOTS) / "08_ai_answer.png"), full_page=False)
     page.get_by_text("Evidence sources", exact=False).click()

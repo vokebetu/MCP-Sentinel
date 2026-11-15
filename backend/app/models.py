@@ -280,3 +280,31 @@ class Health(BaseModel):
     database: str
     schema_versions: list[str]
     servers: int | None
+
+
+class ReviewItem(BaseModel):
+    item: str
+    label: str
+    status: Literal["present", "missing", "not_assessed", "not_applicable"]
+    attention: bool
+    detail: str
+    source: str | None
+    observed_at: datetime | None
+
+
+class ToolFlag(BaseModel):
+    tool_name: str
+    flag: str
+    explanation: str
+    matched_text: str | None
+
+
+class ReviewResponse(BaseModel):
+    server_id: int
+    registry_name: str
+    version: str
+    items: list[ReviewItem]
+    tool_flags: list[ToolFlag]
+    tool_fingerprint: str | None
+    sbom_available: bool
+    notes: list[str]

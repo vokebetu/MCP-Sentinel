@@ -61,26 +61,29 @@ def test_concern_sort_puts_unknown_after_assessed(client):
 
 def test_security_endpoint_separates_direct_and_dependency(client):
     body = client.get(f"/api/servers/{server_id(client, 'io.github.MervinPraison/praisonai')}/security").json()
-    assert body["summary"]["direct_advisories"] == 80 and body["summary"]["dependency_advisories"] >= 1
+    assert body["summary"]["direct_advisories"] == 81 and body["summary"]["dependency_advisories"] >= 1
     labels = {f["finding_category"]: f["evidence_label"] for f in body["findings"]}
     assert "Modeled dependency exposure" in labels["resolved_dependency"] and "not proof of installation" in labels["resolved_dependency"]
     assert all(f["cves"] for f in body["findings"] if any(i.startswith("CVE-") for i in f["identifiers"]))
 
 
-def test_coverage_shows_not_assessed_for_unassessed_server(client):
-    items = client.get("/api/servers", params={"assessment": "not_assessed", "deployment": "packages_only", "page_size": 1}).json()["items"]
-    body = client.get(f"/api/servers/{items[0]['server_id']}/coverage").json()
-    assert "direct_package_advisories" in body["not_assessed_check_types"]
-    security = client.get(f"/api/servers/{items[0]['server_id']}/security").json()
-    assert security["summary"]["distinct_advisories"] is None
+def test_coverage_keeps_unknown_apart_from_zero(client):
+    remote = server_id(client, "ai.agentplaybooks/agentplaybooks")
+    summary = client.get(f"/api/servers/{remote}/security").json()["summary"]
+    assert summary["vulnerability_assessment_state"] == "no_package_vulnerability_path" and summary["distinct_advisories"] is None
+    coverage = {c["check_type"]: c for c in client.get(f"/api/servers/{remote}/coverage").json()["check_types"]}
+    assert coverage["direct_package_advisories"]["outcomes"] == {"not_applicable": 1}
+    deleted = client.get("/api/servers", params={"status": "deleted", "assessment": "not_assessed", "page_size": 1}).json()["items"][0]
+    assert client.get(f"/api/servers/{deleted['server_id']}/coverage").json()["not_assessed_check_types"]
 
 
 def test_compare_warns_about_unequal_coverage(client):
     a = server_id(client, "io.github.MervinPraison/praisonai")
-    b = client.get("/api/servers", params={"assessment": "not_assessed", "page_size": 1}).json()["items"][0]["server_id"]
+    b = server_id(client, "ai.agentplaybooks/agentplaybooks")
     body = client.get("/api/compare", params={"server_ids": f"{a},{b}"}).json()
     assert len(body["servers"]) == 2
     assert any("not necessarily more secure" in note for note in body["notes"])
+    assert any("unknown rather than zero" in note for note in body["notes"])
     assert client.get("/api/compare", params={"server_ids": f"{a},{a}"}).status_code == 422
     assert client.get("/api/compare", params={"server_ids": "1;DROP TABLE servers"}).status_code == 422
 
@@ -168,8 +171,63 @@ def test_ai_incremental_index_and_retrieval_use_only_current_versions(client, mo
         version = conn.execute("SELECT latest_version_id FROM servers WHERE server_id=%s", (sid,)).fetchone()[0]
         conn.execute("""INSERT INTO ai_chunks (chunk_key,server_id,server_version_id,kind,title,content,content_hash,
                      embedding_model,embedding,seen_run) VALUES ('deleted-test',%s,%s,'server','praisonai deleted test',
-                     'praisonai deleted test','test',%s,%s::vector,'00000000-0000-0000-0000-000000000000')""",
+                     'praisonai deleted test','test',%s,%s::halfvec,'00000000-0000-0000-0000-000000000000')""",
                      (sid, version, ai.EMBEDDING_MODEL, json.dumps(vector)))
     assert all(s["citation_id"] != "deleted-test" for s in ai.retrieve("praisonai deleted test", 10))
     third = ai.index_corpus()
     assert third["removed"] == 1 and third["embedded"] == 0
+
+
+def test_review_checklist_reports_evidence_status(client):
+    keys = ["publisher_identity", "source_repository", "pinned_versions", "known_vulnerabilities", "sbom", "provenance", "tool_permissions",
+            "prompt_injection_hints", "tool_fingerprint", "secrets_and_logins", "static_analysis"]
+    review = client.get(f"/api/servers/{server_id(client, 'io.github.MervinPraison/praisonai')}/review").json()
+    items = {i["item"]: i for i in review["items"]}
+    assert list(items) == keys
+    assert items["known_vulnerabilities"]["status"] == "present" and items["known_vulnerabilities"]["attention"]
+    assert items["sbom"]["status"] == "present" and review["sbom_available"]
+    assert items["static_analysis"]["status"] == "not_assessed"
+    remote = client.get(f"/api/servers/{server_id(client, 'ai.agentplaybooks/agentplaybooks')}/review").json()
+    states = {i["item"]: i["status"] for i in remote["items"]}
+    assert states["pinned_versions"] == states["known_vulnerabilities"] == states["sbom"] == "not_applicable"
+    assert client.get("/api/servers/999999999/review").status_code == 404
+
+
+def test_sbom_is_cyclonedx_and_only_for_resolved_servers(client):
+    bom = client.get(f"/api/servers/{server_id(client, 'io.github.MervinPraison/praisonai')}/sbom").json()
+    assert bom["bomFormat"] == "CycloneDX" and bom["specVersion"] == "1.5"
+    assert bom["components"] and all(c["purl"].startswith("pkg:pypi/") for c in bom["components"])
+    assert len({c["bom-ref"] for c in bom["components"]}) == len(bom["components"])
+    assert client.get(f"/api/servers/{server_id(client, 'ai.agentplaybooks/agentplaybooks')}/sbom").status_code == 404
+
+
+def test_tool_hint_filter_matches_review(client):
+    flagged = client.get("/api/servers", params={"tool_hints": "true", "status": "all", "page_size": 100}).json()["items"]
+    for entry in flagged:
+        assert client.get(f"/api/servers/{entry['server_id']}/review").json()["tool_flags"]
+    clean = client.get("/api/servers", params={"tool_hints": "false", "has_tools": "true", "page_size": 20}).json()["items"]
+    for entry in clean:
+        assert not client.get(f"/api/servers/{entry['server_id']}/review").json()["tool_flags"]
+
+
+def test_ai_inventory_questions_get_sql_statistics(client, monkeypatch):
+    import json
+    ai = importlib.import_module("app.ai")
+    monkeypatch.setenv("OPENAI_API_KEY", "test-not-a-real-key")
+    monkeypatch.setattr(ai, "retrieve", lambda *args: [])
+    seen = {}
+
+    def answer(path, payload):
+        seen["payload"] = payload
+        return {"status": "completed", "output": [{"type": "message", "content": [{"type": "output_text", "text": json.dumps({
+            "answer": "Counted from statistics.", "status": "grounded", "citation_ids": ["stats:coverage"], "limitations": []})}]}]}
+
+    monkeypatch.setattr(ai, "post", answer)
+    body = client.post("/api/ai/chat", json={"question": "How many servers have recorded findings?"}).json()
+    assert [s["citation_id"] for s in body["sources"]] == ["stats:totals", "stats:coverage", "stats:ranking", "stats:advisories"]
+    assert body["citation_ids"] == ["stats:coverage"] and body["sources"][0]["similarity"] is None
+    evidence = json.loads(seen["payload"]["input"][0]["content"])["evidence"]
+    totals = client.get("/api/stats").json()["totals"]
+    assert f"{totals['all']:,}" in evidence[0]["content"]
+    plain = client.post("/api/ai/chat", json={"question": "Is praisonai safe?"})
+    assert plain.status_code == 200 and plain.json()["sources"] == []

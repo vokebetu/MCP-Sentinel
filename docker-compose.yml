@@ -62,5 +62,20 @@ services:
       db:
         condition: service_healthy
 
+  analytics:
+    build:
+      context: .
+      dockerfile: analytics/Dockerfile
+    profiles: ["tools"]
+    environment:
+      <<: *database-env
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+    volumes:
+      - ./data:/srv/data
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   postgres_data:

@@ -9,15 +9,19 @@
 
 | Part | Result |
 |---|---|
-| Database | PostgreSQL 17 + pgvector: 24 tables, 4 views, 75 indexes (32 secondary) |
+| Database | PostgreSQL 17 + pgvector: 24 tables, 5 views, 75 indexes |
 | Registry import | 50,019 servers (48,673 not deleted) |
+| Package lookup | every declared npm, PyPI, NuGet and Cargo package version (16,669) in deps.dev and OSV, 2026-11-14 |
 | Research data import | OSV, deps.dev, NVD, CVE.org, EPSS, CISA KEV, GitHub, npm, PyPI, Agora, PolicyLayer, ToolHive |
-| Security findings | 204 findings on 22 servers |
-| Coverage records | 148,923 checks |
-| AI assistant | answers with sources from 48,878 indexed records (OpenAI embeddings + `gpt-4.1-mini`) |
+| Vulnerability coverage | 16,514 servers checked; 30,150 remote-only servers have no package to check |
+| Security findings | 19,406 findings on 6,048 servers |
+| Coverage records | 317,347 checks |
+| Review checklist | per server: the evidence a bank's third-party review asks for, plus an SBOM download |
+| AI assistant | answers with sources from 55,477 indexed records (OpenAI embeddings + `gpt-4.1-mini`); 26/26 evaluation questions |
+| Spark analytics | Bronze/Silver/Gold Parquet, 4 SQL reports, K-Means on 16,514 servers |
 | App | FastAPI + Streamlit in Docker Compose |
-| Backup | 84 MB dump with AI index, restore tested |
-| Tests | 54 automated tests, 42 database checks |
+| Backup | two dump files (37 MB data, 77 MB AI index), restore tested |
+| Tests | 64 automated tests, 42 database checks |
 
 ## 2. Data Modeling and Database Design
 
@@ -125,6 +129,7 @@ erDiagram
 | `server_security_summary` | findings and assessment state per server |
 | `advisory_cve_context` | CVSS, EPSS, KEV per advisory CVE |
 | `cve_latest_observations` | newest value per CVE and source |
+| `tool_review_flags` | text-pattern hints in tool descriptions (hidden instructions, invisible characters, key or config file mentions, tool redirects) |
 
 ### D. Schema design decisions
 
@@ -144,7 +149,7 @@ erDiagram
 | `BOOLEAN` (nullable) | `NULL` = not observed |
 | `JSONB` | original registry record, version ranges, tool schemas, source payloads |
 | `TSVECTOR` | keyword search |
-| `vector(512)` | AI text embeddings |
+| `halfvec(512)` | AI text embeddings (half-size floats) |
 
 | Index | For |
 |---|---|
@@ -183,10 +188,10 @@ erDiagram
 |---|---|---|---|
 | Relational (PostgreSQL) | main store | foreign keys, constraints, joins, JSONB, full-text search, one dump | long graph paths are verbose |
 | Document (MongoDB) | raw API documents | flexible schema | no foreign keys; duplicated data |
-| Graph (Neo4j) | dependency paths | natural path queries | second system; our graphs are small (21,571 edges) |
+| Graph (Neo4j) | dependency paths | natural path queries | second system; our 2.16 million edges are only read one server's graph at a time |
 | Time-series | repeated observations | time windows | only one snapshot |
 | Vector (pgvector) | AI search | finds similar text inside PostgreSQL | added as an extension for the AI assistant |
-| Data lake | raw archives | cheap storage | too heavy for a database of about 660 MB |
+| Data lake | raw archives | cheap storage | too heavy for a database of about 1.1 GB |
 
 **Selected: PostgreSQL 17 with pgvector.**
 
@@ -213,10 +218,12 @@ flowchart LR
 
 | Step | What happens |
 |---|---|
+| Package lookup | `enrich_packages.py` looks up every declared package once (deps.dev, OSV, CVE.org, EPSS) and saves every answer |
 | Ingestion | `build_bundle.py` reads saved files (no internet) and keeps only redistributable sources |
 | Storage | importers load the bundle in one transaction each; every fact gets a source and a date |
 | Access | FastAPI runs parameterised, read-only queries; Streamlit calls FastAPI |
 | AI index | `python -m app.ai index` turns profiles and findings into text chunks with embeddings |
+| Analytics | `docker compose run --rm analytics` exports views read-only, then Spark builds Parquet layers, SQL reports and K-Means |
 | Updates | re-import changes nothing; new snapshots add history |
 
 ## 5. Database Implementation
@@ -227,19 +234,19 @@ flowchart LR
 |---|---|
 | `servers` / `server_versions` | 50,019 / 50,019 |
 | `repositories` / `server_repositories` | 27,323 / 34,005 |
-| `packages` / `package_versions` | 20,634 / 19,220 |
+| `packages` / `package_versions` | 36,853 / 43,243 |
 | `server_package_declarations` | 20,456 |
 | `remote_endpoints` | 33,965 |
-| `advisories` / `advisory_identifiers` | 280 / 766 |
-| `dependency_resolutions` / `dependency_edges` | 215 / 21,571 |
-| `security_findings` | 204 (82 direct, 122 dependency) |
-| `assessment_checks` | 148,923 |
-| `evidence_observations` | 34,474 |
+| `advisories` / `advisory_identifiers` | 1,363 / 3,327 |
+| `dependency_resolutions` / `dependency_edges` | 16,263 / 2,158,770 |
+| `security_findings` | 19,406 (94 direct, 19,312 dependency) on 6,048 servers |
+| `assessment_checks` | 317,347 |
+| `evidence_observations` | 86,920 |
 | `tool_observations` | 16,055 (620 servers with valid schemas) |
 | `endpoint_observations` | 31,485 |
-| `cve_observations` | 777 |
+| `cve_observations` | 4,204 |
 | `import_errors` | 0 |
-| `ai_chunks` | 48,878 |
+| `ai_chunks` | 55,477 |
 
 ### Data sources
 
@@ -264,15 +271,15 @@ Rule: only individual records are loaded. Summary counts are never turned into r
 
 ### Check against the research measurements
 
-| Measure | Measured in research | Database |
+| Measure | Measured in research (2026-10-23) | Database |
 |---|---|---|
 | Registry records | 50,019 | 50,019 |
 | Active / deprecated / deleted | 48,056 / 617 / 1,346 | same |
 | Package declarations / remote endpoints | 20,175 / 32,726 | same |
 | Shared GitHub repositories | 741 | 741 |
 | Declarations without exact version | 2,238 | 2,238 |
-| Random sample: servers with findings, advisories, CVEs | 18, 150, 152 | same |
-| `praisonai@2.3.42` advisories | 80 | 80 |
+| Package versions checked for vulnerabilities | 400-server sample | all 16,669 (lookup of 2026-11-14) |
+| `praisonai@2.3.42` advisories | 80 | 81 (one advisory published after 2026-10-23) |
 | Servers with valid tool schemas | 620 | 620 |
 | Known-vulnerable test packages detected | 10/10 | 10/10 |
 
@@ -280,11 +287,11 @@ Rule: only individual records are loaded. Summary counts are never turned into r
 
 | Test | Result |
 |---|---|
-| Automated tests (`pytest`) | 54 passed: 16 unit, 20 database, 12 API, 6 browser (including one live AI test) |
+| Automated tests (`pytest`) | 64 passed: 16 unit, 20 database, 16 API, 7 browser (including one live AI test), 5 Spark |
 | Database checks (`importer validate`) | 42/42 passed |
 | Import twice | identical row counts |
 | `docker compose down` + `up` | data kept |
-| Restore dump on a new volume | 42/42 passed, identical counts, AI index works |
+| Restore both dump files on a new volume | 3 minutes, 42/42 passed, identical counts, AI index works |
 | Public ports | only 8501 |
 | Secrets in dump | none |
 
@@ -296,7 +303,13 @@ Rule: only individual records are loaded. Summary counts are never turned into r
 
 ![Compare](screenshots/07_compare.png)
 
+![Review checklist for praisonai](screenshots/09_review_checklist.png)
+
 ![AI answer](screenshots/08_ai_answer.png)
+
+![AI answer sources](screenshots/08_ai_answer_sources.png)
+
+![AI follow-up question](screenshots/09_ai_followup.png)
 
 ## 6. Query and Retrieval Demonstration
 
@@ -319,48 +332,48 @@ Uses joins, `GROUP BY`, `count(DISTINCT)`, and handles servers with several ecos
 
 ### Query 2: vulnerabilities of one server (`io.github.MervinPraison/praisonai`)
 
-Shows the declared version, advisories, CVEs, severity, fixed versions, and direct versus dependency findings. First 8 of 82 rows, plus both dependency rows:
+Shows the declared version, advisories, CVEs, severity, fixed versions, and direct versus dependency findings. First 8 of 84 rows, plus the three dependency rows:
 
 | category | advisory | CVE | other IDs | severity | NVD CVSS | EPSS | affected | fixed in |
 |---|---|---|---|---|---|---|---|---|
-| direct_package | CVE-2026-39305 | CVE-2026-39305 | GHSA-jfxc-v5g9-38xr, PYSEC-2026-475 | CRITICAL | 10.0 | 0.00427 | praisonai@2.3.42 | 4.5.113 |
+| direct_package | CVE-2026-39305 | CVE-2026-39305 | GHSA-jfxc-v5g9-38xr, PYSEC-2026-475 | CRITICAL | 10.0 | 0.00318 | praisonai@2.3.42 | 4.5.113 |
 | direct_package | CVE-2026-47392 | CVE-2026-47392 | GHSA-4mr5-g6f9-cfrh, PYSEC-2026-463, PYSEC-2026-483 | CRITICAL | 9.9 | 0.00884 | praisonai@2.3.42 | 4.6.40 |
-| direct_package | CVE-2026-61445 | CVE-2026-61445 | GHSA-9mp3-24cc-77mg, PYSEC-2026-4253 | CRITICAL | 9.9 | 0.00881 | praisonai@2.3.42 | 4.6.78 |
-| direct_package | CVE-2026-34934 | CVE-2026-34934 | GHSA-9cq8-3v94-434g, PYSEC-2026-470 | CRITICAL | 9.8 | 0.00596 | praisonai@2.3.42 | 4.5.90 |
-| direct_package | CVE-2026-39890 | CVE-2026-39890 | GHSA-32vr-5gcf-3pw2, PYSEC-2026-462 | CRITICAL | 9.8 | 0.00812 | praisonai@2.3.42 | 4.5.115 |
-| direct_package | CVE-2026-40288 | CVE-2026-40288 | GHSA-vc46-vw85-3wvm, PYSEC-2026-477, PYSEC-2026-488 | CRITICAL | 9.8 | 0.00925 | praisonai@2.3.42 | 4.5.139 |
-| direct_package | CVE-2026-41497 | CVE-2026-41497 | GHSA-9qhq-v63v-fv3j, PYSEC-2026-473 | CRITICAL | 9.8 | 0.00767 | praisonai@2.3.42 | 4.5.149 |
-| direct_package | CVE-2026-47391 | CVE-2026-47391 | GHSA-vg22-4gmj-prxw, PYSEC-2026-478 | CRITICAL | 9.8 | 0.01165 | praisonai@2.3.42 | 4.6.40 |
+| direct_package | CVE-2026-61445 | CVE-2026-61445 | GHSA-9mp3-24cc-77mg, PYSEC-2026-4253 | CRITICAL | 9.9 | 0.00640 | praisonai@2.3.42 | 4.6.78 |
+| direct_package | CVE-2026-34934 | CVE-2026-34934 | GHSA-9cq8-3v94-434g, PYSEC-2026-470 | CRITICAL | 9.8 | 0.00543 | praisonai@2.3.42 | 4.5.90 |
+| direct_package | CVE-2026-39890 | CVE-2026-39890 | GHSA-32vr-5gcf-3pw2, PYSEC-2026-462 | CRITICAL | 9.8 | 0.00589 | praisonai@2.3.42 | 4.5.115 |
+| direct_package | CVE-2026-40288 | CVE-2026-40288 | GHSA-vc46-vw85-3wvm, PYSEC-2026-477, PYSEC-2026-488 | CRITICAL | 9.8 | 0.00619 | praisonai@2.3.42 | 4.5.139 |
+| direct_package | CVE-2026-41497 | CVE-2026-41497 | GHSA-9qhq-v63v-fv3j, PYSEC-2026-473 | CRITICAL | 9.8 | 0.00541 | praisonai@2.3.42 | 4.5.149 |
+| direct_package | CVE-2026-47391 | CVE-2026-47391 | GHSA-vg22-4gmj-prxw, PYSEC-2026-478 | CRITICAL | 9.8 | 0.01498 | praisonai@2.3.42 | 4.6.40 |
 | resolved_dependency | GHSA-x462-jjpc-q4q4 | none | GHSA-x462-jjpc-q4q4 | HIGH | none | none | praisonaiagents@1.7.14 | 4.5.128 |
 | resolved_dependency | CVE-2026-56074 | CVE-2026-56074 | GHSA-ffp3-3562-8cv3, PYSEC-2026-2946 | MODERATE | 5.5 | 0.00176 | praisonaiagents@1.7.14 | 4.5.128 |
+| resolved_dependency | CVE-2026-126360 | CVE-2026-126360 | GHSA-mf5v-w3w3-f6cg | MODERATE | none | 0.00519 | opentelemetry-api@1.45.1 | 1.45.2 |
 
 Summary:
 
 | category | findings | distinct advisories | CVE IDs | critical or high | max CVSS | max EPSS | in KEV |
 |---|---|---|---|---|---|---|---|
-| direct_package | 80 | 80 | 82 | 64 | 10.0 | 0.01165 | 0 |
-| resolved_dependency | 2 | 2 | 1 | 1 | 5.5 | 0.00176 | 0 |
+| direct_package | 81 | 81 | 83 | 65 | 10.0 | 0.01498 | 0 |
+| resolved_dependency | 3 | 3 | 2 | 1 | 5.5 | 0.00519 | 0 |
 
-- Aliases are grouped: 80 advisories, 82 CVEs.
+- Aliases are grouped: 81 advisories, 83 CVEs.
+- NVD scores exist only for CVEs from the research sample; the new dependency CVE shows `none`.
 - Missing values stay missing (`none`), never 0.
 - EPSS is per CVE, not a chance that this server is hacked.
 
 ### Query 3: two servers compared, with coverage
 
-Both are PyPI servers with zero recorded findings. Only the first was checked.
+Two PyPI servers. In the October research sample only the first was checked; the full package lookup now covers both.
 
 | | io.github.Buer2333/tiktok-shop-mcp | io.github.06ketan/medium-ops |
 |---|---|---|
 | package | pypi:tiktok-shop-mcp@0.3.0 | pypi:medium-ops@0.1.2 |
 | repository | GitHub lookup: found | GitHub lookup: not checked |
-| direct advisories | 0 | NULL (unknown) |
-| dependency advisories | 0 | NULL (unknown) |
-| assessment state | no known findings in completed checks | not assessed |
-| checks done | OSV, GHSA, deps.dev, PyPI, GitHub, Agora, PolicyLayer, ToolHive | Agora, PolicyLayer, ToolHive |
-| checks missing | tool metadata | vulnerabilities, dependencies, package, repository |
-| meaning | no known advisories (not proof of safety) | count unknown |
+| direct advisories | 0 | 0 |
+| dependency advisories | 1 (advisory published after 2026-10-23) | 0 |
+| assessment state | findings recorded | no known findings in completed checks |
+| meaning | one modeled dependency exposure | no known advisories (not proof of safety) |
 
-`0` means checked. `NULL` means never checked.
+`0` means checked. `NULL` means never checked: the 30,150 remote-only servers keep `NULL` because they have no package to check.
 
 ## 7. AI Assistant
 
@@ -381,39 +394,54 @@ flowchart LR
 |---|---|
 | Bronze | saved registry and evidence bundles (`data/`) |
 | Silver | normalized tables: versions, packages, advisories, findings, checks |
-| Gold | SQL views and `ai_chunks`: one text record per server profile and per finding, with source URL, date and hash |
+| Gold | SQL views and `ai_chunks`: one text record per server profile and one per server's findings, with source URL, date and hash |
 
 | Step | How |
 |---|---|
-| Chunks | one JSON text per record; long ones split at 2,400 characters with 240 overlap |
-| Embeddings | `text-embedding-3-small`, 512 dimensions, batches of 32, 2 workers |
+| Chunks | one JSON text per server profile and per server's findings; long ones split at 2,400 characters with 240 overlap |
+| Embeddings | `text-embedding-3-small`, 512 dimensions, stored as `halfvec`, batches of 32, 2 workers |
 | Updates | content hash per chunk; unchanged chunks are not sent again; old chunks removed only after a full run |
 | Retrieval | HNSW cosine + full-text + exact server name and CVE/GHSA match; top 5 |
-| Prompts | zero-shot or few-shot (3 examples); strict JSON answer schema |
-| Citations | must be IDs of retrieved chunks; checked again in code |
+| Inventory questions | counts, shares and rankings get live SQL statistics over the whole database as extra sources |
+| Advisory questions | a CVE or GHSA id in the question adds live SQL counts of the servers it affects |
+| Prompts | zero-shot or few-shot (4 examples); strict JSON answer schema |
+| Citations | must be IDs of retrieved sources; checked again in code |
 | Guards | named server not found, or "compromised today?": answer is "not enough evidence" |
 | Safety | questions use the read-only connection; key only in the backend; `store: false` |
 
-Indexing, measured:
+Indexing, measured on the full database:
 
-| Data | Chunks | Embedding tokens | Time | Rerun without changes |
-|---|---|---|---|---|
-| Demo (131 servers) | 333 | 96,551 | 6 s | 0 chunks sent, 1 s |
-| Full (50,019 servers) | 48,878 | 12,460,545 | 9.7 min | 0 chunks sent, 71 s |
+| Chunks | Embedding tokens | Time | Rerun without changes |
+|---|---|---|---|
+| 55,477 (48,673 profiles, 6,801 findings, 1 note) | about 17.0 million | about 13 min | 0 chunks sent, 65 s |
 
-Evaluation (`docs/AI_EVALUATION.json`): demo data, 9 questions × 2 prompts × retrieval on/off = 36 runs.
+### Answer quality across question types
+
+Answers were good for questions about one server but varied for other kinds of questions. A 22-question check on the full data showed where:
+
+| Question type | Before | After | What went wrong before |
+|---|---|---|---|
+| Named server, everyday name, concepts, search, comparison | 12/12 | 12/12 | |
+| Counts over the whole database | 0/5 | 5/5 | counted the 5 retrieved records: "There are 5 MCP servers in the database", "100% are remote-only" |
+| Rankings | 0/2 | 2/2 | "None of the servers have vulnerabilities" |
+| CVE lookups | 1/2 | 2/2 | right servers, but named by internal ids |
+| Decline when unsure | 1/1 | 1/1 | |
+| **Total** | **14/22** | **22/22** | |
+
+Fixes: live SQL statistics for inventory and advisory questions, a prompt rule against counting the sample, and server names instead of ids.
+
+Evaluation (`docs/AI_EVALUATION.json`): full data, 26 questions in 9 categories × 2 prompts × retrieval on/off = 104 runs. Expected answers for data-dependent questions are computed from the database when the evaluation runs.
 
 | Prompt | Retrieval | Passed | Mean time | Input / output tokens |
 |---|---|---|---|---|
-| Zero-shot | yes | 8/9 | 1.94 s | 19,551 / 980 |
-| Few-shot (default) | yes | 9/9 | 1.64 s | 21,084 / 885 |
-| Zero-shot | no | 2/9 | 1.05 s | 3,183 / 508 |
-| Few-shot | no | 2/9 | 1.25 s | 4,935 / 483 |
+| Zero-shot | yes | 26/26 | 3.3 s | 126,372 / 4,325 |
+| Few-shot (default) | yes | 26/26 | 2.9 s | 133,376 / 3,560 |
+| Zero-shot | no | 2/26 | 0.9 s | 11,254 / 1,525 |
+| Few-shot | no | 2/26 | 1.0 s | 18,554 / 1,416 |
 
-- Retrieval makes the difference: 2/9 without it, 8–9/9 with it.
-- The named server was retrieved in 14 of 14 cases; 77% of retrieved chunks were about it.
-- The zero-shot miss gave a correct explanation but marked it "not enough evidence".
-- 9 questions do not measure general accuracy.
+- Retrieval makes the difference: without it only the two "decline" questions pass.
+- Checks are term matches; the answers for counts, rankings and CVEs were also read by hand.
+- 26 questions do not measure general accuracy.
 
 | Problem found during evaluation | Fix |
 |---|---|
@@ -421,20 +449,88 @@ Evaluation (`docs/AI_EVALUATION.json`): demo data, 9 questions × 2 prompts × r
 | Missed an exact CVE | exact CVE/GHSA match in retrieval |
 | Cited sources it was not given | citation choices limited to retrieved IDs, checked in code |
 | Said vulnerable dependencies were installed | interpretation rule and few-shot example |
-| Full data: plain words in a question ("graph", "server") matched server names | a short name counts only if exactly one server has it |
-| Full data: search took 7.7 s | vector index used directly, cheaper keyword ranking: 0.4–0.7 s |
+| Plain words in a question ("graph", "server") matched server names | a short name counts only if exactly one server has it |
+| Search took 7.7 s | vector index used directly, cheaper keyword ranking: 0.4–0.7 s |
+| Counted retrieved records as the whole database | live SQL statistics; prompt forbids counting the sample |
+| One CVE can affect 100+ servers; top 5 cannot list them | live SQL counts per advisory |
+| 19,406 findings would mean 19,406 vectors and partial lists | one findings record per server (6,801 records) |
+| Newlines inside JSON glued "n" to the next word, so exact CVE search missed | findings separated with " \| " |
+| Index scan of the full data took about 40 minutes | planner set for full scans: the scan takes 1.4 s |
+| One network error stopped a long index run | up to two retries for connection errors |
+| Dump would pass GitHub's 100 MB file limit | vectors stored as `halfvec`; AI index in its own dump file |
 
-Full-data check: 5 test questions (Neo4j, Wireshark, praisonai count, exact CVE, unassessed server) all return the right server first.
+## 8. Review Checklist
 
-## 8. Updated System Architecture
+Reviewer feedback asked what evidence a bank should require before using an MCP server that has no known vulnerabilities but was never fully assessed. The profile page now answers that per server.
+
+| Item | Evidence used | Coverage |
+|---|---|---|
+| Identifiable publisher | registry namespace: verified GitHub account or domain | every server |
+| Source repository and activity | GitHub lookup | 287 repositories checked |
+| Pinned versions | exact versions or image digests in the registry record | every package |
+| Known vulnerabilities | OSV, declared packages and modeled dependencies | 16,514 servers |
+| SBOM | deps.dev dependency list, downloadable as CycloneDX 1.5 | 16,263 dependency lists |
+| Signed builds and provenance | deps.dev SLSA provenance and attestations | 2,773 and 4,880 of 16,406 package versions |
+| Tool permission review | PolicyLayer labels, publisher annotations | 1,037 servers with tools |
+| Prompt injection hints | text patterns over tool descriptions | 24 servers with hints |
+| Tool definition fingerprint | SHA-256 of tool names, descriptions and schemas | 1,037 servers with tools |
+| Secrets and logins it needs | registry record | every server |
+| Static code analysis | not run (code is never downloaded) | none |
+
+- Every item says whether evidence exists, not whether the server is safe.
+- Hints were read by hand: the one hidden-instruction hit is a security scanner's own example text; most key mentions are wallet tools that ask for a private key.
+- Not built: sandboxing, pinned deployments and a logging gateway. These are the bank's runtime controls.
+
+## 9. Spark Analytics
+
+A second processing path runs batch analytics without changing the app.
 
 ```mermaid
 flowchart LR
-    A[Data sources] --> B[Ingestion<br/>build_bundle.py + importers]
+    A[(PostgreSQL views)] -->|read-only CSV export| B[Bronze Parquet]
+    B --> C[Silver: typed columns]
+    C --> D[Gold: one row per server version]
+    D --> E[Spark SQL reports]
+    D --> F[K-Means on assessed servers]
+```
+
+| Layer | Rows |
+|---|---|
+| Bronze | 50,019 profiles, 50,019 security summaries, 280,126 check groups, 6,051 finding groups |
+| Gold | 50,019 server versions, 16,514 eligible for clustering |
+
+Coverage by assessment state (Spark SQL):
+
+| State | Servers |
+|---|---|
+| no package to check | 30,150 |
+| completed vulnerability checks | 16,514 |
+| checks could not complete | 2,009 |
+| not assessed (deleted records) | 1,346 |
+
+| K-Means | Result |
+|---|---|
+| Features | packages, remotes, repositories, tools, completed and incomplete checks, distinct advisories |
+| Train / test | 13,283 / 3,231 (80/20, seed 42) |
+| Clusters | 3 (test sizes 2,931 / 172 / 128) |
+| Test silhouette | 0.71 |
+
+- Clusters group similar evidence profiles. They are not safety ratings.
+- Most servers share one profile; the two small clusters hold the servers with many advisories or many tools.
+- First run fixes: `numpy` was missing for Spark ML, a test built empty untyped columns, and `randomSplit` ran on an uncached join (could crash or overlap rows).
+
+## 10. Updated System Architecture
+
+```mermaid
+flowchart LR
+    A[Data sources] --> L[Package lookup<br/>enrich_packages.py, saved answers]
+    L --> B[Ingestion<br/>build_bundle.py + importers]
+    A --> B
     B --> C[Storage<br/>PostgreSQL 17 + pgvector]
-    C --> D[Processing<br/>SQL views + checks + AI index]
+    C --> D[Processing<br/>SQL views + checks + review checklist + AI index]
     D --> F[App<br/>FastAPI :8000 internal, Streamlit :8501]
     F <--> G[OpenAI<br/>embeddings + answers]
+    C --> S[Spark analytics<br/>Bronze/Silver/Gold, SQL, K-Means]
 ```
 
 | Change from the first design | Reason |
@@ -443,20 +539,25 @@ flowchart LR
 | Offline, repeatable import | same input gives the same database |
 | Coverage is its own table | "not checked" must be visible |
 | One database engine, with pgvector | see Section 3 |
+| Every declared package looked up, not a sample | "not assessed" dropped from 48,269 servers to none |
+| Review checklist per server | reviewer feedback: show the evidence a bank asks for |
+| Spark path beside the app | batch analytics without changing the operational database |
+| AI index in its own dump file | each file stays under GitHub's 100 MB limit |
 
-## 9. Reflection
+## 11. Reflection
 
 **Hard:**
 
 - Knowing which research files had real records and which had only counts.
 - Getting identities right: shared repositories, alias IDs, inexact versions.
-- Showing that 48,269 servers were never checked for vulnerabilities, without storing fake rows.
+- Showing what was never checked, without storing fake rows. After the full package lookup, every current server has a recorded state.
 - Making the AI say "not enough evidence" instead of guessing.
 
 **Worked well:**
 
 - Comparing every count with the source snapshot.
-- Re-checking all 204 findings against advisory version ranges: all agreed.
+- Re-checking all 19,406 findings against advisory version ranges: all agreed.
+- Saving every API answer, so the package lookup can be rebuilt without sending a request again.
 - Storing the dated KEV catalog, so "not listed" is a real answer.
 
 **Learned:**
@@ -465,8 +566,9 @@ flowchart LR
 - Database constraints catch data mistakes early.
 - A backup counts only after a restore is tested.
 - AI answers need the same rule as the database: unknown stays unknown.
+- Counting questions need SQL, not a sample of retrieved text.
 
-## 10. Checklist
+## 12. Checklist
 
 | Item | Done |
 |---|---|
@@ -481,3 +583,6 @@ flowchart LR
 | Backup restores on a new volume | yes |
 | AI assistant with sources | yes |
 | AI evaluation | yes |
+| Full package vulnerability lookup | yes |
+| Review checklist and SBOM | yes |
+| Spark ETL, SQL reports and K-Means | yes |

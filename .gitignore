@@ -10,8 +10,11 @@ __pycache__/
 /research/
 *.dump
 !data/dump/mcp_sentinel.dump
+!data/dump/mcp_sentinel_ai.dump
 *.log
 *.zip
+/data/analytics/
+/data/research/registry_study/results/full_match_results.csv
 
 /data/research/cache/http/002ab86504dea6bc3997a339f696c4bca8de6c7be86d1aa082d340125dff6380.json
 /data/research/cache/http/006e40c8639f40ea03ac8e2c31476cceeb27695d059407da706f7ab0b731e83d.json

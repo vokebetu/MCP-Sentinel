@@ -13,10 +13,17 @@ def run(*args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Load an evidence bundle into PostgreSQL and validate it.")
-    parser.add_argument("dataset", choices=["seed", "full", "validate"])
+    parser = argparse.ArgumentParser(description="Load an evidence bundle into PostgreSQL and validate it, or add new tables.")
+    parser.add_argument("dataset", choices=["seed", "full", "validate", "migrate"])
     parser.add_argument("--bundle", help="bundle directory; defaults to data/seed or data/bundle")
     args = parser.parse_args()
+    if args.dataset == "migrate":
+        sys.path.insert(0, str(ROOT / "scripts"))
+        from sentinel_common import apply_migrations, connect
+        with connect() as conn:
+            applied = apply_migrations(conn)
+        print("applied: " + ", ".join(applied) if applied else "database is up to date")
+        return
     bundle = Path(args.bundle) if args.bundle else BUNDLES["full" if args.dataset == "validate" else args.dataset]
     for name in ("registry_snapshot.jsonl.gz", "registry_snapshot_meta.json", "evidence.jsonl.gz"):
         if not (bundle / name).exists():

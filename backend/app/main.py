@@ -9,6 +9,7 @@ from psycopg_pool import PoolTimeout
 
 from .db import fetch_all, fetch_one, pool
 from .ai import close_client, router as ai_router
+from .review import router as review_router
 from .models import (
     CheckRecord, CheckTypeCoverage, CompareEntry, CompareResponse, CoverageResponse, CveContext, EndpointObservation, EvidenceSource, Finding,
     Health, PackageDeclaration, RemoteEndpoint, Repository, SecurityResponse, SecuritySummary, ServerDetail, ServerPage, ServerSummary, SourceInfo,
@@ -43,13 +44,13 @@ METHODOLOGY = [
     "Coverage lists every recorded check for this server version, with its source, scope, date and outcome.",
     "A check type with no recorded check is shown as not_assessed. It was never run, which is different from no_known_finding.",
     "not_applicable_to_server is derived from the registry record itself, for example package checks on a server that declares no package.",
-    "Vulnerability checks were run for 400 sampled servers and for registry versions linked to stored advisories. Most registry "
-    "servers have endpoint and tool-catalog lookups but no package vulnerability lookup.",
+    "Package vulnerability checks (deps.dev and OSV) ran on 2026-11-14 for every declared npm, PyPI, NuGet and Cargo package version. "
+    "Remote-only servers have no package to check, and Docker images and MCPB files have no vulnerability database lookup.",
     "Coverage is not a security score. Complete coverage with no findings still does not show that a server is safe.",
 ]
 LIMITATIONS = [
     "The Official MCP Registry snapshot is from a single collection run; the registry changes daily.",
-    "Package vulnerability lookups exist only for 400 sampled servers and for packages named in stored advisories.",
+    "Package vulnerability lookups need an exact declared version in npm, PyPI, NuGet or Cargo. NVD scores exist only for CVEs from the research sample.",
     "Remote-only servers have no package-level vulnerability path; their endpoints were never scanned.",
     "Endpoint observations are historical third-party (Agora) handshake results, not live status.",
     "Tool input schemas are available for about 1.3% of the registry from the tested downloadable sources.",
@@ -67,6 +68,7 @@ async def lifespan(app):
 
 app = FastAPI(title="MCP Sentinel API", version="0.3.0", lifespan=lifespan)
 app.include_router(ai_router)
+app.include_router(review_router)
 
 
 @app.exception_handler(PoolTimeout)
@@ -112,6 +114,7 @@ WHERE (%(q)s::text IS NULL OR sv.search_vector @@ (websearch_to_tsquery('english
   AND (%(has_repository)s::boolean IS NULL OR (p.repository_count > 0) = %(has_repository)s)
   AND (%(assessment)s::text IS NULL OR ss.vulnerability_assessment_state = %(assessment)s)
   AND (%(has_tools)s::boolean IS NULL OR (p.observed_tool_count > 0) = %(has_tools)s)
+  AND (%(tool_hints)s::boolean IS NULL OR EXISTS (SELECT 1 FROM tool_review_flags f WHERE f.server_version_id = p.server_version_id) = %(tool_hints)s)
   AND (%(server_ids)s::bigint[] IS NULL OR p.server_id = ANY (%(server_ids)s))
 ORDER BY {order}
 LIMIT %(limit)s OFFSET %(offset)s
@@ -120,7 +123,7 @@ LIMIT %(limit)s OFFSET %(offset)s
 
 def list_servers(params, sort="name", page=1, page_size=25):
     base = {"q": None, "status": "all", "ecosystem": None, "deployment": None, "has_repository": None, "assessment": None, "has_tools": None,
-            "server_ids": None, **params, "limit": page_size, "offset": (page - 1) * page_size}
+            "tool_hints": None, "server_ids": None, **params, "limit": page_size, "offset": (page - 1) * page_size}
     rows = fetch_all(LIST_SQL.format(order=SORTS[sort]), base)
     return (rows[0]["total"] if rows else 0), [ServerSummary(**row) for row in rows]
 
@@ -135,6 +138,7 @@ def search_servers(
     assessment: Literal["findings_recorded", "no_known_findings_in_completed_checks", "checks_could_not_complete",
                         "no_package_vulnerability_path", "not_assessed"] | None = None,
     has_tools: bool | None = None,
+    tool_hints: bool | None = None,
     sort: Literal["name", "concerns", "newest", "relevance"] = "name",
     page: int = Query(1, ge=1, le=10000),
     page_size: int = Query(25, ge=1, le=100),
@@ -143,7 +147,7 @@ def search_servers(
     if sort == "relevance" and not query:
         sort = "name"
     total, items = list_servers({"q": query, "status": status, "ecosystem": ecosystem, "deployment": deployment, "has_repository": has_repository,
-                                 "assessment": assessment, "has_tools": has_tools}, sort, page, page_size)
+                                 "assessment": assessment, "has_tools": has_tools, "tool_hints": tool_hints}, sort, page, page_size)
     return ServerPage(total=total, page=page, page_size=page_size, items=items)
 
 
@@ -377,8 +381,8 @@ def compare(server_ids: str = Query(..., pattern=r"^\d+(,\d+){1,3}$", descriptio
     states = {entry.summary.vulnerability_assessment_state for entry in entries}
     if len(states) > 1:
         notes.append("These servers have different assessment coverage. A server with fewer recorded findings is not necessarily more secure.")
-    if "not_assessed" in states:
-        notes.append("At least one server has no recorded vulnerability lookup, so its finding count is unknown rather than zero.")
+    if states & {"not_assessed", "no_package_vulnerability_path", "checks_could_not_complete"}:
+        notes.append("At least one server has no completed vulnerability lookup, so its finding count is unknown rather than zero.")
     return CompareResponse(servers=entries, notes=notes)
 
 

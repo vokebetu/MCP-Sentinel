@@ -22,6 +22,10 @@ CACHE = RESEARCH / "cache" / "http"
 DOWNLOADS = RESEARCH / "cache" / "downloads"
 SNAPSHOT = STUDY / "data" / "registry_snapshot.jsonl.gz"
 SNAPSHOT_META = STUDY / "data" / "registry_snapshot_meta.json"
+FULL_MATCH = STUDY / "results" / "full_match_results.csv.gz"
+FULL_DEPENDENCIES = STUDY / "results" / "full_resolved_dependencies.csv.gz"
+FULL_RESPONSES = RESEARCH / "cache" / "full_responses.jsonl.gz"
+FULL_SOURCES = {"deps.dev (package version)", "deps.dev (dependency graph)", "OSV.dev (declared package version)", "OSV.dev (resolved dependencies)"}
 OSV_QUERY_URL = "https://api.osv.dev/v1/query"
 ALLOWED_HOSTS = {"api.osv.dev", "api.deps.dev", "services.nvd.nist.gov", "cveawg.mitre.org", "api.first.org"}
 CONTROL_ECOSYSTEM = {"npm": "npm", "PyPI": "pypi"}
@@ -37,10 +41,17 @@ def cache_key(method, url, params=None, payload=None, headers=None, parse="json"
     return hashlib.sha256(json.dumps([method, url, params, payload, headers, parse], sort_keys=True).encode()).hexdigest()
 
 
-def load_cache():
+def load_cache(full=True):
+    records = [json.loads(path.read_text(encoding="utf-8")) for path in sorted(CACHE.glob("*.json"))]
+    newer = {}
+    if full and FULL_RESPONSES.exists():
+        with gzip.open(FULL_RESPONSES, "rt", encoding="utf-8") as handle:
+            for line in handle:
+                record = json.loads(line)
+                newer[record.get("final_url") or record.get("url") or ""] = record
+    records = [r for r in records if (r.get("final_url") or r.get("url") or "") not in newer] + list(newer.values())
     index = defaultdict(list)
-    for path in sorted(CACHE.glob("*.json")):
-        record = json.loads(path.read_text(encoding="utf-8"))
+    for record in records:
         url = record.get("final_url") or record.get("url") or ""
         host = urlsplit(url).hostname or ""
         if host in ALLOWED_HOSTS:
@@ -517,6 +528,9 @@ def main():
     entries_by_name = {entry["server"]["name"]: entry for entry in entries}
     inventory = {name for name, entry in entries_by_name.items() if ((entry.get("_meta") or {}).get(OFFICIAL) or {}).get("status") != "deleted"}
     rows = read_csv(STUDY / "results" / "match_results.csv")
+    full_rows = read_csv(FULL_MATCH) if FULL_MATCH.exists() else []
+    full_servers = {row["server_name"] for row in full_rows}
+    rows = [row for row in rows if not (row["target_source"] in FULL_SOURCES and row["server_name"] in full_servers)] + full_rows
     validation = read_csv(STUDY / "results" / "vulnerability_validation.csv")
     controls = read_csv(STUDY / "data" / "positive_controls.csv")
     flags = {row["name"]: row for row in read_csv(STUDY / "data" / "registry_offline_flags.csv.gz")}
@@ -528,7 +542,10 @@ def main():
     osv_times = {row["server_name"]: row["requested_at"] for row in rows if row["target_source"] == "OSV.dev (resolved dependencies)" and row["requested_at"]}
     graph_roots = set()
     for label in ("a", "b"):
-        records.extend(dependency_records(read_csv(STUDY / "results" / f"sample_{label}_resolved_dependencies.csv.gz"), entries_by_name, osv_times, graph_roots))
+        sample = [row for row in read_csv(STUDY / "results" / f"sample_{label}_resolved_dependencies.csv.gz") if row["server_name"] not in full_servers]
+        records.extend(dependency_records(sample, entries_by_name, osv_times, graph_roots))
+    if FULL_DEPENDENCIES.exists():
+        records.extend(dependency_records(read_csv(FULL_DEPENDENCIES), entries_by_name, osv_times, graph_roots))
     records.extend(missing_graph_checks(rows, entries_by_name, graph_roots))
     records.extend(control_records(validation, controls, entries_by_name))
     for row in read_csv(STUDY / "results" / "pypi_provenance.csv"):
@@ -538,7 +555,8 @@ def main():
     records.extend(tool_and_catalog_records(entries, flags))
     seed_reasons = None
     if args.seed:
-        seed_reasons = select_seed(entries, entries_by_name, rows, validation, records)
+        original = [r for r in cache_records(load_cache(full=False)) if r["kind"] == "osv_record"] + [r for r in records if r["kind"] == "tool_listing"]
+        seed_reasons = select_seed(entries, entries_by_name, read_csv(STUDY / "results" / "match_results.csv"), validation, original)
         records = filter_for_seed(records, set(seed_reasons), entries_by_name)
         lines = [line for line, entry in zip(lines, entries) if entry["server"]["name"] in seed_reasons]
     with gzip.GzipFile(out / "registry_snapshot.jsonl.gz", "wb", mtime=0) as handle:

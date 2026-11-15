@@ -26,6 +26,7 @@
    ```bash
    docker compose ps
    ```
+   Upgrading a database made by an older version of MCP Sentinel? Run `docker compose run --rm importer migrate` once. It adds new tables and keeps your data.
 6. The database starts empty. Load demo data (131 servers):
    ```bash
    docker compose run --rm importer seed
@@ -36,7 +37,7 @@
    ```
 8. Open <http://localhost:8501>. All pages except **AI assistant** work without an OpenAI key.
 
-For the full database (50,019 servers), see "Load the full database" in `README.md`.
+For the full database (50,019 servers), follow "Quick start: full database" in `README.md`.
 
 ## Stop and start again
 
@@ -60,12 +61,15 @@ flowchart LR
     imp[importer<br/>run on demand] -->|db:5432| db
     seed[[data/seed]] --> imp
     bundle[[data/bundle]] --> imp
-    dump[[data/dump/mcp_sentinel.dump]] -->|restore_database.sh| db
+    dump[[data/dump: mcp_sentinel.dump + mcp_sentinel_ai.dump]] -->|restore_database.sh| db
+    spark[analytics<br/>Spark, run on demand] -->|read-only export| db
+    spark --> out[[data/analytics]]
 ```
 
 - The browser talks only to the frontend.
 - The app reads the database read-only.
 - Only the importer and the AI index command write to it. Both run only when you start them.
+- The analytics service only reads from the database and writes files to `data/analytics/`.
 - The OpenAI key stays in the backend. It is never sent to the browser.
 
 ## 2. Services and ports
@@ -75,7 +79,8 @@ flowchart LR
 | `frontend` | python:3.12-slim + Streamlit 1.66 | 8501 | yes | web app |
 | `backend` | python:3.12-slim + FastAPI 0.162 | 8000 | no | API |
 | `db` | postgres:17.11-alpine + pgvector 0.8.7 (`database/Dockerfile`) | 5432 | no | database and AI index |
-| `importer` | python:3.12-slim | none | no | load and check data |
+| `importer` | python:3.12-slim | none | no | load and check data, add new tables |
+| `analytics` | python:3.12-slim + Java 21 + PySpark 4.0.1 (`analytics/Dockerfile`) | none | no | Spark ETL, SQL reports, K-Means |
 
 Health checks:
 
@@ -89,13 +94,14 @@ Health checks:
 
 | What | Where | Kept after `docker compose down`? |
 |---|---|---|
-| Database (about 660 MB when full) | Docker volume `mcp-sentinel_postgres_data` | yes (deleted only by `down -v`) |
+| Database (about 1.1 GB when full) | Docker volume `mcp-sentinel_postgres_data` | yes (deleted only by `down -v`) |
 | AI index | table `ai_chunks` in the database | yes |
 | Table definitions | `database/schema/*.sql` (run once, on an empty volume) | file |
 | Demo data | `data/seed/` | file, in Git |
 | Full data bundle | `data/bundle/` | file, in Git |
-| Full database backup | `data/dump/mcp_sentinel.dump` + `.sha256` | file, in Git |
+| Full database backup | `data/dump/mcp_sentinel.dump` (data) + `mcp_sentinel_ai.dump` (AI index), each with `.sha256` | file, in Git |
 | Source data for the bundle | `data/research/` | file, in Git |
+| Spark outputs | `data/analytics/` | file, not in Git |
 | Your own backups | `artifacts/` | file, not in Git |
 
 ## 4. Configuration (`.env`)
@@ -123,23 +129,26 @@ A new install starts with an **empty** database. Load demo data or restore the d
 | Load demo data | `docker compose run --rm importer seed` |
 | Load full data | `docker compose run --rm importer full` |
 | Check the full data | `docker compose run --rm importer validate` |
+| Add new tables to an older database | `docker compose run --rm importer migrate` |
+| Run Spark analytics | `docker compose run --rm analytics` |
+| Look up all packages again (research) | `.venv/bin/python -I scripts/enrich_packages.py` |
 | Build or update the AI index | `docker compose exec backend python -m app.ai index` |
 | Check the AI setup | `docker compose exec backend python -c "import urllib.request; print(urllib.request.urlopen('http://localhost:8000/api/ai/status').read().decode())"` |
 | Run report queries | `./scripts/run_report_queries.sh` |
 | Open SQL shell | `docker compose exec db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"'` |
 | Stop, keep data | `docker compose stop` or `docker compose down` |
 | Stop, delete data | `docker compose down -v` |
-| Back up | `./scripts/export_database.sh` (writes `artifacts/mcp_sentinel.dump`) |
+| Back up | `./scripts/export_database.sh` (writes `artifacts/mcp_sentinel.dump` and `artifacts/mcp_sentinel_ai.dump`) |
 | Restore into empty database | `./scripts/restore_database.sh data/dump/mcp_sentinel.dump` |
 | Restore over existing data | `./scripts/restore_database.sh data/dump/mcp_sentinel.dump --replace` |
 
 `restore_database.sh` does these steps:
 
-1. Checks the `.sha256`.
+1. Checks the `.sha256` of both files.
 2. Refuses to overwrite data unless `--replace` is given.
 3. Stops backend and frontend.
 4. Recreates the database.
-5. Runs `pg_restore`.
+5. Runs `pg_restore` for the data, then for the AI index if `mcp_sentinel_ai.dump` is next to the data file.
 
 After it finishes, run `docker compose up -d`.
 
@@ -148,6 +157,7 @@ After it finishes, run `docker compose up -d`.
 ```bash
 createdb mcp_sentinel
 pg_restore --no-owner --no-privileges -d mcp_sentinel mcp_sentinel.dump
+pg_restore --no-owner --no-privileges -d mcp_sentinel mcp_sentinel_ai.dump
 ```
 
 **Test a restore on a separate copy** (port 8502):
@@ -161,10 +171,10 @@ docker compose -p mcp-sentinel-restoretest down -v
 
 ## 6. Known issues
 
-- Vulnerabilities were checked only for 400 sample servers. 48,269 of 48,673 non-deleted servers show "not assessed".
+- Vulnerability lookups need an npm, PyPI, NuGet or Cargo package with an exact version (16,514 servers). 30,150 remote-only servers have no package to check; Docker images and MCPB files are not covered.
 - Endpoint status is from 2026-10-22, not live.
-- The importer loads the whole bundle into memory (about 115 MB).
-- A database created before the AI update has no `ai_chunks` table. The AI page shows an error until you run the migration in section 7.
+- The importer loads the whole bundle into memory. A full import takes about 8 minutes.
+- A database made by an older version lacks new tables. The AI page then shows the fix: `docker compose run --rm importer migrate`.
 - If your shell already exports `OPENAI_API_KEY`, it overrides `.env`. Run `unset OPENAI_API_KEY`, then `docker compose up -d --force-recreate backend`.
 
 ## 7. AI assistant
@@ -173,10 +183,13 @@ docker compose -p mcp-sentinel-restoretest down -v
 |---|---|
 | Embeddings | `text-embedding-3-small`, 512 dimensions |
 | Answers | `OPENAI_CHAT_MODEL` (default `gpt-4.1-mini`), Responses API, `store: false`, temperature 0 |
+| Storage | `halfvec(512)` (half-size floats) in table `ai_chunks` |
 | Search | pgvector HNSW (cosine) + full-text + exact server and CVE/GHSA matches |
+| Questions about counts, shares or rankings | live SQL statistics over the whole database are added as sources |
+| Questions naming a CVE or GHSA id | live SQL statistics for that advisory are added as sources |
 | Sources per answer | 5 by default, 10 at most |
 | Limits | question 1,500 characters, history 6 turns, 4 requests at a time |
-| Index contents | latest version of each non-deleted server, active findings, one methodology note |
+| Index contents | latest version of each non-deleted server, all findings of each server (grouped), one methodology note |
 | Index updates | only changed text is sent again; old chunks are removed after a full successful run |
 
 API:
@@ -186,19 +199,66 @@ API:
 | `GET /api/ai/status` | key present (not tested), model names, chunk count, last index time |
 | `POST /api/ai/chat` | `question`, `history`, `strategy` (`zero_shot`/`few_shot`), `top_k`, `use_retrieval` |
 
-Add the AI table to a database made before the AI update (keeps all data):
+Add the AI table to a database made by an older version (keeps all data):
 
 ```bash
 docker compose up -d --build
-docker compose exec -T db sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < database/schema/003_ai.sql
+docker compose run --rm importer migrate
 docker compose exec backend python -m app.ai index
 ```
 
 New empty databases get the table automatically.
 
-Run the AI evaluation (written for the demo data; up to 36 OpenAI requests):
+Run the AI evaluation on the full database (26 questions, each with and without retrieval and with two prompts: up to 104 OpenAI requests, about $0.05):
 
 ```bash
 docker compose exec backend python -m app.ai evaluate
 docker compose cp backend:/tmp/ai-evaluation.json docs/AI_EVALUATION.json
+```
+
+## 8. Review checklist and SBOM
+
+The **Review checklist** tab on each server profile lists the evidence a bank's third-party risk review asks for.
+
+| Item | Source |
+|---|---|
+| Identifiable publisher | registry namespace (verified GitHub account or domain) |
+| Source repository and activity | GitHub lookup |
+| Pinned versions | registry package declarations |
+| Known vulnerabilities | OSV (declared packages and modeled dependencies) |
+| SBOM | deps.dev dependency list |
+| Signed builds and provenance | deps.dev (SLSA provenance, attestations), PyPI |
+| Tool permission review | PolicyLayer labels, publisher tool annotations |
+| Prompt injection hints | text patterns over stored tool descriptions (view `tool_review_flags`) |
+| Tool definition fingerprint | SHA-256 over tool names, descriptions and input schemas |
+| Secrets and logins it needs | registry record (secret settings, login headers) |
+| Static code analysis | always "not assessed": code is never downloaded |
+
+Each item has a status (`present`, `missing`, `not_assessed`, `not_applicable`) and a "needs attention" flag. Status says whether evidence exists, not whether the server is safe.
+
+| Route | Does |
+|---|---|
+| `GET /api/servers/{id}/review` | checklist, tool review hints, fingerprint |
+| `GET /api/servers/{id}/sbom` | CycloneDX 1.5 JSON from the stored dependency list (404 if none) |
+| `GET /api/servers?tool_hints=true` | servers with at least one tool review hint |
+
+The profile page offers the checklist as JSON or Markdown, and the SBOM as JSON.
+
+## 9. Spark analytics
+
+```bash
+docker compose run --rm analytics
+```
+
+1. Exports four database views to CSV (read-only connection).
+2. Bronze: the CSVs as Parquet. Silver: typed columns. Gold: one row per server version with coverage and model eligibility.
+3. Runs the four Spark SQL reports in `analytics/analysis.sql`.
+4. Trains K-Means (k up to 3, seed 42, 80/20 split) on servers with completed vulnerability checks only, and reports the test silhouette.
+
+Outputs go to `data/analytics/output/` (`metrics.json`, `sql/`, `ml/`, Parquet layers). About 40 seconds on the full database. Cluster numbers are not safety ratings.
+
+Run the Spark tests (they need Java, so they run in the container):
+
+```bash
+docker compose run --rm --entrypoint python analytics -m pytest -q tests/test_analytics.py
 ```

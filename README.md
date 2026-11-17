@@ -42,6 +42,15 @@ Security search for the 50,019 servers in the Official MCP Registry.
 
 Without an OpenAI key every page works except **AI assistant**. To add a key later, put it in `.env` and run `docker compose up -d`.
 
+**Update an existing install** after `git pull` (keeps your database):
+
+```bash
+docker compose up -d --build --wait
+docker compose run --rm importer migrate
+```
+
+`migrate` only adds missing tables and says "database is up to date" otherwise. To load a newer database from `data/dump/`, run `./scripts/restore_database.sh data/dump/mcp_sentinel.dump --replace` (this replaces the current data).
+
 ## Start with demo data (131 servers)
 
 1. Download the project:
@@ -188,10 +197,14 @@ Exports four database views (read-only), builds Bronze/Silver/Gold Parquet files
 | Page | Shows |
 |---|---|
 | Dashboard | Totals, deployment types, package ecosystems, coverage |
-| Server search | Search and filters, including "Tool review hints" |
-| Server profile | One server: review checklist (with JSON, Markdown and SBOM downloads), software, vulnerabilities, checks, tools |
-| Compare | Two servers side by side |
-| AI assistant | Questions and answers with sources and limits |
+| Server search | Search box, quick filters (Has vulnerabilities, Remote only, Has GitHub repo, Has tools), more filters, column picker, checkboxes that keep selections across pages, CSV export of the visible page or of all filtered results |
+| Server profile | One server: review checklist (with JSON, Markdown and SBOM downloads), repository link, software, vulnerabilities, checks, tools with their source and date, "Ask AI about this server" |
+| Compare | Up to 4 servers: summary cards, "Show differences only", grouped rows, add and remove servers, "How we got this data" |
+| AI assistant | Suggested questions, a server scope picker, answers with numbered sources and coverage notes |
+
+Filters, the current page, selected servers and the chat stay when you move between pages in the same browser tab. Server names in the results open the profile in a new tab.
+
+Missing values use one vocabulary: **— Not applicable** (the check does not apply), **○ Not assessed** (no lookup recorded), **? Unknown** (a lookup could not complete), **✓ None found** (checked, nothing found; not proof of safety), **Not observed** (no metadata in the checked sources; not zero).
 
 ## Folders
 
@@ -218,6 +231,7 @@ More: `DEPLOYMENT.md` (ports, settings, backup, all commands) and `docs/PROJECT_
 - Remote-only servers (30,150) have no package to check. Endpoints are never contacted.
 - Package lookups ran on 2026-11-14; NVD scores exist only for CVEs from the earlier research sample.
 - Tool review hints are text patterns. Most of them are harmless and need a human to read them.
+- Tool metadata comes from catalogs (tool names) or Agora handshakes (tool counts). "Not observed" means unknown, not zero tools.
 - Endpoint status comes from Agora (2026-10-22). It is not live.
 - AI answers use only indexed data. Sources are checked to be real retrieved records; each sentence is not checked automatically.
 - Each AI question and its retrieved public records are sent to OpenAI.

@@ -6,6 +6,7 @@ from pydantic import BaseModel
 AssessmentState = Literal[
     "findings_recorded", "no_known_findings_in_completed_checks", "checks_could_not_complete", "no_package_vulnerability_path", "not_assessed"
 ]
+ToolState = Literal["listed", "count_observed", "observed_none", "not_observed"]
 
 
 class ServerSummary(BaseModel):
@@ -17,10 +18,16 @@ class ServerSummary(BaseModel):
     ecosystems: list[str]
     deployment_type: str
     has_github_repository: bool
+    repository_url: str | None
     package_count: int
     remote_count: int
-    observed_tool_count: int
-    valid_input_schema_count: int
+    observed_tool_count: int | None
+    valid_input_schema_count: int | None
+    tool_metadata_state: ToolState
+    tool_count: int | None
+    tool_count_source: str | None
+    tool_observed_at: datetime | None
+    tool_review_hints: int
     published_at: datetime | None
     vulnerability_assessment_state: AssessmentState
     distinct_advisories: int | None
@@ -137,6 +144,10 @@ class ServerDetail(BaseModel):
     packages: list[PackageDeclaration]
     remotes: list[RemoteEndpoint]
     tools: list[ToolInfo]
+    tool_metadata_state: ToolState
+    tool_count: int | None
+    tool_count_source: str | None
+    tool_observed_at: datetime | None
     evidence_sources: list[EvidenceSource]
     missing_information: list[str]
 

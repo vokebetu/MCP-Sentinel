@@ -39,6 +39,7 @@ class Question(BaseModel):
     strategy: Literal["zero_shot", "few_shot"] = "few_shot"
     top_k: int = Field(default=5, ge=1, le=10)
     use_retrieval: bool = True
+    server_ids: list[int] = Field(default_factory=list, max_length=4)
 
 
 class Answer(BaseModel):
@@ -63,27 +64,38 @@ Evidence of kind statistics is computed by SQL over the whole database when the 
 inventory-wide counts, shares and rankings. Server and finding evidence is a small retrieved sample: never call it
 the database, and never derive inventory-wide counts or rankings from it. Name servers by registry_name, never by
 numeric ids. Never invent a risk score, fixed release, CVE, count, or current status.
-Explain coverage limitations. Do not reveal private reasoning.
-With no evidence, identify what information is unavailable and do not claim snapshot-specific facts.
-Return the requested JSON schema. Citation IDs belong in citation_ids; use plain prose in answer."""
+Evidence of kind server_facts is a live SQL summary of one server: use it for that server's status, deployment,
+assessment state, counts, tool metadata and dates. If a server declares no package (remote only), say the package
+advisory lookup is not applicable; never call it clean, passed, checked, or zero vulnerabilities. Highest advisory
+severity is the most severe recorded advisory, not an overall risk score: never call a server dangerous, safe or compromised.
+Each evidence item has a ref number. Cite inline by writing [ref] right after each claim it supports, for example [1]
+or [2][3]. Use only refs of supplied evidence. Never write citation_id strings in the answer text; list the
+citation_id of every cited item in citation_ids.
+Mention the evidence date (for example the registry snapshot date) when it matters. Explain coverage limitations.
+Do not reveal private reasoning. With no evidence, identify what information is unavailable and do not claim
+snapshot-specific facts. Return the requested JSON schema."""
 
 EXAMPLES = """
 Examples (illustrative, not project evidence):
-Q: Is demo/alpha safe? Evidence id example-A: vulnerability_assessment_state=not_assessed;
-distinct_advisories=null. Output: {"answer":"No vulnerability assessment is recorded for demo/alpha;
+Q: Is demo/alpha safe? Evidence ref 1, id example-A: vulnerability_assessment_state=not_assessed;
+distinct_advisories=null. Output: {"answer":"No vulnerability assessment is recorded for demo/alpha [1];
 its advisory count is unknown and safety cannot be established.","status":"grounded",
 "citation_ids":["example-A"],"limitations":["No completed vulnerability assessment."]}
-Q: Does demo/beta have installed vulnerable dependencies? Evidence id example-B: finding_category=
-resolved_dependency. Output: {"answer":"A modeled dependency exposure was recorded for demo/beta.
+Q: Does demo/beta have installed vulnerable dependencies? Evidence ref 1, id example-B: finding_category=
+resolved_dependency. Output: {"answer":"A modeled dependency exposure was recorded for demo/beta [1].
 It does not prove which dependencies are installed.","status":"grounded",
 "citation_ids":["example-B"],"limitations":["No deployed software inventory was collected."]}
 Q: Was demo/gamma compromised today? Evidence: none. Output: {"answer":"The available data does
 not establish whether demo/gamma was compromised today.","status":"insufficient_evidence",
 "citation_ids":[],"limitations":["No live compromise telemetry is available."]}
-Q: How many servers have recorded findings? Evidence id example-S (statistics): servers with recorded findings: 7.
-Output: {"answer":"7 servers have recorded vulnerability findings. Servers that were never assessed are not counted
+Q: How many servers have recorded findings? Evidence ref 1, id example-S (statistics): servers with recorded findings: 7.
+Output: {"answer":"7 servers have recorded vulnerability findings [1]. Servers that were never assessed are not counted
 as clean.","status":"grounded","citation_ids":["example-S"],"limitations":["Only servers with completed checks can
 have findings."]}
+Q: Is demo/delta vulnerable? Evidence ref 1, id example-F (server_facts): deployment remote only, no package declared,
+package advisory lookup not applicable. Output: {"answer":"demo/delta declares no package, so a package advisory lookup
+does not apply [1]. That is not a clean result: its remote endpoint was never scanned.","status":"grounded",
+"citation_ids":["example-F"],"limitations":["No package-level evidence exists for remote-only servers."]}
 Never cite the example IDs in a real answer.
 """
 INVENTORY = re.compile(r"\b(how many|number of|count|share|percent|percentage|proportion|most|top|rank|ranking|largest|"
@@ -238,12 +250,56 @@ def inventory_facts(bucket):
             for key, (title, lines) in facts.items()]
 
 
-def retrieve(question, top_k=5):
+SEVERITY = re.compile(r"\b(critical|high[- ]severity|high[- ]risk|dangerous|vulnerable|risky|severe|riskiest)\b", re.I)
+COVERAGE = re.compile(r"\b(not (been )?assessed|unassessed|not applicable|no package|could not complete|never (been )?checked|"
+                      r"not (been )?checked|assessment coverage)\b", re.I)
+TOOL_QUESTION = re.compile(r"\b(tool metadata|input schemas?|verified tools?|tool (data|information|lists?|counts?))\b|"
+                           r"\bwhich servers\b.*\btools?\b", re.I)
+DISCOVERY = re.compile(r"\b(find|list|show|recommend|suggest|which|what)\b(\W+\w+){0,4}\W+(servers?|tools?)\b|"
+                       r"\b(two|three|four|five|six|ten|several|some)\s+(\w+\s+)?servers?\b", re.I)
+SOURCE_NAMES = {"server": "Server profile chunk (registry snapshot and stored evidence)", "finding": "Recorded OSV.dev advisory findings",
+                "methodology": "MCP Sentinel methodology note", "statistics": "Live SQL statistics over the whole database",
+                "server_facts": "Live SQL facts for this server"}
+DEPLOYMENT_TEXT = {"remote_only": "remote endpoint only, no package declared", "packages_only": "downloadable package only",
+                   "packages_and_remotes": "package and remote endpoint", "neither": "neither a package nor a remote endpoint declared"}
+DEFINITION = re.compile(r"\b(mean|means|meaning|definition|define|not[_ ]assessed|not applicable|unknown|zero vulnerabilit\w*|coverage|"
+                        r"methodology|how (is|was|are|were) .* (collected|checked|assessed))\b", re.I)
+MAX_SOURCES = 18
+
+
+def methodology_source():
+    return fetch_all("""SELECT chunk_key AS citation_id, server_id, server_version_id, kind, title, content, source_url, observed_at, indexed_at,
+                               NULL::float AS similarity, NULL::float AS rank
+                        FROM ai_chunks WHERE kind = 'methodology' AND embedding_model = %(model)s ORDER BY chunk_key LIMIT 1""",
+                     {"model": EMBEDDING_MODEL})
+
+
+def retrieve(question, top_k=5, scope=()):
     vector = json.dumps(query_embedding(question))
     terms = re.findall(r"[A-Za-z0-9][A-Za-z0-9_./:@-]{3,}", question)[:40]
     lexical = " OR ".join(terms) or question
     names = [t.lower().rstrip('?.') for t in terms]
     advisory_ids = re.findall(r"(?:CVE-\d{4}-\d+|GHSA-[a-z0-9-]+)", question, re.IGNORECASE)
+    if scope:
+        rows = fetch_all(
+            """SELECT c.chunk_key AS citation_id, c.server_id, c.server_version_id, c.kind, c.title, c.content, c.source_url, c.observed_at,
+                      c.indexed_at, 1 - (c.embedding <=> %(vector)s::halfvec) AS similarity,
+                      0.8 * (1 - (c.embedding <=> %(vector)s::halfvec)) +
+                      LEAST(0.15, ts_rank_cd(c.search_vector, websearch_to_tsquery('english', %(lexical)s))) +
+                      CASE WHEN c.kind = 'server' THEN 0.05 ELSE 0 END +
+                      CASE WHEN EXISTS (SELECT 1 FROM unnest(%(ids)s::text[]) identifier
+                          WHERE c.search_vector @@ plainto_tsquery('english', identifier)) THEN 0.6 ELSE 0 END AS rank
+               FROM ai_chunks c JOIN servers s ON s.server_id = c.server_id AND s.latest_version_id = c.server_version_id
+               WHERE c.embedding_model = %(model)s AND c.server_id = ANY(%(scope)s)
+               ORDER BY rank DESC, c.chunk_key""",
+            {"model": EMBEDDING_MODEL, "vector": vector, "lexical": lexical, "ids": advisory_ids, "scope": list(scope)})
+        queues = {sid: [r for r in rows if r["server_id"] == sid] for sid in scope}
+        picked = []
+        while len(picked) < top_k and any(queues.values()):
+            for sid in scope:
+                if queues[sid] and len(picked) < top_k:
+                    picked.append(queues[sid].pop(0))
+        return picked
     return fetch_all(
         """WITH named AS (
             SELECT server_id FROM servers WHERE lower(registry_name) = ANY(%(names)s)
@@ -285,6 +341,158 @@ def retrieve(question, top_k=5):
     )
 
 
+def fact(key, title, content, server_id=None, observed_at=None, kind="statistics"):
+    return {"citation_id": key, "server_id": server_id, "server_version_id": None, "kind": kind, "title": title, "content": content,
+            "source_url": None, "observed_at": observed_at, "indexed_at": None, "similarity": None, "rank": None}
+
+
+def assessment_text(s):
+    if s.vulnerability_assessment_state == "findings_recorded":
+        return (f"findings recorded: {s.distinct_advisories} distinct advisories ({s.direct_advisories} in declared packages, "
+                f"{s.dependency_advisories} in modeled dependencies; modeled dependency exposures do not prove installation). "
+                f"Highest recorded advisory severity: {s.highest_advisory_severity or 'unknown'} (not an overall risk score).")
+    if s.vulnerability_assessment_state == "no_known_findings_in_completed_checks":
+        return "checked, no known advisories in completed checks (not proof of safety)."
+    if s.vulnerability_assessment_state == "checks_could_not_complete":
+        return "eligible package checks could not complete (unsupported package type, inexact version or no dependency list); the advisory count is unknown."
+    if s.vulnerability_assessment_state == "no_package_vulnerability_path":
+        return ("not applicable: no package is declared, so a declared-package advisory lookup does not apply. This is not a passed security "
+                "scan and not zero vulnerabilities; remote endpoints were never scanned.")
+    return "not assessed: no package lookup is recorded; the advisory count is unknown, not zero."
+
+
+def tool_text(s):
+    if s.tool_metadata_state == "listed":
+        return f"{s.tool_count} tool names listed in tool catalogs ({s.valid_input_schema_count} with a verified input schema)."
+    if s.tool_metadata_state == "count_observed":
+        return f"no tool names stored; an Agora endpoint handshake reported {s.tool_count} tools."
+    if s.tool_metadata_state == "observed_none":
+        return "no tool names stored; an Agora endpoint handshake answered without listing tools."
+    return "not observed: no tool metadata in the checked sources (this does not mean the server has no tools)."
+
+
+def server_facts(ids):
+    from .main import summaries
+    found = {s.server_id: s for s in summaries(list(ids))}
+    extra = {r["server_id"]: r for r in fetch_all(
+        """SELECT s.server_id, sv.observed_at, (SELECT string_agg(d.registry_type || ':' || d.declared_identifier || '@' ||
+                  COALESCE(d.declared_version, 'no version'), '; ' ORDER BY d.position) FROM server_package_declarations d
+                  WHERE d.server_version_id = sv.server_version_id) AS packages
+           FROM servers s JOIN server_versions sv ON sv.server_version_id = s.latest_version_id WHERE s.server_id = ANY(%(ids)s)""",
+        {"ids": list(ids)})}
+    facts = []
+    for sid in ids:
+        s = found.get(sid)
+        if not s:
+            continue
+        e = extra[sid]
+        facts.append(fact(f"facts:server:{sid}", f"{s.registry_name}: live server facts", " ".join([
+            f"{s.registry_name} version {s.version}, registry status {s.registry_status}, registry snapshot {str(e['observed_at'])[:10]}.",
+            f"Deployment: {DEPLOYMENT_TEXT.get(s.deployment_type, s.deployment_type)}.",
+            f"Declared packages: {e['packages'] or 'none'}.",
+            f"Package vulnerability assessment: {assessment_text(s)}",
+            f"Tool metadata: {tool_text(s)}",
+            f"Source repository: {s.repository_url or 'not declared'}."]), sid, e["observed_at"], "server_facts"))
+    return facts
+
+
+@lru_cache(maxsize=4)
+def severity_facts(levels, bucket):
+    rows = fetch_all(
+        """SELECT ss.highest_advisory_severity AS severity, count(*) OVER (PARTITION BY ss.highest_advisory_severity) AS n, s.registry_name,
+                  ss.distinct_advisories, ss.direct_advisories, ss.dependency_advisories
+           FROM server_security_summary ss JOIN servers s ON s.server_id = ss.server_id
+           WHERE s.registry_status <> 'deleted' AND ss.highest_advisory_severity = ANY(%(levels)s)
+           ORDER BY CASE ss.highest_advisory_severity WHEN 'CRITICAL' THEN 0 ELSE 1 END, ss.distinct_advisories DESC, s.registry_name LIMIT 40""",
+        {"levels": list(levels)})
+    totals = {r["severity"]: r["n"] for r in rows}
+    lines = [f"Non-deleted servers whose highest recorded advisory severity is {level}: {totals.get(level, 0):,}." for level in levels]
+    lines.append("Examples ordered by distinct advisories: " + "; ".join(
+        f"{r['registry_name']} ({r['severity']}, {r['distinct_advisories']} advisories: {r['direct_advisories']} direct, "
+        f"{r['dependency_advisories']} modeled dependency)" for r in rows) + ".")
+    lines.append("Highest recorded advisory severity is not an overall server risk score and does not show that a server is dangerous or compromised.")
+    return [fact("stats:severity", f"MCP Sentinel inventory statistics: servers by recorded advisory severity ({', '.join(levels)})", "\n".join(lines))]
+
+
+@lru_cache(maxsize=1)
+def assessment_facts(bucket):
+    rows = fetch_all(
+        """SELECT ss.vulnerability_assessment_state AS state, s.registry_status = 'deleted' AS deleted, count(*) AS n,
+                  (array_agg(s.registry_name ORDER BY s.registry_name))[1:12] AS names
+           FROM server_security_summary ss JOIN servers s ON s.server_id = ss.server_id GROUP BY 1, 2 ORDER BY 2, 3 DESC""")
+    meaning = {"findings_recorded": "findings recorded", "no_known_findings_in_completed_checks": "checked, none found",
+               "checks_could_not_complete": "eligible but checks could not complete (unknown)",
+               "no_package_vulnerability_path": "not applicable (no package declared)", "not_assessed": "not assessed (no lookup recorded)"}
+    lines = [f"{'Deleted registry records' if r['deleted'] else 'Non-deleted servers'} with state {r['state']} ({meaning[r['state']]}): "
+             f"{r['n']:,}. Examples: {', '.join(r['names'])}." for r in rows]
+    lines.append("Not applicable means no package is declared; it is not a clean result. Not assessed and could not complete mean the count is unknown.")
+    return [fact("stats:assessment", "MCP Sentinel inventory statistics: vulnerability assessment coverage", "\n".join(lines))]
+
+
+@lru_cache(maxsize=1)
+def tool_facts(bucket):
+    from .main import TOOL_STATE_SQL
+    states = fetch_all(f"""SELECT {TOOL_STATE_SQL} AS state, count(*) AS n FROM servers s
+                           JOIN server_versions sv ON sv.server_version_id = s.latest_version_id
+                           WHERE s.registry_status <> 'deleted' GROUP BY 1 ORDER BY 2 DESC""")
+    top = fetch_all("""SELECT s.registry_name, count(DISTINCT t.tool_name) AS tools,
+                              count(DISTINCT t.tool_name) FILTER (WHERE t.input_schema_state = 'valid') AS valid
+                       FROM tool_observations t JOIN servers s ON s.latest_version_id = t.server_version_id
+                       WHERE s.registry_status <> 'deleted' GROUP BY s.registry_name ORDER BY 3 DESC, 2 DESC, 1""")
+    meaning = {"listed": "tool names listed in tool catalogs", "count_observed": "only a tool count from an Agora endpoint handshake",
+               "observed_none": "Agora handshake answered without listing tools", "not_observed": "no tool metadata observed (unknown, not zero)"}
+    valid = [r for r in top if r["valid"]]
+    lines = [f"Non-deleted servers with {meaning[r['state']]}: {r['n']:,}." for r in states]
+    lines.append(f"Servers with at least one verified tool input schema: {len(valid):,}. Most verified schemas: " +
+                 "; ".join(f"{r['registry_name']} ({r['valid']} of {r['tools']} tools)" for r in valid[:20]) + ".")
+    lines.append("Tool metadata comes from stored catalogs and third-party handshakes; no MCP server was contacted by MCP Sentinel.")
+    return [fact("stats:tools", "MCP Sentinel inventory statistics: tool metadata coverage", "\n".join(lines))]
+
+
+EXCERPT_KEYS = ("deployment_type", "vulnerability_assessment_state", "distinct_advisories", "direct_advisories", "dependency_advisories",
+                "highest_advisory_severity", "declarations", "version", "distinct_advisories", "findings")
+
+
+def excerpt(source):
+    content = source.get("content") or ""
+    if source.get("kind") in ("server", "finding"):
+        pairs = []
+        for key in dict.fromkeys(EXCERPT_KEYS):
+            match = re.search(rf'"{key}": ("[^"]*"|[^,}}]+)', content)
+            if match:
+                pairs.append(f"{key}: {match.group(1).strip(chr(34))}")
+        if pairs:
+            text = " · ".join(pairs)
+            return text if len(text) <= 260 else text[:259].rstrip() + "…"
+    text = content if source.get("kind") in ("statistics", "server_facts") else content.split("\n", 1)[-1]
+    text = re.sub(r'"([A-Za-z_]+)":', r"\1:", text)
+    text = re.sub(r"\s+", " ", re.sub(r'[{}\[\]"]', "", text)).strip()
+    return text if len(text) <= 260 else text[:259].rstrip() + "…"
+
+
+def number_citations(answer, sources):
+    refs = {i + 1: s["citation_id"] for i, s in enumerate(sources)}
+    numbers_by_id = {cid: n for n, cid in refs.items()}
+
+    def marker(match):
+        inner = match.group(1).strip()
+        if inner.isdigit():
+            return match.group(0) if int(inner) in refs else ""
+        parts = [part.strip() for part in re.split(r"[,;]", inner)]
+        if all(part in numbers_by_id for part in parts):
+            return "".join(f"[{numbers_by_id[part]}]" for part in parts)
+        return "" if ":" in inner and " " not in inner else match.group(0)
+
+    text = re.sub(r"\[([^\[\]]{1,120})\]", marker, answer.answer)
+    marked = {refs[int(n)] for n in re.findall(r"\[(\d+)\]", text)}
+    cited = set(answer.citation_ids) | marked
+    if cited and not marked:
+        text = text.rstrip() + " " + "".join(f"[{n}]" for n, cid in refs.items() if cid in cited)
+    answer.answer = re.sub(r"\s+([.,;:])", r"\1", re.sub(r" {2,}", " ", text)).strip()
+    answer.citation_ids = [cid for cid in refs.values() if cid in cited]
+    return answer
+
+
 def generate(question, sources):
     prompt = SYSTEM + (EXAMPLES if question.strategy == "few_shot" else "")
     schema = Answer.model_json_schema()
@@ -293,8 +501,9 @@ def generate(question, sources):
     else:
         schema["properties"]["citation_ids"]["maxItems"] = 0
         schema["properties"]["status"]["enum"] = ["insufficient_evidence"]
-    evidence = [{**source, "interpretation": "Registry versions are declared, not observed installed. "
-                "Modeled dependency exposures are not proof of installation; missing assessment counts remain unknown."} for source in sources]
+    evidence = [{"ref": i + 1, **source, "interpretation": "Registry versions are declared, not observed installed. "
+                "Modeled dependency exposures are not proof of installation; missing assessment counts remain unknown."}
+                for i, source in enumerate(sources)]
     result = post("responses", {
         "model": os.environ.get("OPENAI_CHAT_MODEL", "gpt-4.1-mini"), "store": False,
         "instructions": prompt, "temperature": 0, "max_output_tokens": 900,
@@ -311,12 +520,30 @@ def generate(question, sources):
         text = "".join(c["text"] for item in result["output"] if item["type"] == "message"
                        for c in item["content"] if c["type"] == "output_text")
         answer = Answer.model_validate_json(text)
-        allowed = {s["citation_id"] for s in sources}
-        if not set(answer.citation_ids) <= allowed or (answer.status == "grounded" and not answer.citation_ids):
+        if not set(answer.citation_ids) <= {s["citation_id"] for s in sources}:
             raise ValueError("unsupported citations")
+        answer = number_citations(answer, sources)
+        if answer.status == "grounded" and not answer.citation_ids:
+            answer.status = "insufficient_evidence"
+            answer.limitations.append("The model did not cite a supplied source, so this answer is not shown as grounded.")
         return answer, result.get("usage", {})
     except (KeyError, TypeError, ValueError, ValidationError):
         raise HTTPException(502, "The model returned an incomplete answer or unsupported citations. Please try again.") from None
+
+
+def coverage_notes(facts):
+    notes = []
+    for f in facts:
+        content, name = f["content"], f["title"].split(": ")[0]
+        if "not applicable: no package is declared" in content:
+            notes.append(f"{name}: package checks are not applicable (no declared package). This is not a clean result.")
+        elif "checks could not complete" in content:
+            notes.append(f"{name}: eligible package checks could not complete, so its advisory count is unknown.")
+        elif "not assessed: no package lookup" in content:
+            notes.append(f"{name}: no package lookup is recorded, so its advisory count is unknown.")
+        if "Tool metadata: not observed" in content:
+            notes.append(f"{name}: tool metadata was not observed; this does not mean it has no tools.")
+    return notes
 
 
 def answer_question(question):
@@ -329,17 +556,41 @@ def answer_question(question):
     try:
         prior = " ".join(t.content[:500] for t in question.history[-4:] if t.role == "user")
         retrieval_start = time.perf_counter()
+        requested = list(dict.fromkeys(question.server_ids))
+        facts = server_facts(requested) if requested and question.use_retrieval else []
+        scope = [f["server_id"] for f in facts]
+        named = re.findall(r"\b(?:[A-Za-z0-9_-]+\.)+[A-Za-z0-9_-]+/[A-Za-z0-9_./-]+", query)
+        mentioned = []
+        if named and not requested and question.use_retrieval:
+            rows = fetch_all("SELECT server_id FROM servers WHERE lower(registry_name) = ANY(%(names)s) AND registry_status <> 'deleted' "
+                             "ORDER BY registry_name LIMIT 4", {"names": [n.rstrip("?.,").lower() for n in named]})
+            mentioned = server_facts([r["server_id"] for r in rows])
+        top_k = min(10, max(question.top_k, 8)) if not scope and DISCOVERY.search(query) else question.top_k
         try:
-            sources = retrieve((prior + " " + query).strip(), question.top_k) if question.use_retrieval else []
+            sources = retrieve((prior + " " + query).strip(), top_k, scope) if question.use_retrieval else []
         except psycopg.errors.UndefinedTable:
             raise HTTPException(503, MISSING_TABLE + ", then: docker compose exec backend python -m app.ai index") from None
-        if question.use_retrieval and INVENTORY.search(query):
-            sources = inventory_facts(int(time.time() // 600)) + sources
-        if question.use_retrieval and (ids := ADVISORY.findall(query)):
-            sources = advisory_facts(ids) + sources
+        extra, bucket = [], int(time.time() // 600)
+        if question.use_retrieval:
+            if INVENTORY.search(query):
+                extra += inventory_facts(bucket)
+            if SEVERITY.search(query):
+                levels = ("CRITICAL",) if re.search(r"\bcritical\b", query, re.I) else ("CRITICAL", "HIGH")
+                extra += severity_facts(levels, bucket)
+            if COVERAGE.search(query):
+                extra += assessment_facts(bucket)
+            if TOOL_QUESTION.search(query):
+                extra += tool_facts(bucket)
+            if ids := ADVISORY.findall(query):
+                extra += advisory_facts(ids)
+            if DEFINITION.search(query):
+                extra += methodology_source()
+        unique = {}
+        for source in facts + mentioned + extra + sources:
+            unique.setdefault(source["citation_id"], source)
+        sources = list(unique.values())[:MAX_SOURCES]
         retrieval_ms = round((time.perf_counter() - retrieval_start) * 1000, 1)
-        named = re.findall(r"\b(?:[A-Za-z0-9_-]+\.)+[A-Za-z0-9_-]+/[A-Za-z0-9_./-]+", query)
-        missing_identity = question.use_retrieval and any(not any(
+        missing_identity = question.use_retrieval and not scope and any(not any(
             s["title"].lower().startswith(name.rstrip('.').lower() + ':') for s in sources) for name in named)
         live_compromise = re.search(r"\b(compromised|breached|hacked|exploited)\b.*\b(today|now|currently)\b", query, re.I)
         if live_compromise:
@@ -359,8 +610,14 @@ def answer_question(question):
             usage = {}
         else:
             answer, usage = generate(question, sources)
-        return {**answer.model_dump(), "sources": sources, "strategy": question.strategy,
-                "use_retrieval": question.use_retrieval, "model": os.environ.get("OPENAI_CHAT_MODEL", "gpt-4.1-mini"),
+        cited = set(answer.citation_ids)
+        shown = [{**s, "ref": i + 1, "cited": s["citation_id"] in cited, "source_name": SOURCE_NAMES.get(s.get("kind"), s.get("kind")),
+                  "registry_name": s.get("title", "").split(": ")[0] if s.get("server_id") else None, "excerpt": excerpt(s)}
+                 for i, s in enumerate(sources)]
+        return {**answer.model_dump(), "sources": shown, "strategy": question.strategy, "use_retrieval": question.use_retrieval,
+                "scope": [{"server_id": f["server_id"], "registry_name": f["title"].split(": ")[0]} for f in facts],
+                "missing_scope": [sid for sid in requested if sid not in scope], "coverage_notes": coverage_notes(facts + mentioned),
+                "top_k_used": top_k, "model": os.environ.get("OPENAI_CHAT_MODEL", "gpt-4.1-mini"),
                 "retrieval_ms": retrieval_ms, "latency_ms": round((time.perf_counter() - started) * 1000, 1),
                 "input_tokens": usage.get("input_tokens", 0), "output_tokens": usage.get("output_tokens", 0)}
     finally:
@@ -531,6 +788,14 @@ EVALUATION = [
     {"id": "postgres_search", "category": "search", "question": "Which MCP servers can work with PostgreSQL databases?", "expected": ["postgres"], "server": "postgres"},
     {"id": "network_search", "category": "search", "question": "Which stored MCP server helps analyze network packets with Wireshark?", "expected": ["wireshark"], "server": "wireshark"},
     {"id": "compare", "category": "comparison", "question": "Compare the recorded vulnerabilities of praisonai and hushdrop.", "fact": "compare", "all": True},
+    {"id": "dangerous_wording", "category": "severity filter", "question": "Which MCP servers are the most dangerous?",
+     "expected": ["not an overall", "risk score", "does not show", "cannot", "not establish", "not a measure"]},
+    {"id": "tool_metadata", "category": "tool metadata", "question": "Which servers have verified tool metadata?", "fact": "valid_schema_servers"},
+    {"id": "coverage_unassessed", "category": "assessment coverage", "question": "Which servers have not been assessed?", "fact": "coverage_terms"},
+    {"id": "scoped_not_applicable", "category": "server scope", "question": "Why is there no package vulnerability assessment for this server?",
+     "scope": "remote_example", "expected": ["not applicable", "no package", "does not apply"]},
+    {"id": "scoped_summary", "category": "server scope", "question": "Summarize the security evidence for this server.",
+     "scope": "io.github.MervinPraison/praisonai", "fact": "praisonai_distinct"},
     {"id": "live_unknown", "category": "abstain", "question": "Was praisonai compromised today?", "abstain": True, "server": "praisonai"},
     {"id": "absent_server", "category": "abstain", "question": "Is com.example/not-a-registered-server safe?", "abstain": True},
 ]
@@ -555,6 +820,9 @@ def evaluation_facts():
                 WHERE s.registry_status <> 'deleted' AND ss.distinct_advisories > 0 {extra}
                 ORDER BY ss.distinct_advisories DESC, s.registry_name LIMIT {limit}"""
     praisonai, hushdrop, vidlet = (summary(n) for n in ("io.github.MervinPraison/praisonai", "io.github.maxtechera/hushdrop", "app.vidlet/vidlet"))
+    valid = fetch_all("""SELECT s.registry_name FROM tool_observations t JOIN servers s ON s.latest_version_id = t.server_version_id
+                         WHERE s.registry_status <> 'deleted' AND t.input_schema_state = 'valid' GROUP BY 1
+                         ORDER BY count(DISTINCT t.tool_name) DESC, 1""")
     base = data.totals["non_deleted"]
     remote = data.deployment_types.get("remote_only", 0)
     return {
@@ -574,17 +842,31 @@ def evaluation_facts():
                                           JOIN servers s ON s.latest_version_id = f.server_version_id
                                           WHERE ai.identifier = 'CVE-2025-66414' AND s.registry_status <> 'deleted'""")),
         "compare": [str(praisonai.get("distinct_advisories") or 0), str(hushdrop.get("distinct_advisories") or 0)],
+        "praisonai_distinct": numbers(praisonai.get("distinct_advisories") or 0),
+        "valid_schema_servers": numbers(len(valid)) + short(valid[:3]),
+        "coverage_terms": numbers(data.assessment_states.get("no_package_vulnerability_path", 0)) + ["not applicable", "1,346", "deleted"],
     }
 
 
+def evaluation_scopes():
+    rows = fetch_all("""SELECT s.server_id, s.registry_name FROM servers s WHERE s.registry_name IN ('ac.snag/snag', 'io.github.MervinPraison/praisonai')""")
+    scopes = {r["registry_name"]: r["server_id"] for r in rows}
+    remote = scopes.get("ac.snag/snag") or fetch_one(
+        """SELECT s.server_id FROM servers s JOIN server_versions sv ON sv.server_version_id = s.latest_version_id WHERE s.registry_status <> 'deleted'
+           AND NOT EXISTS (SELECT 1 FROM server_package_declarations d WHERE d.server_version_id = sv.server_version_id)
+           AND EXISTS (SELECT 1 FROM remote_endpoints r WHERE r.server_version_id = sv.server_version_id) ORDER BY s.registry_name LIMIT 1""")["server_id"]
+    return {**scopes, "remote_example": remote}
+
+
 def evaluate(output):
-    facts = evaluation_facts()
+    facts, scopes = evaluation_facts(), evaluation_scopes()
     rows = []
     for case in EVALUATION:
         expected = case.get("expected") or facts.get(case.get("fact"), [])
+        scope = [scopes[case["scope"]]] if case.get("scope") in scopes else []
         for strategy, retrieval in (("zero_shot", True), ("few_shot", True), ("zero_shot", False), ("few_shot", False)):
             try:
-                response = answer_question(Question(question=case["question"], strategy=strategy, use_retrieval=retrieval))
+                response = answer_question(Question(question=case["question"], strategy=strategy, use_retrieval=retrieval, server_ids=scope))
                 text = response["answer"].lower()
                 hits = [s for s in response["sources"] if case.get("server") and case["server"].lower() in (s["title"] + s["content"]).lower()]
                 if case.get("abstain"):
@@ -613,7 +895,8 @@ def evaluate(output):
                            "mean_latency_ms": round(sum(r["latency_ms"] for r in completed) / max(1, len(completed)), 1),
                            "input_tokens": sum(r["input_tokens"] for r in completed), "output_tokens": sum(r["output_tokens"] for r in completed)})
     report = {"generated_at": datetime.now(timezone.utc).isoformat(), "corpus": status(), "top_k": 5,
-              "method": "26 fixed questions in 9 categories, each run with and without retrieval and with zero-shot and few-shot prompts. "
+              "method": f"{len(EVALUATION)} fixed questions in {len({c['category'] for c in EVALUATION})} categories, each run with and without "
+                        "retrieval and with zero-shot and few-shot prompts. Server-scoped questions pass the server id as the chat scope. "
                         "Expected terms for data-dependent questions are computed from the database when the evaluation runs. "
                         "Abstention questions pass only with insufficient_evidence. Target retrieval is a server-level proxy, not exhaustive "
                         "relevance labels. Citation IDs are validated at runtime; claim support requires human review.",

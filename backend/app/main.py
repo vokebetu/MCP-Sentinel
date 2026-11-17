@@ -1,10 +1,15 @@
+import json
+import logging
+import re
+import time
+import uuid
 from collections import Counter, defaultdict
 from contextlib import asynccontextmanager
 from typing import Literal
 
 import psycopg
 from fastapi import FastAPI, HTTPException, Query, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from psycopg_pool import PoolTimeout
 
 from .db import fetch_all, fetch_one, pool
@@ -71,15 +76,48 @@ app.include_router(ai_router)
 app.include_router(review_router)
 
 
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+log = logging.getLogger("mcp_sentinel.api")
+REQUEST_ID = re.compile(r"^[A-Za-z0-9-]{1,64}$")
+
+
+@app.middleware("http")
+async def request_log(request: Request, call_next):
+    supplied = request.headers.get("x-request-id", "")
+    request.state.request_id = supplied if REQUEST_ID.match(supplied) else uuid.uuid4().hex[:12]
+    started = time.perf_counter()
+    response = await call_next(request)
+    response.headers["X-Request-ID"] = request.state.request_id
+    log.info(json.dumps({"event": "request", "request_id": request.state.request_id, "method": request.method, "path": request.url.path,
+                         "status": response.status_code, "ms": round((time.perf_counter() - started) * 1000, 1)}))
+    return response
+
+
+def unavailable(request, exc, reason, detail):
+    request_id = getattr(request.state, "request_id", None)
+    log.warning(json.dumps({"event": "database_error", "request_id": request_id, "path": request.url.path, "reason": reason,
+                            "error": type(exc).__name__}))
+    return JSONResponse(status_code=503, content={"detail": detail, "reason": reason, "request_id": request_id}, headers={"Retry-After": "1"})
+
+
 @app.exception_handler(PoolTimeout)
+async def database_busy(request: Request, exc: Exception):
+    return unavailable(request, exc, "database_busy", "The database is busy: no connection became free in time. Please retry.")
+
+
+@app.exception_handler(psycopg.errors.QueryCanceled)
+async def query_timeout(request: Request, exc: Exception):
+    return unavailable(request, exc, "query_timeout", "The database query exceeded its time limit.")
+
+
 @app.exception_handler(psycopg.OperationalError)
 async def database_unavailable(request: Request, exc: Exception):
-    return JSONResponse(status_code=503, content={"detail": "database unavailable"})
+    return unavailable(request, exc, "database_unavailable", "database unavailable")
 
 
 @app.exception_handler(psycopg.errors.UndefinedTable)
 async def schema_missing(request: Request, exc: Exception):
-    return JSONResponse(status_code=503, content={"detail": "database schema is not initialized"})
+    return unavailable(request, exc, "schema_missing", "database schema is not initialized")
 
 
 @app.get("/health", response_model=Health)
@@ -94,38 +132,181 @@ def health():
     return Health(status="ok", database="ok", schema_versions=versions, servers=servers)
 
 
-LIST_SQL = """
-SELECT p.server_id, p.registry_name, p.title, p.version, p.registry_status, p.ecosystems, p.deployment_type, p.has_github_repository,
-       p.package_count, p.remote_count, p.observed_tool_count, p.valid_input_schema_count, p.published_at,
-       ss.vulnerability_assessment_state, ss.distinct_advisories, ss.direct_advisories, ss.dependency_advisories, ss.highest_advisory_severity,
-       CASE ss.highest_advisory_severity WHEN 'CRITICAL' THEN 4 WHEN 'HIGH' THEN 3 WHEN 'MODERATE' THEN 2 WHEN 'LOW' THEN 1 END AS severity_rank,
-       CASE WHEN %(q)s::text IS NULL THEN 0
-            ELSE ts_rank(sv.search_vector, websearch_to_tsquery('english', %(q)s) || websearch_to_tsquery('simple', %(q)s))
-                 + CASE WHEN p.registry_name ILIKE '%%' || %(q)s || '%%' THEN 1 ELSE 0 END END AS rank,
-       count(*) OVER () AS total
-FROM server_profiles p
-JOIN server_security_summary ss ON ss.server_id = p.server_id
-JOIN server_versions sv ON sv.server_version_id = p.server_version_id
+CHECK_TYPES_SQL = "('direct_package_advisories', 'dependency_advisories')"
+STATE_SQL = f"""CASE
+    WHEN EXISTS (SELECT 1 FROM security_findings f WHERE f.server_version_id = sv.server_version_id AND f.finding_status <> 'withdrawn')
+        THEN 'findings_recorded'
+    WHEN EXISTS (SELECT 1 FROM assessment_checks c WHERE c.server_version_id = sv.server_version_id AND c.check_type IN {CHECK_TYPES_SQL}
+                 AND c.outcome IN ('finding_found', 'no_known_finding')) THEN 'no_known_findings_in_completed_checks'
+    WHEN EXISTS (SELECT 1 FROM assessment_checks c WHERE c.server_version_id = sv.server_version_id AND c.check_type IN {CHECK_TYPES_SQL}
+                 AND c.outcome IN ('missing_identifier', 'unsupported', 'access_restricted', 'error', 'not_found')) THEN 'checks_could_not_complete'
+    WHEN EXISTS (SELECT 1 FROM assessment_checks c WHERE c.server_version_id = sv.server_version_id AND c.check_type IN {CHECK_TYPES_SQL}
+                 AND c.outcome = 'not_applicable') THEN 'no_package_vulnerability_path'
+    ELSE 'not_assessed' END"""
+HAS_PACKAGE_SQL = "EXISTS (SELECT 1 FROM server_package_declarations d WHERE d.server_version_id = sv.server_version_id)"
+HAS_REMOTE_SQL = "EXISTS (SELECT 1 FROM remote_endpoints r WHERE r.server_version_id = sv.server_version_id)"
+DEPLOYMENT_SQL = f"""CASE WHEN {HAS_PACKAGE_SQL} AND {HAS_REMOTE_SQL} THEN 'packages_and_remotes' WHEN {HAS_PACKAGE_SQL} THEN 'packages_only'
+    WHEN {HAS_REMOTE_SQL} THEN 'remote_only' ELSE 'neither' END"""
+TOOL_STATE_SQL = """CASE
+    WHEN EXISTS (SELECT 1 FROM tool_observations t WHERE t.server_version_id = sv.server_version_id) THEN 'listed'
+    WHEN EXISTS (SELECT 1 FROM endpoint_observations eo WHERE eo.server_version_id = sv.server_version_id AND eo.observed_tool_count > 0)
+        THEN 'count_observed'
+    WHEN EXISTS (SELECT 1 FROM endpoint_observations eo WHERE eo.server_version_id = sv.server_version_id
+                 AND (eo.observed_tool_count = 0 OR eo.check_result = 'ok_no_tools')) THEN 'observed_none'
+    ELSE 'not_observed' END"""
+RANK_SQL = """CASE WHEN %(q)s::text IS NULL THEN 0
+    ELSE ts_rank(sv.search_vector, websearch_to_tsquery('english', %(q)s) || websearch_to_tsquery('simple', %(q)s))
+         + CASE WHEN s.registry_name ILIKE '%%' || %(q)s || '%%' THEN 1 ELSE 0 END END"""
+CONCERNS_JOIN = """LEFT JOIN (
+    SELECT f.server_version_id, count(DISTINCT f.advisory_id) AS advisories,
+           max(CASE upper(a.severity_label) WHEN 'CRITICAL' THEN 4 WHEN 'HIGH' THEN 3 WHEN 'MODERATE' THEN 2 WHEN 'MEDIUM' THEN 2 WHEN 'LOW' THEN 1 END) AS severity
+    FROM security_findings f JOIN advisories a ON a.advisory_id = f.advisory_id WHERE f.finding_status <> 'withdrawn'
+    GROUP BY f.server_version_id) fa ON fa.server_version_id = sv.server_version_id"""
+CHECKED_SQL = f"""EXISTS (SELECT 1 FROM assessment_checks c WHERE c.server_version_id = sv.server_version_id AND c.check_type IN {CHECK_TYPES_SQL}
+    AND c.outcome IN ('finding_found', 'no_known_finding'))"""
+ORDERS = {
+    "name": ("", "s.registry_name ASC"),
+    "concerns": (CONCERNS_JOIN, f"COALESCE(fa.advisories, CASE WHEN {CHECKED_SQL} THEN 0 END) DESC NULLS LAST, fa.severity DESC NULLS LAST, s.registry_name ASC"),
+    "newest": ("", "sv.published_at DESC NULLS LAST, s.registry_name ASC"),
+    "relevance": ("", f"{RANK_SQL} DESC, s.registry_name ASC"),
+}
+FILTER_SQL = f"""
+FROM servers s
+JOIN server_versions sv ON sv.server_version_id = s.latest_version_id
+{{join}}
 WHERE (%(q)s::text IS NULL OR sv.search_vector @@ (websearch_to_tsquery('english', %(q)s) || websearch_to_tsquery('simple', %(q)s))
-       OR p.registry_name ILIKE '%%' || %(q)s || '%%')
-  AND (%(status)s::text = 'all' OR (%(status)s = 'non_deleted' AND p.registry_status <> 'deleted') OR p.registry_status = %(status)s)
-  AND (%(ecosystem)s::text IS NULL OR %(ecosystem)s = ANY (p.ecosystems))
-  AND (%(deployment)s::text IS NULL OR p.deployment_type = %(deployment)s)
-  AND (%(has_repository)s::boolean IS NULL OR (p.repository_count > 0) = %(has_repository)s)
-  AND (%(assessment)s::text IS NULL OR ss.vulnerability_assessment_state = %(assessment)s)
-  AND (%(has_tools)s::boolean IS NULL OR (p.observed_tool_count > 0) = %(has_tools)s)
-  AND (%(tool_hints)s::boolean IS NULL OR EXISTS (SELECT 1 FROM tool_review_flags f WHERE f.server_version_id = p.server_version_id) = %(tool_hints)s)
-  AND (%(server_ids)s::bigint[] IS NULL OR p.server_id = ANY (%(server_ids)s))
-ORDER BY {order}
-LIMIT %(limit)s OFFSET %(offset)s
+       OR s.registry_name ILIKE '%%' || %(q)s || '%%')
+  AND (%(status)s::text = 'all' OR (%(status)s = 'non_deleted' AND s.registry_status <> 'deleted') OR s.registry_status = %(status)s)
+  AND (%(ecosystem)s::text IS NULL OR EXISTS (SELECT 1 FROM server_package_declarations d WHERE d.server_version_id = sv.server_version_id
+                                               AND d.registry_type = %(ecosystem)s))
+  AND (%(deployment)s::text IS NULL OR {DEPLOYMENT_SQL} = %(deployment)s)
+  AND (%(has_repository)s::boolean IS NULL
+       OR EXISTS (SELECT 1 FROM server_repositories sr WHERE sr.server_version_id = sv.server_version_id) = %(has_repository)s)
+  AND (%(github)s::boolean IS NULL OR EXISTS (SELECT 1 FROM server_repositories sr JOIN repositories r ON r.repository_id = sr.repository_id
+                                               WHERE sr.server_version_id = sv.server_version_id AND r.host = 'github.com') = %(github)s)
+  AND (%(assessment)s::text IS NULL OR {STATE_SQL} = %(assessment)s)
+  AND (%(has_tools)s::boolean IS NULL
+       OR EXISTS (SELECT 1 FROM tool_observations t WHERE t.server_version_id = sv.server_version_id) = %(has_tools)s)
+  AND (%(tool_info)s::text IS NULL OR ({TOOL_STATE_SQL}) = ANY (string_to_array(%(tool_info)s, ',')))
+  AND (%(tool_hints)s::boolean IS NULL
+       OR EXISTS (SELECT 1 FROM tool_review_flags fl WHERE fl.server_version_id = sv.server_version_id) = %(tool_hints)s)
+  AND (%(server_ids)s::bigint[] IS NULL OR s.server_id = ANY (%(server_ids)s))
 """
+DETAIL_SQL = f"""
+SELECT s.server_id, s.registry_name, sv.title, sv.version, s.registry_status, sv.published_at,
+       pk.ecosystems, pk.package_count, re.remote_count, rp.repository_count, rp.has_github_repository, rp.repository_url,
+       tl.listed_tools, tl.valid_schemas, tl.listing_observed_at, ag.handshake_tools, ag.handshake_none, ag.handshake_observed_at,
+       (SELECT count(*) FROM tool_review_flags fl WHERE fl.server_version_id = sv.server_version_id) AS tool_review_hints,
+       fi.distinct_found, fi.direct_found, fi.dependency_found, fi.severity_rank,
+       ck.completed_direct, ck.completed_dependency, ck.incomplete, ck.not_applicable
+FROM unnest(%(ids)s::bigint[]) WITH ORDINALITY AS page(server_id, ord)
+JOIN servers s ON s.server_id = page.server_id
+JOIN server_versions sv ON sv.server_version_id = s.latest_version_id
+LEFT JOIN LATERAL (SELECT count(*) AS package_count, COALESCE(array_agg(DISTINCT d.registry_type ORDER BY d.registry_type), ARRAY[]::text[]) AS ecosystems
+                   FROM server_package_declarations d WHERE d.server_version_id = sv.server_version_id) pk ON true
+LEFT JOIN LATERAL (SELECT count(*) AS remote_count FROM remote_endpoints r WHERE r.server_version_id = sv.server_version_id) re ON true
+LEFT JOIN LATERAL (SELECT count(*) AS repository_count, COALESCE(bool_or(r.host = 'github.com'), false) AS has_github_repository,
+                          (array_agg(r.canonical_url ORDER BY r.canonical_url))[1] AS repository_url
+                   FROM server_repositories sr JOIN repositories r ON r.repository_id = sr.repository_id
+                   WHERE sr.server_version_id = sv.server_version_id) rp ON true
+LEFT JOIN LATERAL (SELECT count(DISTINCT t.tool_name) AS listed_tools,
+                          count(DISTINCT t.tool_name) FILTER (WHERE t.input_schema_state = 'valid') AS valid_schemas,
+                          max(t.observed_at) AS listing_observed_at
+                   FROM tool_observations t WHERE t.server_version_id = sv.server_version_id) tl ON true
+LEFT JOIN LATERAL (SELECT max(eo.observed_tool_count) AS handshake_tools,
+                          COALESCE(bool_or(eo.observed_tool_count = 0 OR eo.check_result = 'ok_no_tools'), false) AS handshake_none,
+                          max(eo.observed_at) AS handshake_observed_at
+                   FROM endpoint_observations eo WHERE eo.server_version_id = sv.server_version_id) ag ON true
+LEFT JOIN LATERAL (SELECT count(DISTINCT f.advisory_id) AS distinct_found,
+                          count(DISTINCT f.advisory_id) FILTER (WHERE f.finding_category = 'direct_package') AS direct_found,
+                          count(DISTINCT f.advisory_id) FILTER (WHERE f.finding_category = 'resolved_dependency') AS dependency_found,
+                          max(CASE upper(a.severity_label) WHEN 'CRITICAL' THEN 4 WHEN 'HIGH' THEN 3 WHEN 'MODERATE' THEN 2 WHEN 'MEDIUM' THEN 2
+                                  WHEN 'LOW' THEN 1 END) AS severity_rank
+                   FROM security_findings f JOIN advisories a ON a.advisory_id = f.advisory_id
+                   WHERE f.server_version_id = sv.server_version_id AND f.finding_status <> 'withdrawn') fi ON true
+LEFT JOIN LATERAL (SELECT count(*) FILTER (WHERE c.check_type = 'direct_package_advisories' AND c.outcome IN ('finding_found', 'no_known_finding'))
+                              AS completed_direct,
+                          count(*) FILTER (WHERE c.check_type = 'dependency_advisories' AND c.outcome IN ('finding_found', 'no_known_finding'))
+                              AS completed_dependency,
+                          count(*) FILTER (WHERE c.check_type IN {CHECK_TYPES_SQL}
+                                           AND c.outcome IN ('missing_identifier', 'unsupported', 'access_restricted', 'error', 'not_found')) AS incomplete,
+                          count(*) FILTER (WHERE c.check_type IN {CHECK_TYPES_SQL} AND c.outcome = 'not_applicable') AS not_applicable
+                   FROM assessment_checks c WHERE c.server_version_id = sv.server_version_id) ck ON true
+ORDER BY page.ord
+"""
+SEVERITIES = {4: "CRITICAL", 3: "HIGH", 2: "MODERATE", 1: "LOW"}
+FILTER_DEFAULTS = {"q": None, "status": "all", "ecosystem": None, "deployment": None, "has_repository": None, "github": None, "assessment": None,
+                   "has_tools": None, "tool_info": None, "tool_hints": None, "server_ids": None}
+
+
+def summarize(row):
+    found = row["distinct_found"] > 0
+    completed_direct, completed_dependency = row["completed_direct"], row["completed_dependency"]
+    if found:
+        state = "findings_recorded"
+    elif completed_direct + completed_dependency > 0:
+        state = "no_known_findings_in_completed_checks"
+    elif row["incomplete"] > 0:
+        state = "checks_could_not_complete"
+    elif row["not_applicable"] > 0:
+        state = "no_package_vulnerability_path"
+    else:
+        state = "not_assessed"
+    if row["listed_tools"]:
+        tools = ("listed", row["listed_tools"], "tool catalogs", row["listing_observed_at"])
+    elif row["handshake_tools"]:
+        tools = ("count_observed", row["handshake_tools"], "endpoint handshake (Agora)", row["handshake_observed_at"])
+    elif row["handshake_none"]:
+        tools = ("observed_none", 0, "endpoint handshake (Agora)", row["handshake_observed_at"])
+    else:
+        tools = ("not_observed", None, None, None)
+    if row["package_count"] and row["remote_count"]:
+        deployment = "packages_and_remotes"
+    elif row["package_count"]:
+        deployment = "packages_only"
+    elif row["remote_count"]:
+        deployment = "remote_only"
+    else:
+        deployment = "neither"
+    return ServerSummary(
+        server_id=row["server_id"], registry_name=row["registry_name"], title=row["title"], version=row["version"],
+        registry_status=row["registry_status"], ecosystems=row["ecosystems"], deployment_type=deployment,
+        has_github_repository=row["has_github_repository"], repository_url=row["repository_url"], package_count=row["package_count"],
+        remote_count=row["remote_count"], observed_tool_count=row["listed_tools"] or None,
+        valid_input_schema_count=row["valid_schemas"] if row["listed_tools"] else None, tool_metadata_state=tools[0], tool_count=tools[1],
+        tool_count_source=tools[2], tool_observed_at=tools[3], tool_review_hints=row["tool_review_hints"], published_at=row["published_at"],
+        vulnerability_assessment_state=state,
+        distinct_advisories=row["distinct_found"] if found or completed_direct + completed_dependency > 0 else None,
+        direct_advisories=row["direct_found"] if found or completed_direct > 0 else None,
+        dependency_advisories=row["dependency_found"] if found or completed_dependency > 0 else None,
+        highest_advisory_severity=SEVERITIES.get(row["severity_rank"]))
+
+
+def summaries(ids):
+    return [summarize(row) for row in fetch_all(DETAIL_SQL, {"ids": ids})] if ids else []
+
+
+def filter_params(params):
+    return {**FILTER_DEFAULTS, **params}
 
 
 def list_servers(params, sort="name", page=1, page_size=25):
-    base = {"q": None, "status": "all", "ecosystem": None, "deployment": None, "has_repository": None, "assessment": None, "has_tools": None,
-            "tool_hints": None, "server_ids": None, **params, "limit": page_size, "offset": (page - 1) * page_size}
-    rows = fetch_all(LIST_SQL.format(order=SORTS[sort]), base)
-    return (rows[0]["total"] if rows else 0), [ServerSummary(**row) for row in rows]
+    join, order = ORDERS[sort]
+    values = filter_params(params)
+    sql = FILTER_SQL.format(join=join)
+    total = fetch_one(f"SELECT count(*) AS n {sql}", values)["n"]
+    ids = [r["server_id"] for r in fetch_all(f"SELECT s.server_id {sql} ORDER BY {order} LIMIT %(limit)s OFFSET %(offset)s",
+                                              {**values, "limit": page_size, "offset": (page - 1) * page_size})]
+    return total, summaries(ids)
+
+
+def search_params(q, status, ecosystem, deployment, has_repository, github, assessment, has_tools, tool_info, tool_hints, sort):
+    query = (q or "").strip() or None
+    if sort == "relevance" and not query:
+        sort = "name"
+    return {"q": query, "status": status, "ecosystem": ecosystem, "deployment": deployment, "has_repository": has_repository, "github": github,
+            "assessment": assessment, "has_tools": has_tools, "tool_info": ",".join(tool_info) if tool_info else None,
+            "tool_hints": tool_hints}, sort
 
 
 @app.get("/api/servers", response_model=ServerPage)
@@ -135,20 +316,47 @@ def search_servers(
     ecosystem: str | None = Query(None, max_length=40),
     deployment: Literal["remote_only", "packages_only", "packages_and_remotes", "neither"] | None = None,
     has_repository: bool | None = None,
+    github: bool | None = None,
     assessment: Literal["findings_recorded", "no_known_findings_in_completed_checks", "checks_could_not_complete",
                         "no_package_vulnerability_path", "not_assessed"] | None = None,
     has_tools: bool | None = None,
+    tool_info: list[Literal["listed", "count_observed", "observed_none", "not_observed"]] | None = Query(None),
     tool_hints: bool | None = None,
     sort: Literal["name", "concerns", "newest", "relevance"] = "name",
     page: int = Query(1, ge=1, le=10000),
     page_size: int = Query(25, ge=1, le=100),
 ):
-    query = (q or "").strip() or None
-    if sort == "relevance" and not query:
-        sort = "name"
-    total, items = list_servers({"q": query, "status": status, "ecosystem": ecosystem, "deployment": deployment, "has_repository": has_repository,
-                                 "assessment": assessment, "has_tools": has_tools, "tool_hints": tool_hints}, sort, page, page_size)
+    params, sort = search_params(q, status, ecosystem, deployment, has_repository, github, assessment, has_tools, tool_info, tool_hints, sort)
+    total, items = list_servers(params, sort, page, page_size)
     return ServerPage(total=total, page=page, page_size=page_size, items=items)
+
+
+@app.get("/api/servers/export")
+def export_servers(
+    q: str | None = Query(None, max_length=200),
+    status: Literal["non_deleted", "active", "deprecated", "deleted", "all"] = "non_deleted",
+    ecosystem: str | None = Query(None, max_length=40),
+    deployment: Literal["remote_only", "packages_only", "packages_and_remotes", "neither"] | None = None,
+    has_repository: bool | None = None,
+    github: bool | None = None,
+    assessment: Literal["findings_recorded", "no_known_findings_in_completed_checks", "checks_could_not_complete",
+                        "no_package_vulnerability_path", "not_assessed"] | None = None,
+    has_tools: bool | None = None,
+    tool_info: list[Literal["listed", "count_observed", "observed_none", "not_observed"]] | None = Query(None),
+    tool_hints: bool | None = None,
+    sort: Literal["name", "concerns", "newest", "relevance"] = "name",
+):
+    params, sort = search_params(q, status, ecosystem, deployment, has_repository, github, assessment, has_tools, tool_info, tool_hints, sort)
+    join, order = ORDERS[sort]
+    with pool.connection(timeout=10) as conn:
+        ids = [r["server_id"] for r in conn.execute(f"SELECT s.server_id {FILTER_SQL.format(join=join)} ORDER BY {order}", filter_params(params))]
+
+    def lines():
+        for start in range(0, len(ids), 2000):
+            for item in summaries(ids[start:start + 2000]):
+                yield item.model_dump_json() + "\n"
+
+    return StreamingResponse(lines(), media_type="application/x-ndjson", headers={"X-Total-Count": str(len(ids))})
 
 
 def server_row(server_id):
@@ -248,8 +456,13 @@ def server_detail(server_id: int):
         missing.append("No installable package is declared, so package and dependency vulnerability checks do not apply.")
     if any(not p.version_is_exact for p in packages):
         missing.append("At least one package is declared without an exact version, so it cannot be matched to advisories.")
-    if not tools:
-        missing.append("No tool names or schemas are available from the tested sources.")
+    summary = summaries([server_id])[0]
+    if not tools and summary.tool_metadata_state == "count_observed":
+        missing.append(f"No tool names are stored, but an endpoint handshake (Agora) reported {summary.tool_count} tools.")
+    elif not tools and summary.tool_metadata_state == "observed_none":
+        missing.append("No tool names are stored; an endpoint handshake (Agora) answered without listing tools.")
+    elif not tools:
+        missing.append("Tool metadata was not observed in the checked sources. This does not mean the server has no tools.")
     elif not any(t.input_schema_state == "valid" for t in tools):
         missing.append("Tool names are available, but no valid JSON Schema input schema was found.")
     if remotes and not any(r.observations for r in remotes):
@@ -257,7 +470,9 @@ def server_detail(server_id: int):
     if state and state["vulnerability_assessment_state"] == "not_assessed":
         missing.append("No vulnerability lookup has been recorded for this server version. Absence of findings is not evidence of safety.")
     return ServerDetail(**{k: row[k] for k in ServerDetail.model_fields if k in row}, repositories=repositories, packages=packages, remotes=remotes,
-                        tools=tools, evidence_sources=sources, missing_information=missing)
+                        tools=tools, tool_metadata_state=summary.tool_metadata_state, tool_count=summary.tool_count,
+                        tool_count_source=summary.tool_count_source, tool_observed_at=summary.tool_observed_at, evidence_sources=sources,
+                        missing_information=missing)
 
 
 def security_summary(server_id):
@@ -381,8 +596,13 @@ def compare(server_ids: str = Query(..., pattern=r"^\d+(,\d+){1,3}$", descriptio
     states = {entry.summary.vulnerability_assessment_state for entry in entries}
     if len(states) > 1:
         notes.append("These servers have different assessment coverage. A server with fewer recorded findings is not necessarily more secure.")
-    if states & {"not_assessed", "no_package_vulnerability_path", "checks_could_not_complete"}:
-        notes.append("At least one server has no completed vulnerability lookup, so its finding count is unknown rather than zero.")
+    for entry in entries:
+        name, state = entry.summary.registry_name, entry.summary.vulnerability_assessment_state
+        if state == "not_assessed":
+            notes.append(f"{name} has no recorded package vulnerability lookup, so its finding count is unknown rather than zero.")
+        elif state == "checks_could_not_complete":
+            notes.append(f"{name} has no completed eligible package assessment: its checks could not complete, so its finding count is "
+                         "unknown rather than zero.")
     return CompareResponse(servers=entries, notes=notes)
 
 

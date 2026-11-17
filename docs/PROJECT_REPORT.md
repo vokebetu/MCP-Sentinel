@@ -17,7 +17,7 @@
 | Security findings | 19,406 findings on 6,048 servers |
 | Coverage records | 317,347 checks |
 | Review checklist | per server: the evidence a bank's third-party review asks for, plus an SBOM download |
-| AI assistant | answers with sources from 55,477 indexed records (OpenAI embeddings + `gpt-4.1-mini`); 26/26 evaluation questions |
+| AI assistant | answers with numbered sources from 55,477 indexed records (OpenAI embeddings + `gpt-4.1-mini`); 31/31 evaluation questions (default prompt) |
 | Spark analytics | Bronze/Silver/Gold Parquet, 4 SQL reports, K-Means on 16,514 servers |
 | App | FastAPI + Streamlit in Docker Compose |
 | Backup | two dump files (37 MB data, 77 MB AI index), restore tested |
@@ -287,7 +287,7 @@ Rule: only individual records are loaded. Summary counts are never turned into r
 
 | Test | Result |
 |---|---|
-| Automated tests (`pytest`) | 64 passed: 16 unit, 20 database, 16 API, 7 browser (including one live AI test), 5 Spark |
+| Automated tests (`pytest`) | 88 passed: 16 unit, 6 frontend helper, 20 database, 27 API, 14 browser (including two live AI tests), 5 Spark |
 | Database checks (`importer validate`) | 42/42 passed |
 | Import twice | identical row counts |
 | `docker compose down` + `up` | data kept |
@@ -430,18 +430,20 @@ Answers were good for questions about one server but varied for other kinds of q
 
 Fixes: live SQL statistics for inventory and advisory questions, a prompt rule against counting the sample, and server names instead of ids.
 
-Evaluation (`docs/AI_EVALUATION.json`): full data, 26 questions in 9 categories × 2 prompts × retrieval on/off = 104 runs. Expected answers for data-dependent questions are computed from the database when the evaluation runs.
+Evaluation (`docs/AI_EVALUATION.json`): full data, 31 questions in 12 categories × 2 prompts × retrieval on/off = 124 runs. Expected answers for data-dependent questions are computed from the database when the evaluation runs. Server-scoped questions pass the server as the chat scope.
 
 | Prompt | Retrieval | Passed | Mean time | Input / output tokens |
 |---|---|---|---|---|
-| Zero-shot | yes | 26/26 | 3.3 s | 126,372 / 4,325 |
-| Few-shot (default) | yes | 26/26 | 2.9 s | 133,376 / 3,560 |
-| Zero-shot | no | 2/26 | 0.9 s | 11,254 / 1,525 |
-| Few-shot | no | 2/26 | 1.0 s | 18,554 / 1,416 |
+| Zero-shot | yes | 30/31 | 4.0 s | 182,445 / 6,196 |
+| Few-shot (default) | yes | 31/31 | 3.5 s | 194,978 / 5,509 |
+| Zero-shot | no | 2/31 | 1.1 s | 18,412 / 1,821 |
+| Few-shot | no | 2/31 | 1.1 s | 30,682 / 1,590 |
 
 - Retrieval makes the difference: without it only the two "decline" questions pass.
 - Checks are term matches; the answers for counts, rankings and CVEs were also read by hand.
-- 26 questions do not measure general accuracy.
+- The zero-shot miss gives a correct answer ("a package vulnerability assessment does not apply") but labels it "insufficient evidence".
+- All 57 grounded answers cite their sources inline as `[n]`, and every number maps to a supplied source.
+- 31 questions do not measure general accuracy.
 
 | Problem found during evaluation | Fix |
 |---|---|
@@ -458,6 +460,30 @@ Evaluation (`docs/AI_EVALUATION.json`): full data, 26 questions in 9 categories 
 | Index scan of the full data took about 40 minutes | planner set for full scans: the scan takes 1.4 s |
 | One network error stopped a long index run | up to two retries for connection errors |
 | Dump would pass GitHub's 100 MB file limit | vectors stored as `halfvec`; AI index in its own dump file |
+| A remote-only server read as "no vulnerabilities" | live SQL facts for scoped or named servers: package lookup "not applicable" |
+| "Most dangerous" read as a verdict | severity statistics state that recorded severity is not a risk score |
+| Definition questions retrieved unrelated profiles | the methodology note is added for definition questions |
+| An uncited answer was labelled grounded | shown as "insufficient evidence" instead |
+
+### Search reliability and usability
+
+Search pages failed with HTTP 503 under quick clicking. Each page recomputed the security summary for all 48,673 servers (317,347 coverage checks) before taking 25 rows, so overlapping requests held all 5 database connections past the 5-second wait.
+
+| Measure (full database) | Before | After |
+|---|---|---|
+| One search page | 0.55 s | 0.10 s |
+| 30 concurrent page requests | 5 × HTTP 503 | all succeed (slowest 0.37 s) |
+| 60 concurrent page requests | not tested | all succeed (slowest 0.66 s) |
+
+The new query filters, sorts and counts on cheap columns, then computes the summary only for the page. For all 50,019 servers it returns the same states and counts as the original views (0 differences).
+
+| Issue | Fix |
+|---|---|
+| Tools showed 0 for 47,638 servers without tool data, including 15,470 with a known handshake tool count | four states: listed, handshake count, observed none, not observed |
+| Filters, selections and chat reset when changing pages | kept in session state for the whole browser session |
+| Result checkboxes allowed one row | real multi-select across pages, "Select all on this page", selection bar |
+| CSV did not match the screen | one formatter for screen and CSV; "visible page" and "all filtered results" exports |
+| Compare listed 20+ equal-weight rows | summary cards, grouped sections, differences highlighted, provenance collapsed |
 
 ## 8. Review Checklist
 

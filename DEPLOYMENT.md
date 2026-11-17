@@ -113,6 +113,7 @@ Health checks:
 | `POSTGRES_PASSWORD` | db, backend, importer | password (required) |
 | `FRONTEND_PORT` | compose | public port, default 8501 |
 | `DB_POOL_SIZE` | backend | optional, default 5 |
+| `DB_POOL_TIMEOUT` | backend | optional, seconds a request waits for a free database connection, default 10 |
 | `OPENAI_API_KEY` | backend | needed only for the AI assistant |
 | `OPENAI_CHAT_MODEL` | backend | optional, default `gpt-4.1-mini` |
 
@@ -197,7 +198,22 @@ API:
 | Route | Does |
 |---|---|
 | `GET /api/ai/status` | key present (not tested), model names, chunk count, last index time |
-| `POST /api/ai/chat` | `question`, `history`, `strategy` (`zero_shot`/`few_shot`), `top_k`, `use_retrieval` |
+| `POST /api/ai/chat` | `question`, `history`, `strategy` (`zero_shot`/`few_shot`), `top_k`, `use_retrieval`, `server_ids` (up to 4: scope) |
+
+How answers are built:
+
+| Question | Extra evidence |
+|---|---|
+| Counts, shares, rankings | live SQL statistics over the whole database |
+| Critical, high severity, "dangerous" | live SQL list by highest recorded advisory severity (not a risk score) |
+| Not assessed, not applicable, coverage | live SQL counts per assessment state |
+| Tool metadata, input schemas | live SQL counts per tool metadata state |
+| A CVE or GHSA id | live SQL count of servers with that advisory |
+| A scoped or named server | live SQL facts for that server, including "not applicable" for remote-only servers |
+| Definitions ("what does … mean") | the methodology note |
+| Broad discovery ("find three …") | at least 8 retrieved sources, never more than 10 |
+
+Answers cite sources inline as `[1]`, `[2]`. Every number is checked against the sources actually supplied; unknown references are removed, and an answer without any verified citation is shown as "insufficient evidence".
 
 Add the AI table to a database made by an older version (keeps all data):
 
@@ -209,7 +225,7 @@ docker compose exec backend python -m app.ai index
 
 New empty databases get the table automatically.
 
-Run the AI evaluation on the full database (26 questions, each with and without retrieval and with two prompts: up to 104 OpenAI requests, about $0.05):
+Run the AI evaluation on the full database (31 questions, each with and without retrieval and with two prompts: up to 124 OpenAI requests, about $0.07):
 
 ```bash
 docker compose exec backend python -m app.ai evaluate
@@ -262,3 +278,24 @@ Run the Spark tests (they need Java, so they run in the container):
 ```bash
 docker compose run --rm --entrypoint python analytics -m pytest -q tests/test_analytics.py
 ```
+
+## 10. Search API, export and troubleshooting
+
+| Route | Does |
+|---|---|
+| `GET /api/servers` | one page of results; filters `q`, `status`, `ecosystem`, `deployment`, `has_repository`, `github`, `assessment`, `has_tools`, `tool_info` (repeatable: `listed`, `count_observed`, `observed_none`, `not_observed`), `tool_hints`; `sort`, `page`, `page_size` |
+| `GET /api/servers/export` | every matching server, same filters and order, streamed as JSON lines; the app turns it into CSV |
+
+Search counts and pages on cheap columns, then computes the security summary only for the rows on the page. A page takes about 0.1 s on the full database, and 60 concurrent page requests all succeed.
+
+Every API response carries an `X-Request-ID` header. The backend logs one JSON line per request (`request_id`, `path`, `status`, `ms`) and a `database_error` line with a reason when the database fails:
+
+| HTTP 503 `reason` | Meaning | What to do |
+|---|---|---|
+| `database_busy` | no database connection became free within `DB_POOL_TIMEOUT` | retry; raise `DB_POOL_SIZE` if it repeats |
+| `query_timeout` | a query ran longer than 15 seconds | report the request id |
+| `database_unavailable` | the database cannot be reached | `docker compose ps`, then `docker compose logs db` |
+| `schema_missing` | tables are missing | `docker compose run --rm importer migrate` |
+
+Find a request in the logs: `docker compose logs backend | grep <request id>`.
+

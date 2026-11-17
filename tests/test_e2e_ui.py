@@ -1,4 +1,7 @@
+import csv
+import io
 import os
+import re
 from pathlib import Path
 
 import pytest
@@ -56,12 +59,169 @@ def test_dashboard_shows_database_statistics(page):
     shot(page, "01_dashboard")
 
 
-def test_search_finds_a_server(page):
+SEARCH_BOX = "Search by server name, title or description"
+
+
+def search_for(page, text, expect=None):
+    box = page.get_by_placeholder(SEARCH_BOX)
+    box.fill(text)
+    box.press("Enter")
+    if expect:
+        for _ in range(100):
+            rows = grid_rows(page)
+            if rows and rows[0][1].endswith("#" + expect):
+                page.wait_for_timeout(500)
+                return
+            page.wait_for_timeout(300)
+        raise AssertionError(f"{expect} did not appear as the first result")
+
+
+def grid_rows(page):
+    cells = page.locator('[data-testid="stDataFrame"] [role="gridcell"]').all_inner_texts()
+    width = len(page.locator('[data-testid="stDataFrame"] [role="columnheader"]').all_inner_texts())
+    return [cells[i:i + width] for i in range(0, len(cells), width)] if width else []
+
+
+def tick(page, row):
+    before = selected_count(page)
+    box = page.locator('[data-testid="stDataFrame"]').first.bounding_box()
+    page.mouse.click(box["x"] + 38, box["y"] + 36 + 35 * row + 17)
+    for _ in range(40):
+        page.wait_for_timeout(250)
+        if selected_count(page) != before:
+            break
+    page.wait_for_timeout(600)
+
+
+def selected_count(page):
+    bar = page.locator(".st-key-selection_bar")
+    if not bar.count():
+        return 0
+    return int(re.search(r"(\d+) selected", bar.inner_text()).group(1))
+
+
+def open_search(page):
     page.goto(f"{FRONTEND_URL}/search")
-    wait_text(page, "Server search")
-    page.get_by_label("Keyword").fill("praisonai")
-    page.get_by_test_id("stBaseButton-primaryFormSubmit").click()
-    wait_text(page, "1 matching servers")
+    wait_text(page, "showing 1–25")
+    page.wait_for_timeout(1200)
+
+
+def test_search_finds_a_server(page):
+    open_search(page)
+    search_for(page, "praisonai", expect="io.github.MervinPraison/praisonai")
+    wait_text(page, "1 server ·")
+
+
+def page_label(page):
+    text = page.get_by_text(re.compile(r"Showing [\d,]+–[\d,]+ of")).first.inner_text()
+    first, last, page_no = re.search(r"Showing ([\d,]+)–([\d,]+) of [\d,]+ · page ([\d,]+)", text).groups()
+    return int(first.replace(",", "")), int(last.replace(",", "")), int(page_no.replace(",", ""))
+
+
+def no_api_errors(page):
+    alerts = " ".join(page.locator('[data-testid="stAlert"]').all_inner_texts())
+    return "HTTP 503" not in alerts and "not reachable" not in alerts and "took too long" not in alerts
+
+
+def test_pagination_sequence_is_exact(page):
+    open_search(page)
+    for number in (2, 3, 4, 5):
+        page.get_by_role("button", name="Next ▶").click()
+        wait_text(page, f"showing {(number - 1) * 25 + 1}–{number * 25}")
+    for number in (4, 3, 2, 1):
+        page.get_by_role("button", name="◀ Previous").click()
+        wait_text(page, f"showing {(number - 1) * 25 + 1}–{number * 25}")
+    assert no_api_errors(page)
+
+
+def test_rapid_pagination_has_no_errors(page):
+    open_search(page)
+    for _ in range(6):
+        page.get_by_role("button", name="Next ▶").click()
+        page.wait_for_timeout(200)
+    for _ in range(5):
+        page.get_by_role("button", name="◀ Previous").click()
+        page.wait_for_timeout(200)
+    page.wait_for_timeout(4000)
+    first, last, number = page_label(page)
+    assert (first, last) == ((number - 1) * 25 + 1, number * 25)
+    assert no_api_errors(page)
+
+
+def test_filters_page_and_selection_survive_navigation(page):
+    open_search(page)
+    page.get_by_role("button", name="Has vulnerabilities").click()
+    wait_text(page, "Vulnerability evidence: Findings recorded")
+    page.get_by_role("button", name="Next ▶").click()
+    wait_text(page, "showing 26–50")
+    page.wait_for_timeout(1200)
+    tick(page, 0)
+    tick(page, 1)
+    assert selected_count(page) == 2
+    for name in ("Server profile", "Compare", "AI assistant", "Server search"):
+        page.get_by_role("link", name=name).click()
+        page.wait_for_timeout(1500)
+    wait_text(page, "showing 26–50")
+    wait_text(page, "Vulnerability evidence: Findings recorded")
+    assert selected_count(page) == 2
+    rows = grid_rows(page)
+    assert rows[0][0] == "true" and rows[1][0] == "true"
+    page.get_by_role("button", name="Clear", exact=True).click()
+    page.get_by_role("button", name="Clear all").click()
+    wait_text(page, "48,")
+
+
+def test_selection_spans_pages_and_select_all_is_page_only(page):
+    open_search(page)
+    tick(page, 0)
+    tick(page, 1)
+    page.get_by_role("button", name="Next ▶").click()
+    wait_text(page, "showing 26–50")
+    page.wait_for_timeout(1200)
+    tick(page, 2)
+    assert selected_count(page) == 3
+    page.get_by_role("button", name="◀ Previous").click()
+    wait_text(page, "showing 1–25")
+    page.wait_for_timeout(1500)
+    rows = grid_rows(page)
+    assert rows[0][0] == "true" and rows[1][0] == "true" and rows[2][0] == "false"
+    page.get_by_text("Select all on this page").click()
+    page.wait_for_timeout(1500)
+    assert selected_count(page) == 26
+    page.get_by_text("Select all on this page").click()
+    page.wait_for_timeout(1500)
+    assert selected_count(page) == 1
+    page.get_by_role("button", name="Clear", exact=True).click()
+
+
+def test_visible_page_export_matches_screen(page):
+    open_search(page)
+    search_for(page, "postgres")
+    page.wait_for_timeout(2500)
+    with page.expect_download() as download:
+        page.get_by_role("button", name="Export visible page (CSV)").click()
+    rows = list(csv.DictReader(io.StringIO(Path(download.value.path()).read_text(encoding="utf-8"))))
+    shown = grid_rows(page)
+    assert rows and len(rows) <= 25 and shown
+    for screen, exported in zip(shown, rows):
+        server_id, name = re.match(r"profile\?server_id=(\d+)#(.+)$", screen[1]).groups()
+        assert exported["Server ID"] == server_id and exported["Server"] == name
+        assert exported["Vulnerability evidence ⓘ"] == screen[5] and exported["Tools ⓘ"] == screen[6]
+        assert exported["Repo"] == (screen[7] or "Not declared")
+
+
+def test_profile_shows_repository_tools_and_ask_ai(page):
+    page.goto(f"{FRONTEND_URL}/profile")
+    choose_server(page, "Find a server", "praisonai")
+    wait_text(page, "io.github.MervinPraison/praisonai")
+    assert page.get_by_role("link", name="View repository").get_attribute("href").startswith("https://github.com/")
+    page.get_by_role("tab", name="Tools").click()
+    wait_text(page, "Tool metadata:")
+    ask = page.get_by_role("button", name="Ask AI about this server")
+    if ask.is_disabled():
+        return
+    ask.click()
+    wait_text(page, "Server: io.github.MervinPraison/praisonai")
 
 
 def test_profile_shows_findings_and_coverage(page):
@@ -98,33 +258,71 @@ def test_unassessed_server_is_not_shown_as_safe(page):
 
 
 def test_compare_two_servers(page):
-    page.goto(f"{FRONTEND_URL}/compare")
-    choose_server(page, "First server", "praisonai")
-    choose_server(page, "Second server", "ai.agentplaybooks/agentplaybooks")
+    open_search(page)
+    for query, name in (("praisonai", "io.github.MervinPraison/praisonai"), ("ai.agentplaybooks/agentplaybooks", "ai.agentplaybooks/agentplaybooks")):
+        search_for(page, query, expect=name)
+        tick(page, 0)
+    assert selected_count(page) == 2
+    page.get_by_role("button", name="Compare selected").click()
+    wait_text(page, "Show differences only")
     wait_text(page, "different assessment coverage")
-    wait_text(page, "unknown rather than zero")
+    wait_text(page, "package checks not applicable")
+    assert page.get_by_text("unknown rather than zero").count() == 0
+    table = page.locator("table.cmp").first
+    assert table.locator("thead a").count() == 2 and "Registry name" not in table.inner_text()
+    assert table.locator("td.diff").count() > 0
     shot(page, "07_compare")
+    before = table.locator("tbody tr").count()
+    page.get_by_text("Show differences only").click()
+    page.wait_for_timeout(2000)
+    assert page.locator("table.cmp").first.locator("tbody tr").count() < before
+    page.get_by_text("How we got this data").click()
+    wait_text(page, "Advisories for declared packages")
+    page.get_by_role("button", name="Remove").first.click()
+    wait_text(page, "Choose at least two servers")
 
 
 @pytest.mark.skipif(os.environ.get("RUN_LIVE_AI_TESTS") != "1", reason="set RUN_LIVE_AI_TESTS=1 to allow live model requests")
 def test_ai_assistant_answers_with_sources_and_clears_history(page):
     page.goto(f"{FRONTEND_URL}/ai")
-    wait_text(page, "searchable evidence chunks")
+    wait_text(page, "evidence chunks")
+    wait_text(page, "What do you want to know?")
+    if page.get_by_role("button", name="New chat").count():
+        page.get_by_role("button", name="New chat").click()
+        wait_text(page, "What do you want to know?")
     question = page.get_by_placeholder("Ask about a server, vulnerability, or missing assessment")
     question.fill("How many direct advisories are recorded for praisonai?")
     question.press("Enter")
-    wait_text(page, "Evidence sources", timeout=110000)
-    assert "81" in page.get_by_test_id("stChatMessage").last.inner_text()
+    wait_text(page, "Sources (", timeout=110000)
+    answer = page.get_by_test_id("stChatMessage").last.inner_text()
+    assert "81" in answer and re.search(r"\[\d+\]", answer)
     if SCREENSHOTS:
         page.screenshot(path=str(Path(SCREENSHOTS) / "08_ai_answer.png"), full_page=False)
-    page.get_by_text("Evidence sources", exact=False).click()
-    wait_text(page, "Original data source")
+    page.get_by_text("Sources (", exact=False).last.click()
+    wait_text(page, "[1]")
     shot(page, "08_ai_answer_sources")
+    page.get_by_role("link", name="Server search").click()
+    page.wait_for_timeout(1500)
+    page.get_by_role("link", name="AI assistant").click()
+    wait_text(page, "How many direct advisories are recorded for praisonai?")
+    question = page.get_by_placeholder("Ask about a server, vulnerability, or missing assessment")
     question.fill("Do those findings prove which dependencies are installed?")
     question.press("Enter")
     page.get_by_test_id("stChatMessage").nth(3).wait_for(timeout=110000)
     wait_text(page, "input /", timeout=110000)
     shot(page, "09_ai_followup")
-    page.get_by_role("button", name="Clear conversation").click()
-    page.get_by_test_id("stChatMessage").first.wait_for(state="detached")
+    page.get_by_role("button", name="New chat").click()
+    wait_text(page, "What do you want to know?")
     assert page.get_by_test_id("stChatMessage").count() == 0
+
+
+@pytest.mark.skipif(os.environ.get("RUN_LIVE_AI_TESTS") != "1", reason="set RUN_LIVE_AI_TESTS=1 to allow live model requests")
+def test_ai_example_card_submits_and_is_hidden_after(page):
+    page.goto(f"{FRONTEND_URL}/ai")
+    wait_text(page, "What do you want to know?")
+    page.locator(".st-key-ai_cards button").first.click()
+    wait_text(page, "Sources (", timeout=110000)
+    assert page.locator(".st-key-ai_cards").count() == 0
+    assert re.search(r"\[\d+\]", page.get_by_test_id("stChatMessage").last.inner_text())
+    page.get_by_role("button", name="New chat").click()
+    wait_text(page, "What do you want to know?")

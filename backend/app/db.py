@@ -27,11 +27,14 @@ pool = ConnectionPool(
 )
 
 
+POOL_TIMEOUT = float(os.environ.get("DB_POOL_TIMEOUT", "10"))
+
+
 def fetch_all(sql, params=None):
-    with pool.connection(timeout=5) as conn:
+    with pool.connection(timeout=POOL_TIMEOUT) as conn:
         return conn.execute(sql, params or {}).fetchall()
 
 
 def fetch_one(sql, params=None):
-    with pool.connection(timeout=5) as conn:
+    with pool.connection(timeout=POOL_TIMEOUT) as conn:
         return conn.execute(sql, params or {}).fetchone()

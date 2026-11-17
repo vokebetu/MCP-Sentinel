@@ -83,7 +83,11 @@ def test_compare_warns_about_unequal_coverage(client):
     body = client.get("/api/compare", params={"server_ids": f"{a},{b}"}).json()
     assert len(body["servers"]) == 2
     assert any("not necessarily more secure" in note for note in body["notes"])
-    assert any("unknown rather than zero" in note for note in body["notes"])
+    assert not any("unknown rather than zero" in note for note in body["notes"])
+    incomplete = client.get("/api/servers", params={"assessment": "checks_could_not_complete", "status": "all", "page_size": 1}).json()["items"]
+    if incomplete:
+        named = client.get("/api/compare", params={"server_ids": f"{a},{incomplete[0]['server_id']}"}).json()["notes"]
+        assert any(note.startswith(incomplete[0]["registry_name"]) and "unknown rather than zero" in note for note in named)
     assert client.get("/api/compare", params={"server_ids": f"{a},{a}"}).status_code == 422
     assert client.get("/api/compare", params={"server_ids": "1;DROP TABLE servers"}).status_code == 422
 
@@ -231,3 +235,217 @@ def test_ai_inventory_questions_get_sql_statistics(client, monkeypatch):
     assert f"{totals['all']:,}" in evidence[0]["content"]
     plain = client.post("/api/ai/chat", json={"question": "Is praisonai safe?"})
     assert plain.status_code == 200 and plain.json()["sources"] == []
+
+
+def all_items(client, **params):
+    items, page = [], 1
+    while True:
+        body = client.get("/api/servers", params={**params, "page": page, "page_size": 100}).json()
+        items += body["items"]
+        if page * 100 >= body["total"]:
+            return items
+        page += 1
+
+
+def test_list_rows_match_the_database_views(client, seed_database_url):
+    import psycopg
+    from psycopg.rows import dict_row
+    with psycopg.connect(seed_database_url, row_factory=dict_row) as conn:
+        views = {r["server_id"]: r for r in conn.execute(
+            """SELECT ss.server_id, ss.vulnerability_assessment_state, ss.distinct_advisories, ss.direct_advisories, ss.dependency_advisories,
+                      ss.highest_advisory_severity, p.deployment_type, p.ecosystems, p.package_count, p.remote_count
+               FROM server_security_summary ss JOIN server_profiles p USING (server_id)""")}
+    items = all_items(client, status="all")
+    assert len(items) == len(views)
+    for item in items:
+        view = views[item["server_id"]]
+        for field in ("vulnerability_assessment_state", "distinct_advisories", "direct_advisories", "dependency_advisories",
+                      "highest_advisory_severity", "deployment_type", "ecosystems", "package_count", "remote_count"):
+            assert item[field] == view[field], (item["registry_name"], field)
+    for state in ("findings_recorded", "no_package_vulnerability_path", "not_assessed"):
+        filtered = client.get("/api/servers", params={"assessment": state, "status": "all", "page_size": 1}).json()["total"]
+        assert filtered == sum(1 for v in views.values() if v["vulnerability_assessment_state"] == state)
+
+
+def test_tool_metadata_is_never_a_default_zero(client, seed_database_url):
+    import psycopg
+    with psycopg.connect(seed_database_url) as conn:
+        listed = {r[0] for r in conn.execute("SELECT DISTINCT s.server_id FROM tool_observations t JOIN servers s ON s.latest_version_id = t.server_version_id")}
+        counted = {r[0] for r in conn.execute("""SELECT DISTINCT s.server_id FROM endpoint_observations e JOIN servers s ON s.latest_version_id = e.server_version_id
+                                                 WHERE e.observed_tool_count > 0""")}
+    items = all_items(client, status="all")
+    for item in items:
+        if item["server_id"] in listed:
+            assert item["tool_metadata_state"] == "listed" and item["tool_count"] > 0 and item["tool_count_source"] == "tool catalogs"
+        elif item["server_id"] in counted:
+            assert item["tool_metadata_state"] == "count_observed" and item["tool_count"] > 0
+        elif item["tool_metadata_state"] == "not_observed":
+            assert item["tool_count"] is None and item["observed_tool_count"] is None and item["valid_input_schema_count"] is None
+        else:
+            assert item["tool_metadata_state"] == "observed_none" and item["tool_count"] == 0
+    assert any(i["tool_metadata_state"] == "not_observed" for i in items) and any(i["tool_metadata_state"] == "listed" for i in items)
+    detail = client.get(f"/api/servers/{next(i['server_id'] for i in items if i['tool_metadata_state'] == 'not_observed')}").json()
+    assert detail["tool_count"] is None and any("does not mean the server has no tools" in m for m in detail["missing_information"])
+
+
+def test_repository_url_comes_from_declared_repositories(client, seed_database_url):
+    import psycopg
+    with psycopg.connect(seed_database_url) as conn:
+        declared = {}
+        for sid, url in conn.execute("""SELECT s.server_id, r.canonical_url FROM servers s JOIN server_repositories sr ON sr.server_version_id = s.latest_version_id
+                                        JOIN repositories r ON r.repository_id = sr.repository_id"""):
+            declared.setdefault(sid, set()).add(url)
+    for item in all_items(client, status="all"):
+        if item["server_id"] in declared:
+            assert item["repository_url"] in declared[item["server_id"]]
+        else:
+            assert item["repository_url"] is None
+
+
+def test_export_matches_paginated_results(client):
+    import json
+    params = {"q": "mcp", "status": "non_deleted", "sort": "concerns", "assessment": "findings_recorded"}
+    pages = all_items(client, **params)
+    response = client.get("/api/servers/export", params=params)
+    assert response.status_code == 200 and response.headers["x-total-count"] == str(len(pages))
+    exported = [json.loads(line) for line in response.text.splitlines() if line]
+    assert [i["server_id"] for i in exported] == [i["server_id"] for i in pages]
+    assert exported == pages
+    tools = client.get("/api/servers/export", params={"tool_info": ["listed", "count_observed"], "status": "all"}).text.splitlines()
+    assert tools and all(json.loads(line)["tool_metadata_state"] in ("listed", "count_observed") for line in tools)
+
+
+def test_rapid_pagination_is_stable(client):
+    totals = set()
+    for page in (1, 2, 3, 2, 1, 2, 3, 4, 3, 2, 1, 2):
+        response = client.get("/api/servers", params={"page": page, "page_size": 25, "sort": "name", "status": "non_deleted"})
+        assert response.status_code == 200 and response.headers["x-request-id"]
+        totals.add(response.json()["total"])
+    assert len(totals) == 1
+
+
+def test_database_errors_return_distinct_503_reasons(client, monkeypatch):
+    import psycopg
+    from psycopg_pool import PoolTimeout
+    main = importlib.import_module("app.main")
+    for error, reason in ((PoolTimeout("no connection"), "database_busy"), (psycopg.errors.QueryCanceled("canceled"), "query_timeout")):
+        def boom(*args, **kwargs):
+            raise error
+        monkeypatch.setattr(main, "fetch_one", boom)
+        response = client.get("/api/servers", headers={"X-Request-ID": "trace-123"})
+        assert response.status_code == 503 and response.json()["reason"] == reason
+        assert response.headers["retry-after"] == "1" and response.headers["x-request-id"] == "trace-123" == response.json()["request_id"]
+        monkeypatch.undo()
+    assert client.get("/health", headers={"X-Request-ID": "bad id; drop"}).headers["x-request-id"] != "bad id; drop"
+
+
+def ai_answer(text, citations):
+    import json
+    return {"status": "completed", "output": [{"type": "message", "content": [{"type": "output_text", "text": json.dumps({
+        "answer": text, "status": "grounded", "citation_ids": citations, "limitations": []})}]}]}
+
+
+def test_ai_scope_filters_retrieval_and_explains_not_applicable(client, monkeypatch):
+    import json
+    ai = importlib.import_module("app.ai")
+    vector = [1.0] + [0.0] * 511
+    monkeypatch.setattr(ai, "embed", lambda texts: ([vector] * len(texts), len(texts)))
+    monkeypatch.setattr(ai, "query_embedding", lambda text: tuple(vector))
+    ai.query_embedding.cache_clear = lambda: None
+    ai.index_corpus(workers=1)
+    remote = client.get("/api/servers", params={"deployment": "remote_only", "page_size": 1}).json()["items"][0]
+    praisonai = server_id(client, "io.github.MervinPraison/praisonai")
+    scoped = ai.retrieve("vulnerabilities", 5, [remote["server_id"], praisonai])
+    assert scoped and {s["server_id"] for s in scoped} <= {remote["server_id"], praisonai} and len({s["server_id"] for s in scoped}) == 2
+    monkeypatch.setenv("OPENAI_API_KEY", "test-not-a-real-key")
+    seen = {}
+
+    def answer(path, payload):
+        seen["evidence"] = json.loads(payload["input"][0]["content"])["evidence"]
+        return ai_answer("Package lookup does not apply [facts:server:%d]." % remote["server_id"], [f"facts:server:{remote['server_id']}"])
+
+    monkeypatch.setattr(ai, "post", answer)
+    body = client.post("/api/ai/chat", json={"question": "Why is there no package assessment?", "server_ids": [remote["server_id"], 999999999]}).json()
+    facts = seen["evidence"][0]
+    assert facts["kind"] == "server_facts" and facts["ref"] == 1 and "not applicable: no package is declared" in facts["content"]
+    assert "not zero vulnerabilities" in facts["content"] and all(e["server_id"] in (None, remote["server_id"]) for e in seen["evidence"])
+    assert body["answer"].endswith("[1].") and body["citation_ids"] == [f"facts:server:{remote['server_id']}"]
+    assert body["scope"][0]["server_id"] == remote["server_id"] and body["missing_scope"] == [999999999]
+    assert any("not applicable" in note for note in body["coverage_notes"])
+    assert body["sources"][0]["cited"] and body["sources"][0]["source_name"] == "Live SQL facts for this server"
+
+
+def test_ai_routes_aggregate_questions_to_sql(client, monkeypatch):
+    import json
+    ai = importlib.import_module("app.ai")
+    monkeypatch.setenv("OPENAI_API_KEY", "test-not-a-real-key")
+    depth = {}
+
+    def retrieve(text, top_k, scope=()):
+        depth[text] = top_k
+        return []
+
+    monkeypatch.setattr(ai, "retrieve", retrieve)
+    seen = {}
+
+    def answer(path, payload):
+        evidence = json.loads(payload["input"][0]["content"])["evidence"]
+        seen["ids"] = [e["citation_id"] for e in evidence]
+        seen["content"] = {e["citation_id"]: e["content"] for e in evidence}
+        return ai_answer("From the statistics [1].", [evidence[0]["citation_id"]])
+
+    monkeypatch.setattr(ai, "post", answer)
+    stats = client.get("/api/stats").json()
+    client.post("/api/ai/chat", json={"question": "Which servers have recorded critical-severity advisories?"})
+    assert "stats:severity" in seen["ids"] and "CRITICAL" in seen["content"]["stats:severity"] and "not an overall server risk score" in seen["content"]["stats:severity"]
+    client.post("/api/ai/chat", json={"question": "Which servers have not been assessed?"})
+    assert "stats:assessment" in seen["ids"]
+    client.post("/api/ai/chat", json={"question": "Which servers have verified tool metadata?"})
+    assert "stats:tools" in seen["ids"]
+    client.post("/api/ai/chat", json={"question": "How many servers have recorded findings?"})
+    assert f"{stats['enrichment']['servers_with_findings']:,}" in seen["content"]["stats:coverage"]
+    client.post("/api/ai/chat", json={"question": "Find three servers for PostgreSQL databases"})
+    client.post("/api/ai/chat", json={"question": "Is praisonai safe?", "top_k": 5})
+    assert depth["Find three servers for PostgreSQL databases"] == 8 and depth["Is praisonai safe?"] == 5 and max(depth.values()) <= 10
+
+
+def test_ai_citations_are_numbered_and_verified(client, monkeypatch):
+    ai = importlib.import_module("app.ai")
+    monkeypatch.setenv("OPENAI_API_KEY", "test-not-a-real-key")
+    sources = [{"citation_id": "server:1:0", "kind": "server", "server_id": 1, "title": "x/y: server profile", "content": "x/y: server profile\n{\"a\": 1}"},
+               {"citation_id": "finding:1:0", "kind": "finding", "server_id": 1, "title": "x/y: recorded findings", "content": "t\n{}"}]
+    monkeypatch.setattr(ai, "retrieve", lambda *args: sources)
+    monkeypatch.setattr(ai, "post", lambda *args: ai_answer("One [2]. Fake [7]. Raw [server:1:0]. Note [optional].", ["finding:1:0"]))
+    body = client.post("/api/ai/chat", json={"question": "Tell me about x/y"}).json()
+    assert body["answer"] == "One [2]. Fake. Raw [1]. Note [optional]."
+    assert body["citation_ids"] == ["server:1:0", "finding:1:0"] and [s["ref"] for s in body["sources"]] == [1, 2]
+
+
+
+def test_ai_named_server_gets_live_facts_without_scoping(client, monkeypatch):
+    import json
+    ai = importlib.import_module("app.ai")
+    monkeypatch.setenv("OPENAI_API_KEY", "test-not-a-real-key")
+    monkeypatch.setattr(ai, "retrieve", lambda *args: [])
+    remote = client.get("/api/servers", params={"deployment": "remote_only", "page_size": 1}).json()["items"][0]
+    seen = {}
+
+    def answer(path, payload):
+        seen["evidence"] = json.loads(payload["input"][0]["content"])["evidence"]
+        return ai_answer("Not applicable [1].", [seen["evidence"][0]["citation_id"]])
+
+    monkeypatch.setattr(ai, "post", answer)
+    body = client.post("/api/ai/chat", json={"question": f"Is {remote['registry_name']} safe?"}).json()
+    assert seen["evidence"][0]["kind"] == "server_facts" and seen["evidence"][0]["server_id"] == remote["server_id"]
+    assert body["scope"] == [] and body["status"] == "grounded"
+
+
+def test_ai_uncited_answers_are_not_shown_as_grounded(client, monkeypatch):
+    ai = importlib.import_module("app.ai")
+    monkeypatch.setenv("OPENAI_API_KEY", "test-not-a-real-key")
+    source = {"citation_id": "server:1:0", "kind": "server", "server_id": 1, "title": "x/y: server profile", "content": "x/y\n{}"}
+    monkeypatch.setattr(ai, "retrieve", lambda *args: [source])
+    monkeypatch.setattr(ai, "post", lambda *args: ai_answer("A confident claim without a citation.", []))
+    body = client.post("/api/ai/chat", json={"question": "Tell me about x/y"}).json()
+    assert body["status"] == "insufficient_evidence" and body["citation_ids"] == []
+    assert any("did not cite" in limitation for limitation in body["limitations"])

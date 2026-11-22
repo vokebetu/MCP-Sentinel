@@ -1,0 +1,760 @@
+{
+  "metadata": {
+    "test_set": "showcase-1.2",
+    "executed_at": "2026-11-22T21:37:48+00:00",
+    "test_set_sha256": "24a97bd0ebaf435b",
+    "gold_file": "2026-10-23_0a110721fbc4_50019.json",
+    "gold_frozen_at": "2026-11-22T21:31:22+00:00",
+    "registry_snapshot": "2026-10-23",
+    "snapshot_key": "2026-10-23_0a110721fbc4_50019",
+    "model": "gpt-4.1-mini",
+    "embedding_model": "text-embedding-3-small",
+    "prompt_sha256": "57a53b58d19cd9ae",
+    "index_chunks": 55477,
+    "index_built_at": "2026-11-15T04:41:48.712832+00:00",
+    "strategy": "few_shot",
+    "repeats": 3,
+    "app_git_commit": "f8fd56d",
+    "app_git_dirty_files": "10",
+    "evaluator_code_sha256": "6f0ac6fe4d872468",
+    "api": "http://backend:8000",
+    "pass_rate_per_run": [
+      0.0,
+      50.0,
+      50.0
+    ],
+    "pass_rate_spread": 50.0
+  },
+  "summary": {
+    "passed": 2,
+    "eligible": 6,
+    "pass_rate": 33.3,
+    "blocked": [],
+    "errors": [],
+    "by_category": {
+      "SQL examples": "2/3",
+      "off topic": "0/3"
+    },
+    "by_dimension": {
+      "factual": "3/3",
+      "state": "2/6",
+      "citation": "3/6",
+      "format": "6/6"
+    },
+    "input_tokens": 43836,
+    "output_tokens": 729,
+    "seconds": 16.0
+  },
+  "variability": {
+    "24": "2/3 passed"
+  },
+  "runs": [
+    [
+      {
+        "id": "24",
+        "category": "SQL examples",
+        "question": "Which servers have critical package advisories?",
+        "expected": "Servers from the SQL set with CRITICAL findings (192), with direct vs modeled and coverage limits.",
+        "evidence_sql": "critical",
+        "selected": [],
+        "fixtures": [],
+        "counted": true,
+        "outcome": "fail",
+        "dimensions": {
+          "factual": true,
+          "state": false,
+          "scope": null,
+          "citation": true,
+          "format": true
+        },
+        "reasons": [
+          "state: does not state: coverage_limit"
+        ],
+        "setup": [],
+        "answer": "192 servers have recorded critical package advisories. Examples include io.github.SAP/mdk-mcp-server, io.github.MervinPraison/praisonai, com.browser-use/browser-use, io.github.ExpertVagabond/universal-blockchain, and io.github.sparta2025/postgres-mcp. These servers have advisories mostly from modeled dependency findings rather than direct package advisories. This data is based on vulnerability assessments of declared package versions as of the latest snapshot and does not prove installed software or overall server risk scores [3][5].",
+        "status": "grounded",
+        "scope": [],
+        "scope_source": "none",
+        "ignored_scope": [],
+        "not_found": [],
+        "coverage_notes": [],
+        "limitations": [
+          "Only servers with completed package vulnerability checks can have findings; modeled dependency advisories are not proof of installed vulnerabilities."
+        ],
+        "citation_ids": [
+          "stats:ranking",
+          "stats:severity"
+        ],
+        "sources": [
+          {
+            "ref": 1,
+            "citation_id": "stats:totals",
+            "kind": "statistics",
+            "title": "MCP Sentinel inventory statistics: totals and deployment",
+            "cited": false,
+            "observed_at": "2026-11-15T04:11:12.324189+00:00"
+          },
+          {
+            "ref": 2,
+            "citation_id": "stats:coverage",
+            "kind": "statistics",
+            "title": "MCP Sentinel inventory statistics: vulnerability coverage",
+            "cited": false,
+            "observed_at": "2026-11-15T04:11:12.324189+00:00"
+          },
+          {
+            "ref": 3,
+            "citation_id": "stats:ranking",
+            "kind": "statistics",
+            "title": "MCP Sentinel inventory statistics: servers with the most advisories",
+            "cited": true,
+            "observed_at": "2026-11-15T04:11:12.324189+00:00"
+          },
+          {
+            "ref": 4,
+            "citation_id": "stats:advisories",
+            "kind": "statistics",
+            "title": "MCP Sentinel inventory statistics: advisories affecting the most servers",
+            "cited": false,
+            "observed_at": "2026-11-15T04:11:12.324189+00:00"
+          },
+          {
+            "ref": 5,
+            "citation_id": "stats:severity",
+            "kind": "statistics",
+            "title": "MCP Sentinel inventory statistics: servers by recorded advisory severity (CRITICAL)",
+            "cited": true,
+            "observed_at": null
+          },
+          {
+            "ref": 6,
+            "citation_id": "server:6131:0",
+            "kind": "server",
+            "title": "com.cve-security/cve-intelligence: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 7,
+            "citation_id": "server:28999:0",
+            "kind": "server",
+            "title": "io.github.horror5how/top11: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 8,
+            "citation_id": "server:4370:0",
+            "kind": "server",
+            "title": "com.a2awire/data-dependency-vulnerability-malicious-package-security: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 9,
+            "citation_id": "server:4366:0",
+            "kind": "server",
+            "title": "com.a2awire/data-cve-security-advisory-vulnerability-database: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 10,
+            "citation_id": "server:3500:0",
+            "kind": "server",
+            "title": "br.com.nineoneninetwo/9192: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 11,
+            "citation_id": "server:24563:0",
+            "kind": "server",
+            "title": "io.github.basitalisandhu/mcp-osv-advisories: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 12,
+            "citation_id": "server:49116:0",
+            "kind": "server",
+            "title": "tech.distribution/distribution: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 13,
+            "citation_id": "server:6374:0",
+            "kind": "server",
+            "title": "com.disclovo/site: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          }
+        ],
+        "retrieved": 13,
+        "cited": 2,
+        "invalid_citations": [],
+        "bad_markers": [],
+        "seconds": 5.03,
+        "input_tokens": 10905,
+        "output_tokens": 161
+      },
+      {
+        "id": "28",
+        "category": "off topic",
+        "question": "Write me a poem about a spaceship.",
+        "expected": "A short, polite redirect to MCP Sentinel's security-intelligence purpose; no poem, no citations.",
+        "evidence_sql": "none",
+        "selected": [],
+        "fixtures": [],
+        "counted": true,
+        "outcome": "fail",
+        "dimensions": {
+          "factual": null,
+          "state": false,
+          "scope": null,
+          "citation": false,
+          "format": true
+        },
+        "reasons": [
+          "state: does not state: redirect",
+          "state: status grounded not in ['insufficient_evidence']",
+          "citation: cites sources for a question with no evidence"
+        ],
+        "setup": [],
+        "answer": "I do not generate poems, but the server ai.lorepunk.poems/margaret-poems specializes in poems by Margaret Corvid and might provide a poem about a spaceship [2].",
+        "status": "grounded",
+        "scope": [],
+        "scope_source": "none",
+        "ignored_scope": [],
+        "not_found": [],
+        "coverage_notes": [],
+        "limitations": [
+          "No direct poem content is available in the evidence."
+        ],
+        "citation_ids": [
+          "server:1063:0"
+        ],
+        "sources": [
+          {
+            "ref": 1,
+            "citation_id": "server:13576:0",
+            "kind": "server",
+            "title": "dev.getbureau/about: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 2,
+            "citation_id": "server:1063:0",
+            "kind": "server",
+            "title": "ai.lorepunk.poems/margaret-poems: server profile",
+            "cited": true,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 3,
+            "citation_id": "server:16693:0",
+            "kind": "server",
+            "title": "io.github.BartWaardenburg/spaceship-mcp: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 4,
+            "citation_id": "server:45190:0",
+            "kind": "server",
+            "title": "io.github.write-space/writespace-mcp: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 5,
+            "citation_id": "server:1026:0",
+            "kind": "server",
+            "title": "ai.letsship/ship: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          }
+        ],
+        "retrieved": 5,
+        "cited": 1,
+        "invalid_citations": [],
+        "bad_markers": [],
+        "seconds": 2.17,
+        "input_tokens": 3707,
+        "output_tokens": 73
+      }
+    ],
+    [
+      {
+        "id": "24",
+        "category": "SQL examples",
+        "question": "Which servers have critical package advisories?",
+        "expected": "Servers from the SQL set with CRITICAL findings (192), with direct vs modeled and coverage limits.",
+        "evidence_sql": "critical",
+        "selected": [],
+        "fixtures": [],
+        "counted": true,
+        "outcome": "pass",
+        "dimensions": {
+          "factual": true,
+          "state": true,
+          "scope": null,
+          "citation": true,
+          "format": true
+        },
+        "reasons": [],
+        "setup": [],
+        "answer": "There are 192 servers with recorded critical package advisories. Examples include io.github.SAP/mdk-mcp-server, io.github.MervinPraison/praisonai, com.browser-use/browser-use, io.github.ExpertVagabond/universal-blockchain, and io.github.sparta2025/postgres-mcp. These servers have advisories mostly from modeled dependencies rather than direct package advisories. The highest advisory severity is critical, but this does not imply the servers are compromised or dangerous. Only servers with completed package vulnerability checks can have findings, and these advisories are based on declared versions, not observed installations [3][5].",
+        "status": "grounded",
+        "scope": [],
+        "scope_source": "none",
+        "ignored_scope": [],
+        "not_found": [],
+        "coverage_notes": [],
+        "limitations": [
+          "Advisories are based on declared package versions, not confirmed installed versions."
+        ],
+        "citation_ids": [
+          "stats:ranking",
+          "stats:severity"
+        ],
+        "sources": [
+          {
+            "ref": 1,
+            "citation_id": "stats:totals",
+            "kind": "statistics",
+            "title": "MCP Sentinel inventory statistics: totals and deployment",
+            "cited": false,
+            "observed_at": "2026-11-15T04:11:12.324189+00:00"
+          },
+          {
+            "ref": 2,
+            "citation_id": "stats:coverage",
+            "kind": "statistics",
+            "title": "MCP Sentinel inventory statistics: vulnerability coverage",
+            "cited": false,
+            "observed_at": "2026-11-15T04:11:12.324189+00:00"
+          },
+          {
+            "ref": 3,
+            "citation_id": "stats:ranking",
+            "kind": "statistics",
+            "title": "MCP Sentinel inventory statistics: servers with the most advisories",
+            "cited": true,
+            "observed_at": "2026-11-15T04:11:12.324189+00:00"
+          },
+          {
+            "ref": 4,
+            "citation_id": "stats:advisories",
+            "kind": "statistics",
+            "title": "MCP Sentinel inventory statistics: advisories affecting the most servers",
+            "cited": false,
+            "observed_at": "2026-11-15T04:11:12.324189+00:00"
+          },
+          {
+            "ref": 5,
+            "citation_id": "stats:severity",
+            "kind": "statistics",
+            "title": "MCP Sentinel inventory statistics: servers by recorded advisory severity (CRITICAL)",
+            "cited": true,
+            "observed_at": null
+          },
+          {
+            "ref": 6,
+            "citation_id": "server:6131:0",
+            "kind": "server",
+            "title": "com.cve-security/cve-intelligence: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 7,
+            "citation_id": "server:28999:0",
+            "kind": "server",
+            "title": "io.github.horror5how/top11: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 8,
+            "citation_id": "server:4370:0",
+            "kind": "server",
+            "title": "com.a2awire/data-dependency-vulnerability-malicious-package-security: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 9,
+            "citation_id": "server:4366:0",
+            "kind": "server",
+            "title": "com.a2awire/data-cve-security-advisory-vulnerability-database: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 10,
+            "citation_id": "server:3500:0",
+            "kind": "server",
+            "title": "br.com.nineoneninetwo/9192: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 11,
+            "citation_id": "server:24563:0",
+            "kind": "server",
+            "title": "io.github.basitalisandhu/mcp-osv-advisories: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 12,
+            "citation_id": "server:49116:0",
+            "kind": "server",
+            "title": "tech.distribution/distribution: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 13,
+            "citation_id": "server:6374:0",
+            "kind": "server",
+            "title": "com.disclovo/site: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          }
+        ],
+        "retrieved": 13,
+        "cited": 2,
+        "invalid_citations": [],
+        "bad_markers": [],
+        "seconds": 3.28,
+        "input_tokens": 10905,
+        "output_tokens": 172
+      },
+      {
+        "id": "28",
+        "category": "off topic",
+        "question": "Write me a poem about a spaceship.",
+        "expected": "A short, polite redirect to MCP Sentinel's security-intelligence purpose; no poem, no citations.",
+        "evidence_sql": "none",
+        "selected": [],
+        "fixtures": [],
+        "counted": true,
+        "outcome": "fail",
+        "dimensions": {
+          "factual": null,
+          "state": false,
+          "scope": null,
+          "citation": false,
+          "format": true
+        },
+        "reasons": [
+          "state: does not state: redirect",
+          "state: status grounded not in ['insufficient_evidence']",
+          "citation: cites sources for a question with no evidence"
+        ],
+        "setup": [],
+        "answer": "I do not generate poems, but the server ai.lorepunk.poems/margaret-poems specializes in poems by Margaret Corvid and might provide a poem about a spaceship [2].",
+        "status": "grounded",
+        "scope": [],
+        "scope_source": "none",
+        "ignored_scope": [],
+        "not_found": [],
+        "coverage_notes": [],
+        "limitations": [
+          "No direct poem content is available in the evidence."
+        ],
+        "citation_ids": [
+          "server:1063:0"
+        ],
+        "sources": [
+          {
+            "ref": 1,
+            "citation_id": "server:13576:0",
+            "kind": "server",
+            "title": "dev.getbureau/about: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 2,
+            "citation_id": "server:1063:0",
+            "kind": "server",
+            "title": "ai.lorepunk.poems/margaret-poems: server profile",
+            "cited": true,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 3,
+            "citation_id": "server:16693:0",
+            "kind": "server",
+            "title": "io.github.BartWaardenburg/spaceship-mcp: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 4,
+            "citation_id": "server:45190:0",
+            "kind": "server",
+            "title": "io.github.write-space/writespace-mcp: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 5,
+            "citation_id": "server:1026:0",
+            "kind": "server",
+            "title": "ai.letsship/ship: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          }
+        ],
+        "retrieved": 5,
+        "cited": 1,
+        "invalid_citations": [],
+        "bad_markers": [],
+        "seconds": 1.08,
+        "input_tokens": 3707,
+        "output_tokens": 73
+      }
+    ],
+    [
+      {
+        "id": "24",
+        "category": "SQL examples",
+        "question": "Which servers have critical package advisories?",
+        "expected": "Servers from the SQL set with CRITICAL findings (192), with direct vs modeled and coverage limits.",
+        "evidence_sql": "critical",
+        "selected": [],
+        "fixtures": [],
+        "counted": true,
+        "outcome": "pass",
+        "dimensions": {
+          "factual": true,
+          "state": true,
+          "scope": null,
+          "citation": true,
+          "format": true
+        },
+        "reasons": [],
+        "setup": [],
+        "answer": "There are 192 non-deleted servers with recorded critical package advisories. Examples include io.github.SAP/mdk-mcp-server, io.github.MervinPraison/praisonai, com.browser-use/browser-use, io.github.ExpertVagabond/universal-blockchain, and io.github.sparta2025/postgres-mcp. These servers have critical advisories mostly from modeled dependency findings rather than direct package advisories. The highest advisory severity is critical but does not represent an overall risk score or proof of compromise. Only servers with checked declared npm, PyPI, NuGet, or Cargo package versions can have findings; others are not counted or shown clean [3][5].",
+        "status": "grounded",
+        "scope": [],
+        "scope_source": "none",
+        "ignored_scope": [],
+        "not_found": [],
+        "coverage_notes": [],
+        "limitations": [
+          "Only servers with completed package vulnerability checks can have recorded advisories."
+        ],
+        "citation_ids": [
+          "stats:ranking",
+          "stats:severity"
+        ],
+        "sources": [
+          {
+            "ref": 1,
+            "citation_id": "stats:totals",
+            "kind": "statistics",
+            "title": "MCP Sentinel inventory statistics: totals and deployment",
+            "cited": false,
+            "observed_at": "2026-11-15T04:11:12.324189+00:00"
+          },
+          {
+            "ref": 2,
+            "citation_id": "stats:coverage",
+            "kind": "statistics",
+            "title": "MCP Sentinel inventory statistics: vulnerability coverage",
+            "cited": false,
+            "observed_at": "2026-11-15T04:11:12.324189+00:00"
+          },
+          {
+            "ref": 3,
+            "citation_id": "stats:ranking",
+            "kind": "statistics",
+            "title": "MCP Sentinel inventory statistics: servers with the most advisories",
+            "cited": true,
+            "observed_at": "2026-11-15T04:11:12.324189+00:00"
+          },
+          {
+            "ref": 4,
+            "citation_id": "stats:advisories",
+            "kind": "statistics",
+            "title": "MCP Sentinel inventory statistics: advisories affecting the most servers",
+            "cited": false,
+            "observed_at": "2026-11-15T04:11:12.324189+00:00"
+          },
+          {
+            "ref": 5,
+            "citation_id": "stats:severity",
+            "kind": "statistics",
+            "title": "MCP Sentinel inventory statistics: servers by recorded advisory severity (CRITICAL)",
+            "cited": true,
+            "observed_at": null
+          },
+          {
+            "ref": 6,
+            "citation_id": "server:6131:0",
+            "kind": "server",
+            "title": "com.cve-security/cve-intelligence: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 7,
+            "citation_id": "server:28999:0",
+            "kind": "server",
+            "title": "io.github.horror5how/top11: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 8,
+            "citation_id": "server:4370:0",
+            "kind": "server",
+            "title": "com.a2awire/data-dependency-vulnerability-malicious-package-security: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 9,
+            "citation_id": "server:4366:0",
+            "kind": "server",
+            "title": "com.a2awire/data-cve-security-advisory-vulnerability-database: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 10,
+            "citation_id": "server:3500:0",
+            "kind": "server",
+            "title": "br.com.nineoneninetwo/9192: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 11,
+            "citation_id": "server:24563:0",
+            "kind": "server",
+            "title": "io.github.basitalisandhu/mcp-osv-advisories: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 12,
+            "citation_id": "server:49116:0",
+            "kind": "server",
+            "title": "tech.distribution/distribution: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 13,
+            "citation_id": "server:6374:0",
+            "kind": "server",
+            "title": "com.disclovo/site: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          }
+        ],
+        "retrieved": 13,
+        "cited": 2,
+        "invalid_citations": [],
+        "bad_markers": [],
+        "seconds": 3.14,
+        "input_tokens": 10905,
+        "output_tokens": 179
+      },
+      {
+        "id": "28",
+        "category": "off topic",
+        "question": "Write me a poem about a spaceship.",
+        "expected": "A short, polite redirect to MCP Sentinel's security-intelligence purpose; no poem, no citations.",
+        "evidence_sql": "none",
+        "selected": [],
+        "fixtures": [],
+        "counted": true,
+        "outcome": "fail",
+        "dimensions": {
+          "factual": null,
+          "state": false,
+          "scope": null,
+          "citation": false,
+          "format": true
+        },
+        "reasons": [
+          "state: does not state: redirect",
+          "state: status grounded not in ['insufficient_evidence']",
+          "citation: cites sources for a question with no evidence"
+        ],
+        "setup": [],
+        "answer": "I do not generate poems, but the server ai.lorepunk.poems/margaret-poems specializes in poems by Margaret Corvid and might provide poems about spaceships [2].",
+        "status": "grounded",
+        "scope": [],
+        "scope_source": "none",
+        "ignored_scope": [],
+        "not_found": [],
+        "coverage_notes": [],
+        "limitations": [
+          "No direct poem generation capability in this data."
+        ],
+        "citation_ids": [
+          "server:1063:0"
+        ],
+        "sources": [
+          {
+            "ref": 1,
+            "citation_id": "server:13576:0",
+            "kind": "server",
+            "title": "dev.getbureau/about: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 2,
+            "citation_id": "server:1063:0",
+            "kind": "server",
+            "title": "ai.lorepunk.poems/margaret-poems: server profile",
+            "cited": true,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 3,
+            "citation_id": "server:16693:0",
+            "kind": "server",
+            "title": "io.github.BartWaardenburg/spaceship-mcp: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 4,
+            "citation_id": "server:45190:0",
+            "kind": "server",
+            "title": "io.github.write-space/writespace-mcp: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          },
+          {
+            "ref": 5,
+            "citation_id": "server:1026:0",
+            "kind": "server",
+            "title": "ai.letsship/ship: server profile",
+            "cited": false,
+            "observed_at": "2026-10-23T05:27:25+00:00"
+          }
+        ],
+        "retrieved": 5,
+        "cited": 1,
+        "invalid_citations": [],
+        "bad_markers": [],
+        "seconds": 1.31,
+        "input_tokens": 3707,
+        "output_tokens": 71
+      }
+    ]
+  ]
+}

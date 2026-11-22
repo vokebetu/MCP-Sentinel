@@ -9,8 +9,17 @@ gatherUsageStats = false
 toolbarMode = "minimal"
 
 [theme]
+base = "light"
 primaryColor = "#1F4FC4"
-backgroundColor = "#F6F7F9"
-secondaryBackgroundColor = "#EEF0F4"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F6F7F9"
 textColor = "#1A1D24"
-baseRadius = "0.6rem"
+linkColor = "#1F4FC4"
+borderColor = "#E1E4EA"
+showWidgetBorder = true
+baseRadius = "0.75rem"
+baseFontSize = 15
+
+[theme.sidebar]
+backgroundColor = "#EEF0F4"
+secondaryBackgroundColor = "#FFFFFF"

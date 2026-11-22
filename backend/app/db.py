@@ -23,7 +23,7 @@ pool = ConnectionPool(
     min_size=1,
     max_size=int(os.environ.get("DB_POOL_SIZE", "5")),
     open=False,
-    kwargs={"row_factory": dict_row, "autocommit": True, "options": "-c default_transaction_read_only=on -c statement_timeout=15000"},
+    kwargs={"row_factory": dict_row, "autocommit": True, "options": "-c default_transaction_read_only=on -c statement_timeout=15000 -c jit=off"},
 )
 
 

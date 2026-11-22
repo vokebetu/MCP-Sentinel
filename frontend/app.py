@@ -8,9 +8,9 @@ import requests
 import streamlit as st
 
 from sentinel_ui import (
-    COLUMN_HELP, COLUMNS, DEFAULT_COLUMNS, DEPLOYMENT_LABELS, ECOSYSTEM_LABELS, EXTRA_COLUMNS, MISSING, MISSING_HELP, RIGHT_ALIGNED, STATE_LABELS,
-    STATUS_LABELS, ApiError, advisory_count, error_message, http_error, page_range, safe_url, search_params, security_text, severity_text,
-    table_rows, to_csv, tools_text,
+    COLUMN_HELP, COLUMNS, DEFAULT_COLUMNS, DEPLOYMENT_LABELS, ECOSYSTEM_LABELS, EXTRA_COLUMNS, MISSING, MISSING_HELP, PAGE_SIZES, RIGHT_ALIGNED,
+    STATE_LABELS, STATUS_LABELS, ApiError, advisory_count, answer_notes, error_message, http_error, page_range, resize_page, safe_url,
+    scope_caption, search_params, security_text, severity_text, table_rows, to_csv, tools_text,
 )
 
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8000").rstrip("/")
@@ -72,6 +72,22 @@ THEME_CSS = """
 .st-key-selection_bar p {color:#FFFFFF; margin:0;}
 .st-key-results_card, .st-key-filter_panel {background: var(--ms-surface); border:1px solid var(--ms-border); border-radius: 12px; padding: 0.7rem 0.9rem;}
 .st-key-search_box input {height: 52px; font-size: 16px;}
+[data-testid="stTextInputRootElement"], [data-testid="stNumberInputContainer"], [data-testid="stTextAreaRootElement"],
+[data-testid="stChatInput"] > div, [data-testid="stSelectbox"] [role="group"],
+[data-testid="stMultiSelect"] [role="group"] {background-color: #FFFFFF !important; border: 1px solid #8C93A0 !important;}
+[data-testid="stTextInputRootElement"]:hover, [data-testid="stNumberInputContainer"]:hover, [data-testid="stChatInput"] > div:hover,
+[data-testid="stSelectbox"] [role="group"]:hover {border-color: #5B6170 !important;}
+[data-testid="stTextInputRootElement"]:focus-within, [data-testid="stNumberInputContainer"]:focus-within,
+[data-testid="stTextAreaRootElement"]:focus-within, [data-testid="stChatInput"] > div:focus-within,
+[data-testid="stSelectbox"] [role="group"]:focus-within {border-color: var(--ms-accent) !important;
+  box-shadow: 0 0 0 3px rgba(31, 79, 196, 0.22) !important;}
+[data-testid="stTextInputRootElement"] input::placeholder, [data-testid="stChatInput"] textarea::placeholder,
+[data-testid="stTextAreaRootElement"] textarea::placeholder {color: #6B7280 !important; opacity: 1 !important;}
+[data-testid="stTextInputRootElement"]:has(input:disabled), [data-testid="stNumberInputContainer"]:has(input:disabled),
+[data-testid="stChatInput"] > div:has(textarea:disabled), [data-testid="stSelectbox"] [role="group"]:has(input:disabled)
+{background-color: #EEF0F4 !important; border-color: #E1E4EA !important; cursor: not-allowed;}
+[data-testid="stTextInputRootElement"] input:disabled, [data-testid="stChatInput"] textarea:disabled {color: #8A8F9C !important;
+  -webkit-text-fill-color: #8A8F9C;}
 .stMainBlockContainer {padding-top: 2.2rem;}
 .ms-title {font-size: 1.35rem; font-weight: 700; margin: 0 0 0.6rem 0; color: var(--ms-text);}
 .st-key-results_card [data-testid="stDataFrame"], .st-key-results_card [data-testid="stDataEditor"] {background: var(--ms-surface);}
@@ -86,6 +102,8 @@ def init_state():
     s.setdefault("filters", dict(SEARCH_DEFAULTS))
     s.setdefault("search_page", 1)
     s.setdefault("page_size", 25)
+    if s["page_size"] not in PAGE_SIZES:
+        s["page_size"] = 25
     s.setdefault("columns", list(DEFAULT_COLUMNS))
     s.setdefault("filters_open", False)
     s.setdefault("selected", {})
@@ -313,8 +331,9 @@ def reset_all():
 
 
 def on_page_size():
-    st.session_state["page_size"] = st.session_state["f_page_size"]
-    st.session_state["search_page"] = 1
+    new = st.session_state["f_page_size"]
+    st.session_state["search_page"] = resize_page(st.session_state["search_page"], st.session_state["page_size"], new)
+    st.session_state["page_size"] = new
 
 
 def on_columns():
@@ -392,8 +411,6 @@ def filter_panel(ecosystems):
                          help={"assessment": COLUMN_HELP["security"], "deployment": COLUMN_HELP["deployment"],
                                "ecosystem": COLUMN_HELP["ecosystems"], "tool_info": COLUMN_HELP["tools"],
                                "tool_hints": COLUMN_HELP["hints"]}.get(field))
-        st.session_state["f_page_size"] = st.session_state["page_size"]
-        st.selectbox("Rows per page", [25, 50, 100], key="f_page_size", on_change=on_page_size)
 
 
 def results_table(items, total, page, pages):
@@ -438,6 +455,9 @@ def results_table(items, total, page, pages):
     nav[2].caption(f"Showing {first:,}–{last:,} of {total:,} · page {page:,} of {pages:,}")
     st.session_state["f_jump"] = page
     nav[3].number_input("Go to page", min_value=1, max_value=pages, step=1, key="f_jump", on_change=on_jump, label_visibility="collapsed")
+    st.session_state["f_page_size"] = st.session_state["page_size"]
+    nav[4].selectbox("Rows per page", PAGE_SIZES, key="f_page_size", on_change=on_page_size, format_func=lambda n: f"{n} per page",
+                     label_visibility="collapsed", help="Rows per page. Selections on other pages are kept.")
     return rows
 
 
@@ -1020,7 +1040,9 @@ def ai_examples():
 
 
 def ai_request(question, ai):
-    history = [{"role": m["role"], "content": m["content"][:4000]} for m in ai["messages"][-6:]]
+    history = [{"role": m["role"], "content": m["content"][:4000],
+                **({"server_ids": [x["server_id"] for x in m["result"].get("scope") or []][:4]} if m["role"] == "assistant" else {})}
+               for m in ai["messages"][-6:]]
     try:
         response = requests.post(f"{BACKEND_URL}/api/ai/chat", json={"question": question, "history": history, "strategy": ai["strategy"],
                                  "top_k": ai["top_k"], "server_ids": [s["server_id"] for s in ai["scope"]]}, timeout=110)
@@ -1039,12 +1061,10 @@ def ai_request(question, ai):
 
 def show_answer(result, key):
     st.markdown(result["answer"])
-    if result["status"] == "insufficient_evidence":
-        st.caption("The available evidence is insufficient for a complete answer.")
-    for note in result.get("coverage_notes", []):
-        st.caption(f"Coverage note: {note}")
-    for limitation in result["limitations"]:
-        st.caption(limitation)
+    st.caption(scope_caption(result))
+    notes = answer_notes(result)
+    if notes:
+        st.caption("Note: " + " ".join(notes))
     sources = result["sources"]
     if sources:
         cited = [s for s in sources if s.get("cited")]
@@ -1082,8 +1102,10 @@ def ai_assistant():
         return
     top = st.columns([5, 1], vertical_alignment="center")
     top[0].markdown('<p class="ai-title">AI assistant</p>', unsafe_allow_html=True)
-    if ai["messages"] and top[1].button("New chat", icon=":material/add_comment:", help="Clears this conversation."):
+    if (ai["messages"] or ai["scope"]) and top[1].button("New chat", icon=":material/add_comment:",
+                                                         help="Clears this conversation and the server scope."):
         ai["messages"] = []
+        ai["scope"] = []
         ai["pending"] = None
         st.rerun()
     if state.get("chunks"):
@@ -1120,11 +1142,10 @@ def ai_assistant():
                 show_answer(message["result"], f"history_{i}")
             else:
                 st.markdown(message["content"])
-                if message.get("scope"):
-                    st.caption("Scope: " + ", ".join(s["registry_name"] for s in message["scope"]))
     controls = st.columns([3, 1], vertical_alignment="center")
     with controls[0].popover(scope_label(ai["scope"]), icon=":material/dns:"):
-        st.caption("Limit answers to specific servers (up to 4). The scope filters retrieval and adds live facts for each server.")
+        st.caption("Limit answers to specific servers (up to 4). A server named in your question is always used instead, and "
+                   "each answer shows the scope it used.")
         picked = server_picker("ai_scope", "Find a server")
         if picked and st.button("Add to scope", type="primary", disabled=len(ai["scope"]) >= 4 or any(s["server_id"] == picked[0] for s in ai["scope"])):
             ai["scope"].append({"server_id": picked[0], "registry_name": picked[1]})
@@ -1144,7 +1165,7 @@ def ai_assistant():
         st.session_state["f_ai_top_k"] = ai["top_k"]
         st.slider("Sources to retrieve", min_value=1, max_value=10, key="f_ai_top_k", on_change=lambda: ai.update(top_k=st.session_state["f_ai_top_k"]),
                   help="Broad discovery questions use at least 8 sources automatically.")
-    question = st.chat_input("Ask about a server, vulnerability, or missing assessment", max_chars=1500)
+    question = st.chat_input("Ask about a server, vulnerability, or missing assessment", max_chars=1500, key="ai_question")
     question = question or ai["pending"]
     if question:
         ai["pending"] = None

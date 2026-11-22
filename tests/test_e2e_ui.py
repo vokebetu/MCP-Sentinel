@@ -326,3 +326,109 @@ def test_ai_example_card_submits_and_is_hidden_after(page):
     assert re.search(r"\[\d+\]", page.get_by_test_id("stChatMessage").last.inner_text())
     page.get_by_role("button", name="New chat").click()
     wait_text(page, "What do you want to know?")
+
+
+def pick_page_size(page, size):
+    combo, option = page.get_by_role("combobox", name="Rows per page"), page.get_by_role("option", name=f"{size} per page")
+    for _ in range(3):
+        combo.scroll_into_view_if_needed()
+        page.wait_for_timeout(500)
+        combo.click()
+        page.wait_for_timeout(800)
+        if option.count():
+            option.click()
+            return
+    raise AssertionError("the rows-per-page menu did not open")
+
+
+def test_page_size_changes_rows_paging_export_and_keeps_selection(page):
+    open_search(page)
+    tick(page, 0)
+    assert selected_count(page) == 1
+    pick_page_size(page, 10)
+    wait_text(page, "showing 1–10")
+    page.wait_for_timeout(1200)
+    assert len(grid_rows(page)) == 10 and page_label(page) == (1, 10, 1)
+    page.get_by_role("button", name="Next ▶").click()
+    wait_text(page, "showing 11–20")
+    assert page_label(page) == (11, 20, 2)
+    pick_page_size(page, 50)
+    wait_text(page, "showing 1–50")
+    page.wait_for_timeout(1500)
+    assert page_label(page) == (1, 50, 1) and selected_count(page) == 1
+    page.get_by_role("button", name="Next ▶").click()
+    wait_text(page, "showing 51–100")
+    for name in ("Compare", "Server search"):
+        page.get_by_role("link", name=name).click()
+        page.wait_for_timeout(1500)
+    wait_text(page, "showing 51–100")
+    with page.expect_download() as download:
+        page.get_by_role("button", name="Export visible page (CSV)").click()
+    rows = list(csv.DictReader(io.StringIO(Path(download.value.path()).read_text(encoding="utf-8"))))
+    assert len(rows) == 50 and selected_count(page) == 1 and no_api_errors(page)
+    pick_page_size(page, 100)
+    wait_text(page, "showing 1–100")
+    pick_page_size(page, 25)
+    wait_text(page, "showing 1–25")
+    page.get_by_role("button", name="Clear", exact=True).click()
+
+
+def styles(page, selector):
+    return page.locator(selector).first.evaluate("e => { const c = getComputedStyle(e); return [c.backgroundColor, c.borderTopColor, "
+                                                 "c.borderTopWidth, c.boxShadow]; }")
+
+
+def test_text_inputs_are_white_bordered_and_show_focus(page):
+    open_search(page)
+    root = '.st-key-search_box [data-testid="stTextInputRootElement"]'
+    background, border, width, _ = styles(page, root)
+    assert background == "rgb(255, 255, 255)" and border == "rgb(140, 147, 160)" and width == "1px"
+    placeholder = page.locator(f"{root} input").evaluate("e => getComputedStyle(e, '::placeholder').color")
+    assert placeholder == "rgb(107, 114, 128)"
+    page.get_by_placeholder(SEARCH_BOX).focus()
+    page.wait_for_timeout(300)
+    assert "rgba(31, 79, 196" in styles(page, root)[3] and styles(page, root)[1] == "rgb(31, 79, 196)"
+    assert styles(page, '.st-key-f_page_size [role="group"]')[0] == "rgb(255, 255, 255)"
+    search_for(page, "ac.snag/snag", expect="ac.snag/snag")
+    row = grid_rows(page)[0]
+    assert row[3] == "1.0.0" and row[4] == "Remote only" and row[5] == "— Not applicable" and row[6] == "Not observed"
+    shot(page, "02_search_snag")
+    page.goto(f"{FRONTEND_URL}/ai")
+    wait_text(page, "AI assistant")
+    page.wait_for_timeout(2500)
+    if page.locator('[data-testid="stChatInput"]').count():
+        background, border, width, _ = styles(page, '[data-testid="stChatInput"] > div')
+        assert background == "rgb(255, 255, 255)" and border == "rgb(140, 147, 160)" and width == "1px"
+    shot(page, "11_ai_input")
+
+
+@pytest.mark.skipif(os.environ.get("RUN_LIVE_AI_TESTS") != "1", reason="set RUN_LIVE_AI_TESTS=1 to allow live model requests")
+def test_ai_named_server_overrides_stale_scope_and_follow_up_keeps_it(page):
+    open_search(page)
+    for name in ("ai.azquo/azquo", "ai.leadmcp/leadmcp"):
+        search_for(page, name, expect=name)
+        tick(page, 0)
+    assert selected_count(page) == 2
+    page.get_by_role("button", name="Ask AI").click()
+    wait_text(page, "Server: 2 servers")
+    question = page.get_by_placeholder("Ask about a server, vulnerability, or missing assessment")
+    question.fill("What version is ac.snag/snag?")
+    question.press("Enter")
+    wait_text(page, "Sources (", timeout=110000)
+    answer = page.get_by_test_id("stChatMessage").last.inner_text()
+    assert "1.0.0" in answer and re.search(r"\[\d+\]", answer) and "azquo" not in answer.split("Scope used")[0]
+    wait_text(page, "Scope used: ac.snag/snag (named in the question)")
+    wait_text(page, "Selected but not used for this answer: ai.azquo/azquo, ai.leadmcp/leadmcp")
+    page.get_by_text("Sources (", exact=False).last.click()
+    wait_text(page, "ac.snag/snag: registry record")
+    shot(page, "10_ai_stale_scope_fixed")
+    question = page.get_by_placeholder("Ask about a server, vulnerability, or missing assessment")
+    question.fill("Does it declare a package?")
+    question.press("Enter")
+    page.get_by_test_id("stChatMessage").nth(3).wait_for(timeout=110000)
+    wait_text(page, "Scope used: ac.snag/snag (from the previous answer)", timeout=110000)
+    page.get_by_role("button", name="New chat").click()
+    wait_text(page, "Server: Any")
+    page.get_by_role("link", name="Server search").click()
+    page.wait_for_timeout(1500)
+    page.get_by_role("button", name="Clear", exact=True).click()

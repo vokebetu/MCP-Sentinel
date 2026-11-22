@@ -17,11 +17,11 @@
 | Security findings | 19,406 findings on 6,048 servers |
 | Coverage records | 317,347 checks |
 | Review checklist | per server: the evidence a bank's third-party review asks for, plus an SBOM download |
-| AI assistant | answers with numbered sources from 55,477 indexed records (OpenAI embeddings + `gpt-4.1-mini`); 31/31 evaluation questions (default prompt) |
+| AI assistant | answers with numbered sources from 55,477 indexed records (OpenAI embeddings + `gpt-4.1-mini`); 28-question benchmark with SQL-checked answers: 84/84 over 3 runs; 31/31 evaluation questions with either prompt |
 | Spark analytics | Bronze/Silver/Gold Parquet, 4 SQL reports, K-Means on 16,514 servers |
 | App | FastAPI + Streamlit in Docker Compose |
 | Backup | two dump files (37 MB data, 77 MB AI index), restore tested |
-| Tests | 64 automated tests, 42 database checks |
+| Tests | 105 automated tests, 42 database checks, 28-question AI benchmark |
 
 ## 2. Data Modeling and Database Design
 
@@ -287,7 +287,8 @@ Rule: only individual records are loaded. Summary counts are never turned into r
 
 | Test | Result |
 |---|---|
-| Automated tests (`pytest`) | 88 passed: 16 unit, 6 frontend helper, 20 database, 27 API, 14 browser (including two live AI tests), 5 Spark |
+| Automated tests (`pytest`) | 105 passed: 16 unit, 9 frontend helper, 20 database, 38 API, 17 browser (including three live AI tests), 5 Spark |
+| AI benchmark (`./scripts/run_benchmark.sh`) | 84/84 over 3 runs (28 questions) |
 | Database checks (`importer validate`) | 42/42 passed |
 | Import twice | identical row counts |
 | `docker compose down` + `up` | data kept |
@@ -310,6 +311,10 @@ Rule: only individual records are loaded. Summary counts are never turned into r
 ![AI answer sources](screenshots/08_ai_answer_sources.png)
 
 ![AI follow-up question](screenshots/09_ai_followup.png)
+
+![Search result for ac.snag/snag](screenshots/02_search_snag.png)
+
+![AI answer that ignores an old selection](screenshots/10_ai_stale_scope_fixed.png)
 
 ## 6. Query and Retrieval Demonstration
 
@@ -465,6 +470,44 @@ Evaluation (`docs/AI_EVALUATION.json`): full data, 31 questions in 12 categories
 | Definition questions retrieved unrelated profiles | the methodology note is added for definition questions |
 | An uncited answer was labelled grounded | shown as "insufficient evidence" instead |
 
+### Scope fix
+
+With `ai.azquo/azquo` and `ai.leadmcp/leadmcp` still selected, "What version is ac.snag/snag?" got "The server ac.snag/snag is not present in the provided evidence", with 0 of 4 sources cited and four notes about the two selected servers. The server is in the registry (version 1.0.0).
+
+| Cause | Fix |
+|---|---|
+| A server named in the question was looked up only when nothing was selected, so retrieval stayed limited to the old selection | names in the question are looked up first, by exact registry name, and win over the selection |
+| "New chat" kept the selection, and the chat showed the selection, not what was used | "New chat" clears the scope; each answer shows "Scope used" and "Selected but not used" |
+| Version and status came from approximate vector search | each scoped server gets two exact SQL sources: its stored registry record and its assessment record (`registry:<name>@<version>`, `assessment:<name>@<version>`) |
+| "Not retrieved" and "not in the database" looked the same | a name that is not in the registry gets a fixed "not in the stored registry snapshot" answer with the snapshot date |
+| Coverage notes repeated for every selected server | one note per server in scope, only for security questions, only when the answer does not already say it |
+
+Order: named in the question, then a follow-up ("it", "those two": the servers of the previous answer), then the selection, then the whole database. Count and ranking questions use the whole database even with a selection.
+
+### Benchmark with known answers
+
+`docs/benchmark/`: 28 questions in 17 categories (registry facts, vulnerability state, tool metadata, provenance, comparison, safety limits, counts, SQL examples and ranking, checked-none-found, unknown, modeled exposure, missing field, not in snapshot, scope regression, follow-up, off topic), plus one prompt-injection check that is not counted.
+
+- Correct answers come from read-only SQL on the base tables, frozen for the snapshot in `gold/2026-10-23_0a110721fbc4_50019.json`. The 12 facts from the reported screenshots all match the database.
+- Each answer is scored on value, wording of unknown / not applicable / checked-none-found, servers used, citations (exist, right server, right snapshot date, no invented markers) and length. A case passes only if every check passes.
+
+`gpt-4.1-mini`, few-shot prompt:
+
+| Test set | Change | Passed |
+|---|---|---|
+| 1.0 | first run | 25/28 (89.3%) |
+| 1.1 | scorer: "not specified" accepted for tools; off-topic needs a real redirect | 80/84 (95.2%), 3 runs |
+| 1.2 | poem check also counts escaped line breaks; cases 24 and 28 only | 2/6 (the model wrote the poem) |
+| 1.3 | scorer reads the notes shown under the answer; fixed redirect for poems; list and coverage rules | 82/84 (97.6%), 3 runs |
+| 1.3 | "not proof of safety" note | **84/84 (100%)**, 3 runs, no case changed between runs |
+
+- Median answer time 1.8 s, mean 2.3 s (one slow model reply of 21.5 s).
+- Not every pass is the model's own wording: case 23 (unknown name) and case 28 (poem) are fixed answers, and in 2 of 3 runs the "not proof of safety" caveat for case 19 came from the note under the answer.
+- Checks are text patterns and SQL sets; single sentences are not checked automatically.
+- Rerun after any prompt, model, index or SQL change: `./scripts/run_benchmark.sh run --repeat 3`. Every run is kept in `docs/benchmark/results/` and `docs/benchmark/history.csv`.
+
+The original 31-question evaluation on the final code (`docs/benchmark/results/20261122_original_31_question_evaluation.json`): with retrieval 31/31 for both prompts (zero-shot 4.0 s, few-shot 3.7 s), without retrieval 2/31.
+
 ### Search reliability and usability
 
 Search pages failed with HTTP 503 under quick clicking. Each page recomputed the security summary for all 48,673 servers (317,347 coverage checks) before taking 25 rows, so overlapping requests held all 5 database connections past the 5-second wait.
@@ -484,6 +527,9 @@ The new query filters, sorts and counts on cheap columns, then computes the summ
 | Result checkboxes allowed one row | real multi-select across pages, "Select all on this page", selection bar |
 | CSV did not match the screen | one formatter for screen and CSV; "visible page" and "all filtered results" exports |
 | Compare listed 20+ equal-weight rows | summary cards, grouped sections, differences highlighted, provenance collapsed |
+| "Has vulnerabilities" sorted by concerns took 1.8 s | per-row lookup of findings instead of a join the planner misjudged (same order for all 50,019 servers), and PostgreSQL JIT off for the API's short queries: 0.85 s |
+| Fixed 25 rows per page | 10, 25, 50 or 100 rows; the first visible row stays on screen; selections and exports follow the chosen size |
+| Grey text boxes looked disabled | theme in `frontend/.streamlit/config.toml`; search box, chat box and select boxes white with a 3:1 contrast border and a focus ring; disabled ones stay grey |
 
 ## 8. Review Checklist
 
@@ -569,6 +615,8 @@ flowchart LR
 | Review checklist per server | reviewer feedback: show the evidence a bank asks for |
 | Spark path beside the app | batch analytics without changing the operational database |
 | AI index in its own dump file | each file stays under GitHub's 100 MB limit |
+| Exact registry lookups before vector search | a server named in a question must not be missed because of retrieval or an old selection |
+| Benchmark with answers frozen from SQL | measure AI quality again after any prompt, model or index change |
 
 ## 11. Reflection
 
@@ -612,3 +660,4 @@ flowchart LR
 | Full package vulnerability lookup | yes |
 | Review checklist and SBOM | yes |
 | Spark ETL, SQL reports and K-Means | yes |
+| AI benchmark with known answers, rerunnable | yes |

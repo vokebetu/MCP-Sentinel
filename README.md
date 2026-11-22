@@ -189,18 +189,24 @@ Exports four database views (read-only), builds Bronze/Silver/Gold Parquet files
    docker compose run --rm --entrypoint python analytics -m pytest -q tests/test_analytics.py
    ```
 
+6. AI benchmark: 28 questions with known answers, checked against the database (needs the app running with an OpenAI key; about 31 requests and 1 minute per run):
+   ```bash
+   ./scripts/run_benchmark.sh run --repeat 3
+   ```
+   Results go to `docs/benchmark/results/`, one line per run to `docs/benchmark/history.csv`. Details: `DEPLOYMENT.md`, section 11.
+
 - The browser tests need the app running at <http://localhost:8501> (or set `FRONTEND_URL`). They are skipped otherwise.
-- AI tests use fake model answers. The live AI browser test runs only with `RUN_LIVE_AI_TESTS=1`. It needs an OpenAI key and the AI index, and makes 2 OpenAI requests.
+- AI tests use fake model answers. The live AI browser tests run only with `RUN_LIVE_AI_TESTS=1`. They need an OpenAI key and the AI index, and make about 6 OpenAI requests.
 
 ## App pages
 
 | Page | Shows |
 |---|---|
 | Dashboard | Totals, deployment types, package ecosystems, coverage |
-| Server search | Search box, quick filters (Has vulnerabilities, Remote only, Has GitHub repo, Has tools), more filters, column picker, checkboxes that keep selections across pages, CSV export of the visible page or of all filtered results |
+| Server search | Search box, quick filters (Has vulnerabilities, Remote only, Has GitHub repo, Has tools), more filters, column picker, 10/25/50/100 rows per page, checkboxes that keep selections across pages, CSV export of the visible page or of all filtered results |
 | Server profile | One server: review checklist (with JSON, Markdown and SBOM downloads), repository link, software, vulnerabilities, checks, tools with their source and date, "Ask AI about this server" |
 | Compare | Up to 4 servers: summary cards, "Show differences only", grouped rows, add and remove servers, "How we got this data" |
-| AI assistant | Suggested questions, a server scope picker, answers with numbered sources and coverage notes |
+| AI assistant | Suggested questions, a server scope picker, answers with numbered sources, the scope each answer used, and coverage notes. A server named in the question always wins over the selected scope. |
 
 Filters, the current page, selected servers and the chat stay when you move between pages in the same browser tab. Server names in the results open the profile in a new tab.
 
@@ -220,7 +226,7 @@ Missing values use one vocabulary: **— Not applicable** (the check does not ap
 | `data/dump/` | Full database backup: data and AI index |
 | `data/research/` | Saved source data used to build `data/bundle/` |
 | `tests/` | Automated tests |
-| `docs/` | Project report, AI evaluation, screenshots |
+| `docs/` | Project report, AI evaluation, AI benchmark (`docs/benchmark/`), screenshots |
 
 More: `DEPLOYMENT.md` (ports, settings, backup, all commands) and `docs/PROJECT_REPORT.md` (design and results).
 

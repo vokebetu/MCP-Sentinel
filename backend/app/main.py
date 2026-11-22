@@ -157,11 +157,11 @@ TOOL_STATE_SQL = """CASE
 RANK_SQL = """CASE WHEN %(q)s::text IS NULL THEN 0
     ELSE ts_rank(sv.search_vector, websearch_to_tsquery('english', %(q)s) || websearch_to_tsquery('simple', %(q)s))
          + CASE WHEN s.registry_name ILIKE '%%' || %(q)s || '%%' THEN 1 ELSE 0 END END"""
-CONCERNS_JOIN = """LEFT JOIN (
-    SELECT f.server_version_id, count(DISTINCT f.advisory_id) AS advisories,
+CONCERNS_JOIN = """LEFT JOIN LATERAL (
+    SELECT NULLIF(count(DISTINCT f.advisory_id), 0) AS advisories,
            max(CASE upper(a.severity_label) WHEN 'CRITICAL' THEN 4 WHEN 'HIGH' THEN 3 WHEN 'MODERATE' THEN 2 WHEN 'MEDIUM' THEN 2 WHEN 'LOW' THEN 1 END) AS severity
-    FROM security_findings f JOIN advisories a ON a.advisory_id = f.advisory_id WHERE f.finding_status <> 'withdrawn'
-    GROUP BY f.server_version_id) fa ON fa.server_version_id = sv.server_version_id"""
+    FROM security_findings f JOIN advisories a ON a.advisory_id = f.advisory_id
+    WHERE f.server_version_id = sv.server_version_id AND f.finding_status <> 'withdrawn') fa ON true"""
 CHECKED_SQL = f"""EXISTS (SELECT 1 FROM assessment_checks c WHERE c.server_version_id = sv.server_version_id AND c.check_type IN {CHECK_TYPES_SQL}
     AND c.outcome IN ('finding_found', 'no_known_finding'))"""
 ORDERS = {

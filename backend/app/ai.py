@@ -31,6 +31,7 @@ slots = threading.BoundedSemaphore(4)
 class Turn(BaseModel):
     role: Literal["user", "assistant"]
     content: str = Field(min_length=1, max_length=4000)
+    server_ids: list[int] = Field(default_factory=list, max_length=4)
 
 
 class Question(BaseModel):
@@ -64,10 +65,21 @@ Evidence of kind statistics is computed by SQL over the whole database when the 
 inventory-wide counts, shares and rankings. Server and finding evidence is a small retrieved sample: never call it
 the database, and never derive inventory-wide counts or rankings from it. Name servers by registry_name, never by
 numeric ids. Never invent a risk score, fixed release, CVE, count, or current status.
-Evidence of kind server_facts is a live SQL summary of one server: use it for that server's status, deployment,
-assessment state, counts, tool metadata and dates. If a server declares no package (remote only), say the package
-advisory lookup is not applicable; never call it clean, passed, checked, or zero vulnerabilities. Highest advisory
-severity is the most severe recorded advisory, not an overall risk score: never call a server dangerous, safe or compromised.
+Evidence of kind registry_record is the stored Official MCP Registry record of one server, found by exact name: use it
+for that server's version, registry status, deployment, declared packages, repository, website and registry snapshot date.
+Evidence of kind assessment is MCP Sentinel's stored package-advisory and tool-metadata state for that server version.
+Evidence of kind lookup means an exact search of the registry snapshot found no such server: say it is not in the snapshot
+and never guess its details. If a server declares no package (remote only), say the package advisory lookup is not
+applicable; never call it clean, passed, checked, or zero vulnerabilities, and say this does not show the remote service
+is secure. Highest advisory severity is the most severe recorded advisory, not an overall risk score: never call a server
+dangerous, safe or compromised, and never rank servers as safer from missing or not-applicable evidence.
+Answer the question directly in the first sentence, then add only the context needed. Put at most one short item in
+limitations, and only for a limit the answer does not already state; otherwise leave it empty. When you name a server
+with no known findings in completed checks, say in the same sentence that this is not proof of safety. For list questions,
+name at most 5 example servers unless more are asked for, give the total from statistics evidence, and say in one clause that
+only servers with checked packages can have findings. If the question is not about MCP servers, their security evidence or
+this project, do not answer it (do not write poems, stories or code): reply in one or two sentences that you only answer
+questions about MCP Sentinel's server security data, and suggest one example question. Use insufficient_evidence and no citations.
 Each evidence item has a ref number. Cite inline by writing [ref] right after each claim it supports, for example [1]
 or [2][3]. Use only refs of supplied evidence. Never write citation_id strings in the answer text; list the
 citation_id of every cited item in citation_ids.
@@ -92,7 +104,7 @@ Q: How many servers have recorded findings? Evidence ref 1, id example-S (statis
 Output: {"answer":"7 servers have recorded vulnerability findings [1]. Servers that were never assessed are not counted
 as clean.","status":"grounded","citation_ids":["example-S"],"limitations":["Only servers with completed checks can
 have findings."]}
-Q: Is demo/delta vulnerable? Evidence ref 1, id example-F (server_facts): deployment remote only, no package declared,
+Q: Is demo/delta vulnerable? Evidence ref 1, id example-F (assessment): deployment remote only, no package declared,
 package advisory lookup not applicable. Output: {"answer":"demo/delta declares no package, so a package advisory lookup
 does not apply [1]. That is not a clean result: its remote endpoint was never scanned.","status":"grounded",
 "citation_ids":["example-F"],"limitations":["No package-level evidence exists for remote-only servers."]}
@@ -173,7 +185,12 @@ def status():
     except psycopg.errors.UndefinedTable:
         row = {"chunks": 0, "last_indexed_at": None, "setup": MISSING_TABLE}
     return {"configured": bool(os.environ.get("OPENAI_API_KEY", "").strip()), "embedding_model": EMBEDDING_MODEL,
-            "chat_model": os.environ.get("OPENAI_CHAT_MODEL", "gpt-4.1-mini"), "dimensions": DIMENSIONS, **row}
+            "chat_model": os.environ.get("OPENAI_CHAT_MODEL", "gpt-4.1-mini"), "dimensions": DIMENSIONS,
+            "prompt_sha256": prompt_fingerprint(), **row}
+
+
+def prompt_fingerprint():
+    return hashlib.sha256("\n".join([SYSTEM, EXAMPLES, str(MAX_SOURCES), str(CHUNK_SIZE)]).encode()).hexdigest()[:16]
 
 
 def share(part, whole):
@@ -252,14 +269,26 @@ def inventory_facts(bucket):
 
 SEVERITY = re.compile(r"\b(critical|high[- ]severity|high[- ]risk|dangerous|vulnerable|risky|severe|riskiest)\b", re.I)
 COVERAGE = re.compile(r"\b(not (been )?assessed|unassessed|not applicable|no package|could not complete|never (been )?checked|"
-                      r"not (been )?checked|assessment coverage)\b", re.I)
+                      r"not (been )?checked|assessment coverage|none found|checked (and|but|with)\b[^?]*\b(no|none|zero|without)|"
+                      r"no (known )?(advisor\w*|findings?|vulnerabilit\w*) (were |was )?found)\b", re.I)
 TOOL_QUESTION = re.compile(r"\b(tool metadata|input schemas?|verified tools?|tool (data|information|lists?|counts?))\b|"
                            r"\bwhich servers\b.*\btools?\b", re.I)
 DISCOVERY = re.compile(r"\b(find|list|show|recommend|suggest|which|what)\b(\W+\w+){0,4}\W+(servers?|tools?)\b|"
                        r"\b(two|three|four|five|six|ten|several|some)\s+(\w+\s+)?servers?\b", re.I)
 SOURCE_NAMES = {"server": "Server profile chunk (registry snapshot and stored evidence)", "finding": "Recorded OSV.dev advisory findings",
                 "methodology": "MCP Sentinel methodology note", "statistics": "Live SQL statistics over the whole database",
-                "server_facts": "Live SQL facts for this server"}
+                "registry_record": "Official MCP Registry record (exact name lookup)",
+                "assessment": "MCP Sentinel assessment record (exact lookup)", "lookup": "Exact registry name lookup"}
+SERVER_NAME = re.compile(r"(?<![\w./:@-])(?:[A-Za-z0-9_-]+\.)+[A-Za-z0-9_-]+/[A-Za-z0-9_.-]*[A-Za-z0-9_-](?:/[A-Za-z0-9_.-]*[A-Za-z0-9_-])*")
+NOT_SERVER_HOSTS = ("github.com/", "gitlab.com/", "bitbucket.org/", "ghcr.io/", "docker.io/", "quay.io/", "registry.npmjs.org/",
+                    "pypi.org/", "huggingface.co/", "www.")
+FOLLOW_UP = re.compile(r"\b(it|its|it's|this server|that server|the server|this one|that one|those two|these two|both|either|them|"
+                       r"those servers|these servers|same server)\b", re.I)
+SELECTION_REF = re.compile(r"\b(selected|selection|in (my |the )?scope|scoped)\b", re.I)
+GLOBAL = re.compile(r"\b(how many|number of|count of|share of|percent\w*|proportion|total|overall|statistics|distribution|breakdown)\b"
+                    r"[^?]*\bservers\b|\b(which|what|list|name|show|find|rank)\b(\W+\w+){0,4}\W+servers\b|\ball servers\b|"
+                    r"\b(in|across) the (whole )?(registry|database|inventory|snapshot)\b", re.I)
+DIRECT = re.compile(r"\bdirect\b[^?]*\badvisor|\bdeclared[- ]package\b[^?]*\badvisor", re.I)
 DEPLOYMENT_TEXT = {"remote_only": "remote endpoint only, no package declared", "packages_only": "downloadable package only",
                    "packages_and_remotes": "package and remote endpoint", "neither": "neither a package nor a remote endpoint declared"}
 DEFINITION = re.compile(r"\b(mean|means|meaning|definition|define|not[_ ]assessed|not applicable|unknown|zero vulnerabilit\w*|coverage|"
@@ -371,29 +400,152 @@ def tool_text(s):
     return "not observed: no tool metadata in the checked sources (this does not mean the server has no tools)."
 
 
+REGISTRY_SQL = """
+SELECT s.server_id, s.registry_name, s.registry_status, sv.server_version_id, sv.version, sv.title, sv.published_at, sv.observed_at,
+       sv.registry_record -> 'server' AS record, r.run_id, r.input_artifact, r.input_sha256, ds.homepage_url,
+       (SELECT string_agg(d.registry_type || ':' || d.declared_identifier || '@' || COALESCE(d.declared_version, 'no version'), '; '
+               ORDER BY d.position) FROM server_package_declarations d WHERE d.server_version_id = sv.server_version_id) AS packages,
+       (SELECT max(c.checked_at) FROM assessment_checks c WHERE c.server_version_id = sv.server_version_id) AS last_check_at,
+       (SELECT string_agg(label, '; ' ORDER BY label) FROM (
+            SELECT c.check_type || ' via ' || cs.source_key || ': ' || c.outcome || ' (' || count(*) || ')' AS label
+            FROM assessment_checks c JOIN data_sources cs ON cs.source_id = c.source_id
+            WHERE c.server_version_id = sv.server_version_id GROUP BY c.check_type, cs.source_key, c.outcome) checks) AS checks
+FROM servers s JOIN server_versions sv ON sv.server_version_id = s.latest_version_id
+JOIN collection_runs r ON r.run_id = sv.run_id JOIN data_sources ds ON ds.source_id = r.source_id
+WHERE s.server_id = ANY(%(ids)s)
+"""
+
+
+def record_value(record, *path):
+    for key in path:
+        record = record.get(key) if isinstance(record, dict) else None
+    return record if isinstance(record, str) and record.strip() else None
+
+
 def server_facts(ids):
     from .main import summaries
     found = {s.server_id: s for s in summaries(list(ids))}
-    extra = {r["server_id"]: r for r in fetch_all(
-        """SELECT s.server_id, sv.observed_at, (SELECT string_agg(d.registry_type || ':' || d.declared_identifier || '@' ||
-                  COALESCE(d.declared_version, 'no version'), '; ' ORDER BY d.position) FROM server_package_declarations d
-                  WHERE d.server_version_id = sv.server_version_id) AS packages
-           FROM servers s JOIN server_versions sv ON sv.server_version_id = s.latest_version_id WHERE s.server_id = ANY(%(ids)s)""",
-        {"ids": list(ids)})}
+    rows = {r["server_id"]: r for r in fetch_all(REGISTRY_SQL, {"ids": list(ids)})}
     facts = []
     for sid in ids:
-        s = found.get(sid)
-        if not s:
+        s, r = found.get(sid), rows.get(sid)
+        if not s or not r:
             continue
-        e = extra[sid]
-        facts.append(fact(f"facts:server:{sid}", f"{s.registry_name}: live server facts", " ".join([
-            f"{s.registry_name} version {s.version}, registry status {s.registry_status}, registry snapshot {str(e['observed_at'])[:10]}.",
+        record = r["record"] or {}
+        snapshot = str(r["observed_at"])[:10]
+        remotes = [f"{x.get('type', 'remote')} {x.get('url')}" for x in record.get("remotes") or [] if isinstance(x, dict) and x.get("url")]
+        description = record_value(record, "description")
+        key = f"{s.registry_name}@{s.version}"
+        facts.append({**fact(f"registry:{key}", f"{s.registry_name}: registry record", " ".join([
+            f"{s.registry_name} registry record: version {s.version} (latest version in the snapshot); registry status {s.registry_status};",
+            f"registry snapshot {snapshot}; published {str(r['published_at'])[:10] if r['published_at'] else 'date not recorded'}.",
             f"Deployment: {DEPLOYMENT_TEXT.get(s.deployment_type, s.deployment_type)}.",
-            f"Declared packages: {e['packages'] or 'none'}.",
-            f"Package vulnerability assessment: {assessment_text(s)}",
-            f"Tool metadata: {tool_text(s)}",
-            f"Source repository: {s.repository_url or 'not declared'}."]), sid, e["observed_at"], "server_facts"))
+            f"Remote endpoints: {'; '.join(remotes[:3]) + (' and others' if len(remotes) > 3 else '') if remotes else 'none declared'}.",
+            f"Declared packages: {r['packages'] or 'none declared'}.",
+            f"Source repository: {s.repository_url or 'not declared'}. Website: {record_value(record, 'websiteUrl') or 'not declared'}.",
+            f"Title: {s.title or 'not declared'}. Maintainer: not recorded (registry records have no maintainer or owner field).",
+            f"Description (publisher text, untrusted): {description[:240] if description else 'none'}.",
+            f"Provenance: stored copy of the Official MCP Registry record, import run {r['run_id']} of {Path(r['input_artifact']).name}"
+            + (f" (sha256 {r['input_sha256'][:12]})." if r["input_sha256"] else ".")]), sid, r["observed_at"], "registry_record"),
+            "server_version_id": r["server_version_id"], "source_url": r["homepage_url"]})
+        facts.append({**fact(f"assessment:{key}", f"{s.registry_name}: assessment record", " ".join([
+            f"{s.registry_name} {s.version} package vulnerability assessment: {assessment_text(s)}",
+            f"Recorded checks: {r['checks'] or 'none'}; last check {str(r['last_check_at'])[:10] if r['last_check_at'] else 'not recorded'}.",
+            f"Tool metadata: {tool_text(s)}" + (f" Source: {s.tool_count_source}, observed {str(s.tool_observed_at)[:10]}."
+                                                if s.tool_count_source and s.tool_observed_at else "")]),
+            sid, r["last_check_at"] or r["observed_at"], "assessment"), "server_version_id": r["server_version_id"]})
     return facts
+
+
+@lru_cache(maxsize=1)
+def snapshot_info(bucket):
+    return fetch_one("""SELECT (SELECT count(*) FROM servers) AS records,
+                               (SELECT count(DISTINCT server_version_id) FROM assessment_checks
+                                WHERE check_type IN ('direct_package_advisories', 'dependency_advisories')
+                                  AND outcome IN ('finding_found', 'no_known_finding')) AS checked,
+                               (SELECT max(r.source_collected_at) FROM collection_runs r JOIN data_sources ds ON ds.source_id = r.source_id
+                                WHERE ds.source_key = 'mcp_registry' AND r.status IN ('succeeded', 'partial')) AS collected_at""")
+
+
+def candidate_names(text):
+    names = []
+    for match in SERVER_NAME.findall(text or ""):
+        if not match.lower().startswith(NOT_SERVER_HOSTS):
+            names.append(match)
+    return list(dict.fromkeys(names))
+
+
+def registry_lookup(names):
+    if not names:
+        return {}, []
+    lowered = [n.lower() for n in names]
+    found = {r["key"]: r["server_id"] for r in fetch_all(
+        "SELECT lower(registry_name) AS key, server_id FROM servers WHERE lower(registry_name) = ANY(%(names)s)", {"names": lowered})}
+    missing = [n for n in names if n.lower() not in found]
+    if missing:
+        known = {r["key"] for r in fetch_all(
+            """SELECT lower(declared_identifier) AS key FROM server_package_declarations WHERE lower(declared_identifier) = ANY(%(names)s)
+               UNION SELECT lower(regexp_replace(canonical_url, '^https?://', '')) FROM repositories
+               WHERE lower(regexp_replace(canonical_url, '^https?://', '')) = ANY(%(names)s)""", {"names": [n.lower() for n in missing]})}
+        missing = [n for n in missing if n.lower() not in known]
+    return {n: found[n.lower()] for n in names if n.lower() in found}, missing
+
+
+def lookup_facts(names):
+    info = snapshot_info(int(time.time() // 600))
+    when = str(info["collected_at"])[:10] if info["collected_at"] else "date not recorded"
+    return [fact(f"lookup:registry:{name}", f"{name}: exact registry lookup",
+                 f"An exact, case-insensitive name lookup for {name} in the stored Official MCP Registry snapshot ({when}, "
+                 f"{info['records']:,} registry records including deleted ones) found no server with this name. MCP Sentinel has no "
+                 "version, package, repository or vulnerability evidence for it.", None, info["collected_at"], "lookup") for name in names]
+
+
+def history_scope(history):
+    for turn in reversed(history):
+        if turn.role == "assistant":
+            if turn.server_ids:
+                return list(dict.fromkeys(turn.server_ids))[:4]
+            continue
+        found, _ = registry_lookup(candidate_names(turn.content))
+        if found:
+            return list(dict.fromkeys(found.values()))[:4]
+        if not FOLLOW_UP.search(turn.content):
+            return []
+    return []
+
+
+def resolve_scope(question, query):
+    selected = list(dict.fromkeys(question.server_ids))
+    names = candidate_names(query)
+    found, missing = registry_lookup(names)
+    named = list(dict.fromkeys(found.values()))
+    if named or missing:
+        extra = [sid for sid in selected if sid not in named] if SELECTION_REF.search(query) else []
+        return (named + extra)[:4], "question+selection" if extra else "question", missing
+    if FOLLOW_UP.search(query) and not SELECTION_REF.search(query):
+        previous = history_scope(question.history)
+        if previous:
+            return previous, "follow_up", []
+    if selected and (SELECTION_REF.search(query) or FOLLOW_UP.search(query) or not GLOBAL.search(query)):
+        return selected, "selection", []
+    return [], "none", []
+
+
+@lru_cache(maxsize=1)
+def direct_facts(bucket):
+    rows = fetch_all(
+        """SELECT s.registry_name, count(DISTINCT f.advisory_id) AS advisories,
+                  max(CASE upper(a.severity_label) WHEN 'CRITICAL' THEN 4 WHEN 'HIGH' THEN 3 WHEN 'MODERATE' THEN 2 WHEN 'LOW' THEN 1 ELSE 0 END) AS rank
+           FROM security_findings f JOIN servers s ON s.latest_version_id = f.server_version_id JOIN advisories a ON a.advisory_id = f.advisory_id
+           WHERE f.finding_category = 'direct_package' AND f.finding_status <> 'withdrawn' AND s.registry_status <> 'deleted'
+           GROUP BY s.registry_name ORDER BY 2 DESC, 1""")
+    severity = {4: "CRITICAL", 3: "HIGH", 2: "MODERATE", 1: "LOW", 0: "unknown"}
+    lines = [f"Non-deleted servers whose declared package versions have at least one recorded direct advisory finding: {len(rows):,}.",
+             "Ranking by distinct direct advisories (ties broken by registry name A-Z): " + "; ".join(
+                 f"{i}. {r['registry_name']} {r['advisories']} (highest {severity[r['rank']]})" for i, r in enumerate(rows[:30], 1)) + ".",
+             "Direct means the advisory affects the declared package version itself; modeled dependency exposures are counted separately. "
+             "Only servers whose declared npm, PyPI, NuGet or Cargo packages were checked can have direct findings."]
+    return [fact("stats:direct", "MCP Sentinel inventory statistics: direct package advisories", "\n".join(lines))]
 
 
 @lru_cache(maxsize=4)
@@ -411,6 +563,8 @@ def severity_facts(levels, bucket):
         f"{r['registry_name']} ({r['severity']}, {r['distinct_advisories']} advisories: {r['direct_advisories']} direct, "
         f"{r['dependency_advisories']} modeled dependency)" for r in rows) + ".")
     lines.append("Highest recorded advisory severity is not an overall server risk score and does not show that a server is dangerous or compromised.")
+    lines.append("Coverage: only servers whose declared npm, PyPI, NuGet or Cargo package versions were checked can have findings. Servers that "
+                 "are not applicable (no package), not assessed, or whose checks could not complete are not counted and are not shown to be clean.")
     return [fact("stats:severity", f"MCP Sentinel inventory statistics: servers by recorded advisory severity ({', '.join(levels)})", "\n".join(lines))]
 
 
@@ -464,7 +618,7 @@ def excerpt(source):
         if pairs:
             text = " · ".join(pairs)
             return text if len(text) <= 260 else text[:259].rstrip() + "…"
-    text = content if source.get("kind") in ("statistics", "server_facts") else content.split("\n", 1)[-1]
+    text = content if source.get("kind") in ("statistics", "registry_record", "assessment", "lookup") else content.split("\n", 1)[-1]
     text = re.sub(r'"([A-Za-z_]+)":', r"\1:", text)
     text = re.sub(r"\s+", " ", re.sub(r'[{}\[\]"]', "", text)).strip()
     return text if len(text) <= 260 else text[:259].rstrip() + "…"
@@ -531,19 +685,60 @@ def generate(question, sources):
         raise HTTPException(502, "The model returned an incomplete answer or unsupported citations. Please try again.") from None
 
 
-def coverage_notes(facts):
-    notes = []
+CREATIVE = re.compile(r"\b(write|compose|create|generate|make|tell|give)\b[^?.]{0,40}\b(poem|poetry|story|song|lyrics|joke|limerick|haiku|"
+                      r"sonnet|essay|rap|novel|fan ?fiction)\b", re.I)
+ABOUT_SERVERS = re.compile(r"\b(servers?|mcp|tools?|registry|packages?|advisor\w*|vulnerab\w*)\b", re.I)
+FINDINGS_STATS = ("stats:severity", "stats:direct", "stats:ranking")
+COVERAGE_STATED = re.compile(r"\bonly\b[^.]*\b(check|assess)\w*|\bcoverage\b|\bnot (been )?(assessed|checked)\b", re.I)
+REPORTS_NONE = re.compile(r"\bno (known )?(advisor\w*|findings?|vulnerabilit\w*)\b|\bnone (were |was )?found\b|\bnothing (was )?found\b", re.I)
+SAFETY_CAVEAT = re.compile(r"\bnot (proof|prove\w*|a guarantee|guarantee\w*|necessarily)\b|\b(does not|doesn't|do not|cannot) (prove|mean|guarantee|establish|show)\b"
+                           r"|\bno guarantee\b|\bnot\b[^.]{0,40}\b(safe|secure)\b", re.I)
+CHECKED_NONE = ("no_known_findings_in_completed_checks", "checked, no known advisories")
+SECURITY_TOPIC = re.compile(r"vulnerab|advisor|secur|safe|risk|\bcves?\b|finding|package|danger|assess|severity|exposure|clean", re.I)
+SAYS_NOT_APPLICABLE = re.compile(r"not applicable|(does not|doesn't|do not|cannot) apply|no package\b[^.]*\bappl", re.I)
+
+
+def coverage_notes(facts, answer="", query=""):
+    text, notes = answer.lower(), []
+    security = bool(SECURITY_TOPIC.search(query))
     for f in facts:
-        content, name = f["content"], f["title"].split(": ")[0]
-        if "not applicable: no package is declared" in content:
-            notes.append(f"{name}: package checks are not applicable (no declared package). This is not a clean result.")
-        elif "checks could not complete" in content:
-            notes.append(f"{name}: eligible package checks could not complete, so its advisory count is unknown.")
-        elif "not assessed: no package lookup" in content:
-            notes.append(f"{name}: no package lookup is recorded, so its advisory count is unknown.")
-        if "Tool metadata: not observed" in content:
-            notes.append(f"{name}: tool metadata was not observed; this does not mean it has no tools.")
+        if f.get("kind") != "assessment":
+            continue
+        content, name, parts = f["content"], f["title"].split(": ")[0], []
+        unknown = "checks could not complete" in content or "not assessed: no package lookup" in content
+        if security and "not applicable: no package is declared" in content and not SAYS_NOT_APPLICABLE.search(text):
+            parts.append("package advisory checks are not applicable (no declared package); this is not a clean result")
+        elif security and unknown and "unknown" not in text:
+            parts.append("its advisory count is unknown, not zero")
+        if "Tool metadata: not observed" in content and re.search(r"\btools?\b", query, re.I) and "not observed" not in text:
+            parts.append("tool metadata was not observed, which does not mean it has no tools")
+        if parts:
+            notes.append(f"{name}: " + "; ".join(parts) + ".")
     return notes
+
+
+def findings_note(cited, scope, text, bucket):
+    if scope or not cited & set(FINDINGS_STATS) or COVERAGE_STATED.search(text):
+        return []
+    checked = snapshot_info(bucket)["checked"]
+    return [f"Only the {checked:,} servers whose declared npm, PyPI, NuGet or Cargo package versions were checked can have findings; "
+            "the others are not counted and are not shown to be clean."]
+
+
+def safety_note(cited_sources, text):
+    if not REPORTS_NONE.search(text) or SAFETY_CAVEAT.search(text):
+        return []
+    if not any(marker in (s.get("content") or "") for s in cited_sources for marker in CHECKED_NONE):
+        return []
+    return ["No known findings in completed checks is not proof of safety: only the declared package versions were checked."]
+
+
+def scope_names(ids):
+    if not ids:
+        return []
+    names = {r["server_id"]: r["registry_name"] for r in fetch_all(
+        "SELECT server_id, registry_name FROM servers WHERE server_id = ANY(%(ids)s)", {"ids": list(ids)})}
+    return [{"server_id": sid, "registry_name": names[sid]} for sid in ids if sid in names]
 
 
 def answer_question(question):
@@ -557,52 +752,62 @@ def answer_question(question):
         prior = " ".join(t.content[:500] for t in question.history[-4:] if t.role == "user")
         retrieval_start = time.perf_counter()
         requested = list(dict.fromkeys(question.server_ids))
-        facts = server_facts(requested) if requested and question.use_retrieval else []
-        scope = [f["server_id"] for f in facts]
-        named = re.findall(r"\b(?:[A-Za-z0-9_-]+\.)+[A-Za-z0-9_-]+/[A-Za-z0-9_./-]+", query)
-        mentioned = []
-        if named and not requested and question.use_retrieval:
-            rows = fetch_all("SELECT server_id FROM servers WHERE lower(registry_name) = ANY(%(names)s) AND registry_status <> 'deleted' "
-                             "ORDER BY registry_name LIMIT 4", {"names": [n.rstrip("?.,").lower() for n in named]})
-            mentioned = server_facts([r["server_id"] for r in rows])
+        selected = scope_names(requested)
+        scope, scope_source, missing_names = resolve_scope(question, query) if question.use_retrieval else ([], "none", [])
+        facts = server_facts(scope) if scope else []
+        used = [{"server_id": f["server_id"], "registry_name": f["title"].split(": ")[0]} for f in facts if f["kind"] == "registry_record"]
+        scope = [u["server_id"] for u in used]
+        lookups = lookup_facts(missing_names) if missing_names else []
+        only_missing = bool(missing_names) and not scope
+        creative = bool(CREATIVE.search(query)) and not ABOUT_SERVERS.search(query) and not scope and not missing_names
         top_k = min(10, max(question.top_k, 8)) if not scope and DISCOVERY.search(query) else question.top_k
         try:
-            sources = retrieve((prior + " " + query).strip(), top_k, scope) if question.use_retrieval else []
+            sources = retrieve((prior + " " + query).strip(), top_k, scope) if question.use_retrieval and not only_missing and not creative else []
         except psycopg.errors.UndefinedTable:
             raise HTTPException(503, MISSING_TABLE + ", then: docker compose exec backend python -m app.ai index") from None
         extra, bucket = [], int(time.time() // 600)
-        if question.use_retrieval:
-            if INVENTORY.search(query):
-                extra += inventory_facts(bucket)
-            if SEVERITY.search(query):
-                levels = ("CRITICAL",) if re.search(r"\bcritical\b", query, re.I) else ("CRITICAL", "HIGH")
-                extra += severity_facts(levels, bucket)
-            if COVERAGE.search(query):
-                extra += assessment_facts(bucket)
-            if TOOL_QUESTION.search(query):
-                extra += tool_facts(bucket)
+        if question.use_retrieval and not only_missing and not creative:
+            if not scope:
+                if INVENTORY.search(query):
+                    extra += inventory_facts(bucket)
+                if SEVERITY.search(query):
+                    levels = ("CRITICAL",) if re.search(r"\bcritical\b", query, re.I) else ("CRITICAL", "HIGH")
+                    extra += severity_facts(levels, bucket)
+                if COVERAGE.search(query):
+                    extra += assessment_facts(bucket)
+                if TOOL_QUESTION.search(query):
+                    extra += tool_facts(bucket)
+                if DIRECT.search(query):
+                    extra += direct_facts(bucket)
             if ids := ADVISORY.findall(query):
                 extra += advisory_facts(ids)
             if DEFINITION.search(query):
                 extra += methodology_source()
         unique = {}
-        for source in facts + mentioned + extra + sources:
+        for source in facts + lookups + extra + sources:
             unique.setdefault(source["citation_id"], source)
         sources = list(unique.values())[:MAX_SOURCES]
         retrieval_ms = round((time.perf_counter() - retrieval_start) * 1000, 1)
-        missing_identity = question.use_retrieval and not scope and any(not any(
-            s["title"].lower().startswith(name.rstrip('.').lower() + ':') for s in sources) for name in named)
         live_compromise = re.search(r"\b(compromised|breached|hacked|exploited)\b.*\b(today|now|currently)\b", query, re.I)
         if live_compromise:
             answer = Answer(answer="The stored historical evidence cannot establish whether a server was compromised today. "
                             "MCP Sentinel does not collect live compromise telemetry.", status="insufficient_evidence",
                             citation_ids=[], limitations=["Historical vulnerability findings do not establish a current compromise."])
             usage = {}
-        elif missing_identity:
-            answer = Answer(answer="The retrieved evidence does not contain the exact server you named. "
-                            "I cannot substitute another server or establish its security status.", status="insufficient_evidence",
-                            citation_ids=[], limitations=["No matching server evidence was retrieved."])
-            sources = []
+        elif creative:
+            answer = Answer(answer="I only answer questions about MCP Sentinel's stored MCP server security data, so I can't write that. "
+                            "You could ask, for example: \"Which servers have critical package advisories?\"",
+                            status="insufficient_evidence", citation_ids=[], limitations=[])
+            usage = {}
+        elif only_missing:
+            info = snapshot_info(bucket)
+            when = str(info["collected_at"])[:10] if info["collected_at"] else "date not recorded"
+            listed = " and ".join(missing_names)
+            answer = number_citations(Answer(
+                answer=f"{listed} {'is' if len(missing_names) == 1 else 'are'} not in the stored registry snapshot of {when} "
+                       f"[{', '.join(f['citation_id'] for f in lookups)}]. An exact name search of all {info['records']:,} registry records "
+                       "found no match, so MCP Sentinel has no version, package or vulnerability data to report.",
+                status="insufficient_evidence", citation_ids=[f["citation_id"] for f in lookups], limitations=[]), sources)
             usage = {}
         elif question.use_retrieval and not sources:
             answer = Answer(answer="The indexed project data does not contain enough evidence to answer this question.",
@@ -614,10 +819,14 @@ def answer_question(question):
         shown = [{**s, "ref": i + 1, "cited": s["citation_id"] in cited, "source_name": SOURCE_NAMES.get(s.get("kind"), s.get("kind")),
                   "registry_name": s.get("title", "").split(": ")[0] if s.get("server_id") else None, "excerpt": excerpt(s)}
                  for i, s in enumerate(sources)]
+        known = {s["server_id"] for s in selected}
         return {**answer.model_dump(), "sources": shown, "strategy": question.strategy, "use_retrieval": question.use_retrieval,
-                "scope": [{"server_id": f["server_id"], "registry_name": f["title"].split(": ")[0]} for f in facts],
-                "missing_scope": [sid for sid in requested if sid not in scope], "coverage_notes": coverage_notes(facts + mentioned),
-                "top_k_used": top_k, "model": os.environ.get("OPENAI_CHAT_MODEL", "gpt-4.1-mini"),
+                "scope": used, "scope_source": scope_source if used or missing_names else "none", "selected_scope": selected,
+                "ignored_scope": [s for s in selected if s["server_id"] not in scope], "not_found": missing_names,
+                "missing_scope": [sid for sid in requested if sid not in known],
+                "coverage_notes": coverage_notes(facts, answer.answer, query) + findings_note(cited, scope, answer.answer, bucket)
+                + safety_note([s for s in sources if s["citation_id"] in cited], answer.answer),
+                "top_k_used": top_k, "model": os.environ.get("OPENAI_CHAT_MODEL", "gpt-4.1-mini"), "prompt_sha256": prompt_fingerprint(),
                 "retrieval_ms": retrieval_ms, "latency_ms": round((time.perf_counter() - started) * 1000, 1),
                 "input_tokens": usage.get("input_tokens", 0), "output_tokens": usage.get("output_tokens", 0)}
     finally:

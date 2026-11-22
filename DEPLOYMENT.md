@@ -135,6 +135,7 @@ A new install starts with an **empty** database. Load demo data or restore the d
 | Look up all packages again (research) | `.venv/bin/python -I scripts/enrich_packages.py` |
 | Build or update the AI index | `docker compose exec backend python -m app.ai index` |
 | Check the AI setup | `docker compose exec backend python -c "import urllib.request; print(urllib.request.urlopen('http://localhost:8000/api/ai/status').read().decode())"` |
+| Run the AI benchmark | `./scripts/run_benchmark.sh run --repeat 3` (section 11) |
 | Run report queries | `./scripts/run_report_queries.sh` |
 | Open SQL shell | `docker compose exec db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"'` |
 | Stop, keep data | `docker compose stop` or `docker compose down` |
@@ -197,7 +198,7 @@ API:
 
 | Route | Does |
 |---|---|
-| `GET /api/ai/status` | key present (not tested), model names, chunk count, last index time |
+| `GET /api/ai/status` | key present (not tested), model names, chunk count, last index time, `prompt_sha256` (changes when the prompt changes) |
 | `POST /api/ai/chat` | `question`, `history`, `strategy` (`zero_shot`/`few_shot`), `top_k`, `use_retrieval`, `server_ids` (up to 4: scope) |
 
 How answers are built:
@@ -209,11 +210,25 @@ How answers are built:
 | Not assessed, not applicable, coverage | live SQL counts per assessment state |
 | Tool metadata, input schemas | live SQL counts per tool metadata state |
 | A CVE or GHSA id | live SQL count of servers with that advisory |
-| A scoped or named server | live SQL facts for that server, including "not applicable" for remote-only servers |
+| A named, follow-up or selected server | exact SQL lookups: the stored registry record (version, status, deployment, packages, repository, snapshot date) and the assessment record (advisory state, checks, tool metadata) |
+| A server name that is not in the registry | fixed answer "not in the stored registry snapshot" with the snapshot date and record count; no model call |
+| Direct advisories | live SQL count and ranking of servers with direct package findings (ties by name) |
+| Requests to write poems, stories or jokes | fixed redirect to MCP security questions; no model call |
 | Definitions ("what does … mean") | the methodology note |
 | Broad discovery ("find three …") | at least 8 retrieved sources, never more than 10 |
 
 Answers cite sources inline as `[1]`, `[2]`. Every number is checked against the sources actually supplied; unknown references are removed, and an answer without any verified citation is shown as "insufficient evidence".
+
+Which servers an answer uses (first match wins):
+
+1. Servers named in the question by exact registry name. Selected servers are added only if the question says "selected".
+2. A follow-up ("it", "those two"): the servers the previous answer used.
+3. The selected scope.
+4. Otherwise the whole database. Count and ranking questions ("how many servers …") use the whole database even when servers are selected.
+
+The response returns `scope`, `scope_source`, `ignored_scope` (selected but not used) and `not_found`. The app shows "Scope used" under each answer. "New chat" clears the conversation and the scope.
+
+Notes under an answer: one per server and only for security questions, when the answer does not already say it (not applicable, unknown, tools not observed). Lists of servers with findings get one coverage note, and "checked, none found" answers get a "not proof of safety" note, when the answer leaves them out.
 
 Add the AI table to a database made by an older version (keeps all data):
 
@@ -286,7 +301,11 @@ docker compose run --rm --entrypoint python analytics -m pytest -q tests/test_an
 | `GET /api/servers` | one page of results; filters `q`, `status`, `ecosystem`, `deployment`, `has_repository`, `github`, `assessment`, `has_tools`, `tool_info` (repeatable: `listed`, `count_observed`, `observed_none`, `not_observed`), `tool_hints`; `sort`, `page`, `page_size` |
 | `GET /api/servers/export` | every matching server, same filters and order, streamed as JSON lines; the app turns it into CSV |
 
-Search counts and pages on cheap columns, then computes the security summary only for the rows on the page. A page takes about 0.1 s on the full database, and 60 concurrent page requests all succeed.
+Search counts and pages on cheap columns, then computes the security summary only for the rows on the page. On the full database a page takes about 0.03 s sorted by name, 0.3 s sorted by concerns, and under 0.9 s with an assessment filter and the concerns sort. 60 concurrent page requests all succeed. The API turns off PostgreSQL JIT for its own connections, because compiling these short queries cost up to 0.45 s each.
+
+Rows per page: 10, 25, 50 or 100 (the API accepts 1–100). Changing it keeps the first visible row on screen and keeps selections on other pages.
+
+Look: `frontend/.streamlit/config.toml` holds the theme (`[theme]`, `[theme.sidebar]`). Text inputs, the chat box and select boxes are white with a `#8C93A0` border (3:1 contrast) and a blue focus ring; disabled ones stay grey. The CSS is in `THEME_CSS` in `frontend/app.py` and targets Streamlit `data-testid` attributes, not generated class names.
 
 Every API response carries an `X-Request-ID` header. The backend logs one JSON line per request (`request_id`, `path`, `status`, `ms`) and a `database_error` line with a reason when the database fails:
 
@@ -298,4 +317,30 @@ Every API response carries an `X-Request-ID` header. The backend logs one JSON l
 | `schema_missing` | tables are missing | `docker compose run --rm importer migrate` |
 
 Find a request in the logs: `docker compose logs backend | grep <request id>`.
+
+## 11. AI benchmark
+
+28 questions with known answers (`docs/benchmark/cases.json`), plus one prompt-injection check that is reported but not counted. Each answer is scored on five things: correct value, correct wording for unknown / not applicable / checked-none-found, correct servers, valid citations, short answer without raw source IDs.
+
+The correct answers come from read-only SQL on the base tables, not from the AI code, and are frozen per registry snapshot in `docs/benchmark/gold/`. The gold file for the shipped database is already in the repository.
+
+Needs the app running with `OPENAI_API_KEY` and the AI index. One run is about 31 requests (about $0.03).
+
+```bash
+./scripts/run_benchmark.sh run --repeat 3
+```
+
+| Option | Does |
+|---|---|
+| `--repeat N` | run every case N times (1–5) and report cases whose result changed |
+| `--cases 01,25,26` | run only these cases |
+| `--strategy zero_shot` | use the zero-shot prompt (default `few_shot`) |
+
+After loading different data, freeze new correct answers first (refuses to overwrite unless `--force`):
+
+```bash
+./scripts/run_benchmark.sh freeze
+```
+
+`run` stops if the database no longer matches the frozen answers. Each run writes `docs/benchmark/results/<time>_<model>_<test set>.json` and `.md` (every answer, sources, scores, failures with expected vs actual) and adds one line to `docs/benchmark/history.csv` (model, prompt fingerprint, index date, Git commit, pass rate). Old results are never overwritten. Run it again after any change to the prompt, model, index or SQL routing.
 

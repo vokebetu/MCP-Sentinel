@@ -71,3 +71,25 @@ def test_503_message_does_not_claim_the_api_is_down():
     assert error.kind == "http_503" and "API is up" in error.message and "not reachable" not in error.message
     assert "abc123" in ui.error_message(error) and "kept" in ui.error_message(error)
     assert ui.http_error(500, {"detail": "boom"}).kind == "http_error"
+
+
+def test_resize_page_keeps_first_visible_row():
+    assert ui.PAGE_SIZES == (10, 25, 50, 100)
+    assert ui.resize_page(3, 25, 10) == 6 and ui.resize_page(6, 10, 25) == 3 and ui.resize_page(1, 100, 10) == 1 and ui.resize_page(4, 10, 100) == 1
+    assert ui.resize_page(0, 25, 50) == 1
+
+
+def test_scope_caption_shows_effective_and_ignored_scope():
+    result = {"scope": [{"server_id": 3, "registry_name": "ac.snag/snag"}], "scope_source": "question", "not_found": [],
+              "ignored_scope": [{"server_id": 1, "registry_name": "ai.azquo/azquo"}, {"server_id": 2, "registry_name": "ai.leadmcp/leadmcp"}]}
+    assert ui.scope_caption(result) == ("Scope used: ac.snag/snag (named in the question) · Selected but not used for this answer: "
+                                     "ai.azquo/azquo, ai.leadmcp/leadmcp")
+    assert ui.scope_caption({"scope": [], "scope_source": "question", "not_found": ["zz.x/y"], "ignored_scope": []}) == \
+        "Scope used: all servers · Not in the registry snapshot: zz.x/y"
+    assert ui.scope_caption({}) == "Scope used: all servers"
+
+
+def test_answer_notes_are_deduplicated_into_one_list():
+    result = {"status": "insufficient_evidence", "coverage_notes": ["a/b: not applicable."], "limitations": ["A/B: not applicable", "Other."]}
+    assert ui.answer_notes(result) == ["The available evidence is insufficient for a complete answer.", "a/b: not applicable.", "Other."]
+    assert ui.answer_notes({"status": "insufficient_evidence", "not_found": ["x.y/z"], "limitations": []}) == []

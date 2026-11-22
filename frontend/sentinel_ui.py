@@ -224,3 +224,36 @@ def error_message(error):
             "http_503": "Your filters and selections are kept; try again in a moment.", "http_error": "Your filters and selections are kept."}
     suffix = f" Request id: {error.request_id}." if error.request_id else ""
     return f"{error.message} {hint.get(error.kind, '')}{suffix}".strip()
+
+
+PAGE_SIZES = (10, 25, 50, 100)
+SCOPE_SOURCES = {"question": "named in the question", "follow_up": "from the previous answer", "selection": "selected scope",
+                 "question+selection": "named in the question and selected"}
+
+
+def resize_page(page, old_size, new_size):
+    return ((max(1, page) - 1) * old_size) // new_size + 1
+
+
+def scope_caption(result):
+    used = ", ".join(s["registry_name"] for s in result.get("scope") or [])
+    text = f"Scope used: {used} ({SCOPE_SOURCES[result['scope_source']]})" if used and result.get("scope_source") in SCOPE_SOURCES \
+        else f"Scope used: {used}" if used else "Scope used: all servers"
+    if result.get("not_found"):
+        text += " · Not in the registry snapshot: " + ", ".join(result["not_found"])
+    if result.get("ignored_scope"):
+        text += " · Selected but not used for this answer: " + ", ".join(s["registry_name"] for s in result["ignored_scope"])
+    return text
+
+
+def answer_notes(result):
+    notes = list(result.get("coverage_notes") or []) + list(result.get("limitations") or [])
+    if result.get("status") == "insufficient_evidence" and not result.get("not_found"):
+        notes.insert(0, "The available evidence is insufficient for a complete answer.")
+    seen, unique = set(), []
+    for note in notes:
+        key = " ".join(note.lower().split()).rstrip(".")
+        if key and key not in seen:
+            seen.add(key)
+            unique.append(note.strip())
+    return unique
